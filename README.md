@@ -6,10 +6,42 @@ This repository contains lab reports and manuals for the Artificial Neural Netwo
 
 - **Lab Reports/**: Contains individual lab report folders (Lab 1 through Lab 12)
 - **Lab Manuals/**: Contains lab manual documents and resources
+- **Lab 1/**, **Lab 2/**, etc.: Contains lab implementation files and reports
 
-## Lab Reports
+## Virtual Environment Setup
 
-Each lab report folder (Lab 1 - Lab 12) is organized for individual lab assignments.
+This project uses a single virtual environment for all labs.
+
+### Initial Setup
+
+1. Create virtual environment:
+   ```bash
+   python3 -m venv venv
+   ```
+
+2. Activate virtual environment:
+   ```bash
+   source venv/bin/activate  # macOS/Linux
+   # or
+   venv\Scripts\activate  # Windows
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Using the Virtual Environment
+
+- **Activate**: `source venv/bin/activate` (macOS/Linux) or `venv\Scripts\activate` (Windows)
+- **Deactivate**: `deactivate`
+- **Check if active**: Look for `(venv)` prefix in your terminal prompt
+
+## Requirements
+
+- Python 3.8 or higher
+- NumPy >= 1.24.0
+- Matplotlib >= 3.7.0
 
 ## Usage
 
