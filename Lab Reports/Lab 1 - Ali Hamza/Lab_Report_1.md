@@ -6,7 +6,7 @@
 **Course Name:** Artificial Neural Networks Lab  
 **Lab Number:** 1  
 **Lab Title:** Installation and Setup of Cursor IDE  
-**Date:** [Date]
+**Date:** January 26, 2026
 
 **Name:** Ali Hamza  
 **Roll Number:** B23F0063AI106  
@@ -143,15 +143,23 @@ Cursor is an AI-powered code editor built on Visual Studio Code. This report doc
 
 ### Version Information
 
-- **Cursor Version**: [Version Number]
-- **Installation Date**: [Date]
-- **Operating System**: [Your OS and Version]
+- **Cursor Version**: 2.4.21
+- **Installation Date**: January 26, 2026
+- **Operating System**: macOS 26.2
 
 ---
 
 ## Conclusion
 
-[**Write your own conclusion here. Describe what you learned from this lab in your own words. Do not copy-paste or use AI-generated content.**]
+This lab provided me with hands-on experience in installing and configuring a modern development environment. Through the process of downloading and installing Cursor IDE, I learned the importance of following systematic installation procedures and understanding the differences between installation methods on different operating systems.
+
+The installation process was straightforward, and I was able to successfully set up Cursor IDE on my macOS system. I found the drag-and-drop installation method on macOS to be intuitive, and the application launched without any issues. During the configuration phase, I learned how to customize the editor settings to match my preferences, which will help improve my coding productivity.
+
+Installing the Python and Jupyter extensions was particularly important for this course, as we will be working with neural networks and machine learning projects. The extension marketplace made it easy to find and install the necessary tools. I also appreciated how Cursor's AI features are integrated directly into the editor, making it accessible through a simple keyboard shortcut.
+
+The verification process helped me understand the importance of testing software installations to ensure all components are working correctly. I was able to confirm that file operations, code editing, syntax highlighting, and the integrated terminal all functioned as expected.
+
+Overall, this lab taught me valuable skills in setting up development tools, which is essential for any programming work. The experience of configuring an IDE from scratch gave me confidence in managing my development environment, and I now feel prepared to use Cursor IDE effectively for the upcoming labs in this course.
 
 ---
 
@@ -175,4 +183,4 @@ Cursor is an AI-powered code editor built on Visual Studio Code. This report doc
 **Prepared by:** Ali Hamza  
 **Roll Number:** B23F0063AI106  
 **Section:** B.S AI - Red  
-**Date:** [Date]
+**Date:** January 26, 2026
