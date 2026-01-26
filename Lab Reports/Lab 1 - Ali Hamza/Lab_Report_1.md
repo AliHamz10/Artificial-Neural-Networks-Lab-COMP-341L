@@ -46,8 +46,9 @@ Cursor is an AI-powered code editor built on Visual Studio Code. This report doc
 
 ### Screenshot
 
-**Figure 1.1:** Cursor website download page  
-*Location: `screenshots/01_cursor_website_download.png`*
+**Figure 1.1:** Cursor website download page
+
+![Cursor website download page](screenshots/01_cursor_website_download.png)
 
 ---
 
@@ -69,8 +70,9 @@ Cursor is an AI-powered code editor built on Visual Studio Code. This report doc
 
 ### Screenshot
 
-**Figure 2.1:** Installation process  
-*Location: `screenshots/02_installation_process.png`*
+**Figure 2.1:** Installation process
+
+![Installation process](screenshots/02_installation_process.png)
 
 ---
 
@@ -86,8 +88,9 @@ Cursor is an AI-powered code editor built on Visual Studio Code. This report doc
 
 ### Screenshot
 
-**Figure 3.1:** Main Cursor interface  
-*Location: `screenshots/03_cursor_main_interface.png`*
+**Figure 3.1:** Main Cursor interface
+
+![Main Cursor interface](screenshots/03_cursor_main_interface.png)
 
 ---
 
@@ -108,8 +111,9 @@ Cursor is an AI-powered code editor built on Visual Studio Code. This report doc
 
 ### Screenshot
 
-**Figure 4.1:** Settings and extensions configuration  
-*Location: `screenshots/04_settings_extensions.png`*
+**Figure 4.1:** Settings and extensions configuration
+
+![Settings and extensions configuration](screenshots/04_settings_extensions.png)
 
 ---
 
@@ -123,23 +127,18 @@ Cursor is an AI-powered code editor built on Visual Studio Code. This report doc
 4. Test code editing: Create a Python file and verify syntax highlighting
 5. Test terminal: Open integrated terminal (`` Ctrl+` ``)
 
-### Screenshot
-
-**Figure 5.1:** About Cursor showing version information  
-*Location: `screenshots/05_about_cursor_verification.png`*
-
 ---
 
 ## Results and Observations
 
 ### Installation Summary
 
-- ✅ Cursor IDE downloaded successfully
-- ✅ Installation completed without errors
-- ✅ Application launches correctly
-- ✅ Settings configured
-- ✅ Extensions installed
-- ✅ All features working properly
+- Cursor IDE downloaded successfully
+- Installation completed without errors
+- Application launches correctly
+- Settings configured
+- Extensions installed
+- All features working properly
 
 ### Version Information
 
@@ -176,7 +175,6 @@ Overall, this lab taught me valuable skills in setting up development tools, whi
 2. **02_installation_process.png** - Installation process
 3. **03_cursor_main_interface.png** - Main Cursor interface
 4. **04_settings_extensions.png** - Settings and extensions
-5. **05_about_cursor_verification.png** - Version verification
 
 ---
 
