@@ -15,14 +15,14 @@ import matplotlib.pyplot as plt
 # ============================================================================
 # Three speech-related features for stress detection:
 # 1. Speech rate (words per minute) - normalized to 0-1 scale
-# 2. Pitch variation (standard deviation of pitch) - normalized to 0-1 scale  
+# 2. Pitch variation (standard deviation of pitch) - normalized to 0-1 scale
 # 3. Pause duration (average pause length) - normalized to 0-1 scale
 
 # Simulate input values for demonstration
 # Example: A person speaking quickly with high pitch variation and short pauses
-speech_rate = 0.85      # High speech rate (0 = slow, 1 = fast)
+speech_rate = 0.85  # High speech rate (0 = slow, 1 = fast)
 pitch_variation = 0.72  # Moderate-high pitch variation (0 = flat, 1 = very shaky)
-pause_duration = 0.25   # Short pauses (0 = long pauses, 1 = no pauses)
+pause_duration = 0.25  # Short pauses (0 = long pauses, 1 = no pauses)
 
 inputs = np.array([speech_rate, pitch_variation, pause_duration])
 print("=" * 70)
@@ -46,7 +46,9 @@ print(f"  Pause Duration: {pause_duration:.2f}")
 
 weights = np.array([0.4, 0.5, 0.1])
 print(f"\nWeights (Importance):")
-print(f"  Speech Rate Weight: {weights[0]:.1f} (Moderate - fast speech may indicate stress)")
+print(
+    f"  Speech Rate Weight: {weights[0]:.1f} (Moderate - fast speech may indicate stress)"
+)
 print(f"  Pitch Variation Weight: {weights[1]:.1f} (HIGHEST - key stress indicator)")
 print(f"  Pause Duration Weight: {weights[2]:.1f} (LOWEST - less reliable)")
 
@@ -69,25 +71,31 @@ print(f"  Low/negative bias → strict (needs strong evidence)")
 # ============================================================================
 weighted_sum = np.dot(inputs, weights) + bias
 print(f"\nWeighted Sum (Evidence): {weighted_sum:.4f}")
-print(f"  Calculation: ({speech_rate:.2f} × {weights[0]:.1f}) + "
-      f"({pitch_variation:.2f} × {weights[1]:.1f}) + "
-      f"({pause_duration:.2f} × {weights[2]:.1f}) + ({bias:.1f}) = {weighted_sum:.4f}")
+print(
+    f"  Calculation: ({speech_rate:.2f} × {weights[0]:.1f}) + "
+    f"({pitch_variation:.2f} × {weights[1]:.1f}) + "
+    f"({pause_duration:.2f} × {weights[2]:.1f}) + ({bias:.1f}) = {weighted_sum:.4f}"
+)
 
 # ============================================================================
 # STEP 5: Apply Different Activation Functions
 # ============================================================================
 
+
 def sigmoid(z):
     """Sigmoid activation: smooth S-curve, outputs 0-1"""
     return 1 / (1 + np.exp(-z))
+
 
 def tanh(z):
     """Hyperbolic tangent: outputs -1 to 1, centered at zero"""
     return np.tanh(z)
 
+
 def relu(z):
     """Rectified Linear Unit: linear for positive, zero for negative"""
     return np.maximum(0, z)
+
 
 # Apply activations
 output_sigmoid = sigmoid(weighted_sum)
@@ -113,38 +121,70 @@ plt.figure(figsize=(12, 5))
 
 # Plot 1: All activations together
 plt.subplot(1, 2, 1)
-plt.plot(z_range, sigmoid_vals, label='Sigmoid', linewidth=2)
-plt.plot(z_range, tanh_vals, label='Tanh', linewidth=2)
-plt.plot(z_range, relu_vals, label='ReLU', linewidth=2)
-plt.axvline(x=weighted_sum, color='red', linestyle='--', linewidth=1.5, 
-            label=f'Our Input (z={weighted_sum:.2f})')
-plt.axhline(y=0, color='black', linestyle='-', linewidth=0.5)
-plt.axvline(x=0, color='black', linestyle='-', linewidth=0.5)
-plt.xlabel('Weighted Sum (z)', fontsize=11)
-plt.ylabel('Activation Output', fontsize=11)
-plt.title('Activation Functions Comparison', fontsize=12, fontweight='bold')
+plt.plot(z_range, sigmoid_vals, label="Sigmoid", linewidth=2)
+plt.plot(z_range, tanh_vals, label="Tanh", linewidth=2)
+plt.plot(z_range, relu_vals, label="ReLU", linewidth=2)
+plt.axvline(
+    x=weighted_sum,
+    color="red",
+    linestyle="--",
+    linewidth=1.5,
+    label=f"Our Input (z={weighted_sum:.2f})",
+)
+plt.axhline(y=0, color="black", linestyle="-", linewidth=0.5)
+plt.axvline(x=0, color="black", linestyle="-", linewidth=0.5)
+plt.xlabel("Weighted Sum (z)", fontsize=11)
+plt.ylabel("Activation Output", fontsize=11)
+plt.title("Activation Functions Comparison", fontsize=12, fontweight="bold")
 plt.legend()
 plt.grid(True, alpha=0.3)
 
 # Plot 2: Zoomed view around our input
 plt.subplot(1, 2, 2)
 zoom_range = np.linspace(weighted_sum - 1, weighted_sum + 1, 200)
-plt.plot(zoom_range, sigmoid(zoom_range), label='Sigmoid', linewidth=2.5, marker='o', markersize=3)
-plt.plot(zoom_range, tanh(zoom_range), label='Tanh', linewidth=2.5, marker='s', markersize=3)
-plt.plot(zoom_range, relu(zoom_range), label='ReLU', linewidth=2.5, marker='^', markersize=3)
-plt.axvline(x=weighted_sum, color='red', linestyle='--', linewidth=2, 
-            label=f'Input z={weighted_sum:.2f}')
-plt.scatter([weighted_sum], [output_sigmoid], color='blue', s=100, zorder=5, label='Sigmoid Output')
-plt.scatter([weighted_sum], [output_tanh], color='green', s=100, zorder=5, label='Tanh Output')
-plt.scatter([weighted_sum], [output_relu], color='orange', s=100, zorder=5, label='ReLU Output')
-plt.xlabel('Weighted Sum (z)', fontsize=11)
-plt.ylabel('Activation Output', fontsize=11)
-plt.title('Zoomed View: Our Neuron Output', fontsize=12, fontweight='bold')
+plt.plot(
+    zoom_range,
+    sigmoid(zoom_range),
+    label="Sigmoid",
+    linewidth=2.5,
+    marker="o",
+    markersize=3,
+)
+plt.plot(
+    zoom_range, tanh(zoom_range), label="Tanh", linewidth=2.5, marker="s", markersize=3
+)
+plt.plot(
+    zoom_range, relu(zoom_range), label="ReLU", linewidth=2.5, marker="^", markersize=3
+)
+plt.axvline(
+    x=weighted_sum,
+    color="red",
+    linestyle="--",
+    linewidth=2,
+    label=f"Input z={weighted_sum:.2f}",
+)
+plt.scatter(
+    [weighted_sum],
+    [output_sigmoid],
+    color="blue",
+    s=100,
+    zorder=5,
+    label="Sigmoid Output",
+)
+plt.scatter(
+    [weighted_sum], [output_tanh], color="green", s=100, zorder=5, label="Tanh Output"
+)
+plt.scatter(
+    [weighted_sum], [output_relu], color="orange", s=100, zorder=5, label="ReLU Output"
+)
+plt.xlabel("Weighted Sum (z)", fontsize=11)
+plt.ylabel("Activation Output", fontsize=11)
+plt.title("Zoomed View: Our Neuron Output", fontsize=12, fontweight="bold")
 plt.legend()
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('task1_activation_comparison.png', dpi=150, bbox_inches='tight')
+plt.savefig("task1_activation_comparison.png", dpi=150, bbox_inches="tight")
 plt.show()
 
 # ============================================================================
@@ -163,9 +203,11 @@ print(f"   - ReLU ({output_relu:.4f}): Hard threshold at zero")
 print(f"     → Either activates (positive) or stays silent (zero)")
 
 print(f"\n2. CONFIDENCE:")
-print(f"   - Sigmoid: {output_sigmoid:.4f} = {output_sigmoid*100:.1f}% confidence in stress")
+print(
+    f"   - Sigmoid: {output_sigmoid:.4f} = {output_sigmoid * 100:.1f}% confidence in stress"
+)
 print(f"   - Tanh: {output_tanh:.4f} = moderate positive activation")
-print(f"   - ReLU: {output_relu:.4f} = {output_relu*100:.1f}% of maximum activation")
+print(f"   - ReLU: {output_relu:.4f} = {output_relu * 100:.1f}% of maximum activation")
 
 print(f"\n3. SUPPRESSION vs AMPLIFICATION:")
 print(f"   - Sigmoid: Only amplifies (0 to 1), cannot suppress")
