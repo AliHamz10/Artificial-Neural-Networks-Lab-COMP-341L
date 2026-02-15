@@ -1,0 +1,18 @@
+{
+  "perceptron_and_epochs": 3,
+  "perceptron_or_epochs": 3,
+  "perceptron_and_converged": true,
+  "perceptron_or_converged": true,
+  "adaline_and_epochs": 500,
+  "adaline_and_final_mse": 0.25432525951557095,
+  "adaline_or_epochs": 500,
+  "adaline_or_final_mse": 0.25432525951557095,
+  "perceptron_xor_last_misclass": 4,
+  "adaline_xor_final_mse": 1.0173010380622838,
+  "adaline_xor_weights": [
+    -1.3877787807814457e-17,
+    0.05882352941176469,
+    0.11764705882352944
+  ],
+  "adaline_xor_decision_boundary_eq": "-0.0000 + 0.0588*x1 + 0.1176*x2 = 0"
+}
