@@ -24,6 +24,7 @@ Temporary Items
 
 # IDE
 .vscode/
+.cursor/
 .idea/
 *.swp
 *.swo
