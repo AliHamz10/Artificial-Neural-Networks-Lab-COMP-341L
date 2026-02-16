@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratory Report 5: Dropout, BatchNorm, and Optimizers — Zarmeena Jawad</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #222; }
+    h1 { font-size: 1.75rem; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; }
+    h2 { font-size: 1.35rem; margin-top: 2rem; }
+    h3 { font-size: 1.1rem; margin-top: 1.25rem; }
+    hr { border: none; border-top: 1px solid #ddd; margin: 1.5rem 0; }
+    p { margin: 0.75rem 0; }
+    ul { margin: 0.75rem 0; padding-left: 1.5rem; }
+    li { margin: 0.35rem 0; }
+    code, pre { background: #f5f5f5; font-family: ui-monospace, monospace; font-size: 0.9em; }
+    code { padding: 0.15em 0.4em; border-radius: 3px; }
+    pre { padding: 1rem; overflow-x: auto; border-radius: 6px; margin: 1rem 0; }
+    pre code { padding: 0; background: none; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem 0.75rem; text-align: left; }
+    th { background: #f0f0f0; }
+    img { max-width: 100%; height: auto; display: block; margin: 1rem 0; border: 1px solid #eee; }
+    .meta { color: #555; font-size: 0.95rem; }
+    strong { font-weight: 600; }
+    em { font-style: italic; }
+    a { color: #0066cc; }
+  </style>
+</head>
+<body>
+
+<h1>Laboratory Report 5: Dropout, Batch Normalization, and Optimizers</h1>
+
+<hr>
+<p class="meta"><strong>Course:</strong> COMP-341L - Artificial Neural Networks Lab<br>
+<strong>Lab Assignment:</strong> 5<br>
+<strong>Topic:</strong> Implementing Dropout, Batch Normalization, and Optimizers in Deep Networks<br>
+<strong>Submission Date:</strong> February 16, 2026</p>
+<p class="meta"><strong>Student Name:</strong> Zarmeena Jawad<br>
+<strong>Roll Number:</strong> B23F0115AI125<br>
+<strong>Section:</strong> AI Red</p>
+<hr>
+
+<p><strong>Academic integrity:</strong> I declare that this report is my own work. I have not copied from other students or submitted another person's report. As per course policy, plagiarism or copy-pasting leads to zero marks for everyone involved.</p>
+<hr>
+
+<h2>Executive Summary</h2>
+<p>This laboratory focuses on improving the training and generalization of deep multilayer perceptrons (MLPs) using TensorFlow. We use the Breast Cancer classification dataset and implement Dropout (regularization), Batch Normalization (training stability), and a comparison of optimizers (SGD vs Adam). We also study the effect of different learning rates on convergence and stability. All experiments are run for 50 epochs; training and validation loss and accuracy are plotted for each configuration.</p>
+<hr>
+
+<h2>Learning Objectives</h2>
+<ul>
+  <li>Build and train deep neural networks in TensorFlow on a real dataset (e.g. Breast Cancer).</li>
+  <li>Implement Dropout and explain how it reduces overfitting.</li>
+  <li>Implement Batch Normalization and relate it to convergence speed and stability.</li>
+  <li>Compare SGD and Adam optimizers in terms of speed, smoothness, and final performance.</li>
+  <li>Use validation curves to diagnose overfitting.</li>
+  <li>Observe how learning rate choice affects stability and possible divergence.</li>
+</ul>
+<hr>
+
+<h2>Experimental Setup</h2>
+<ul>
+  <li><strong>Dataset:</strong> Breast Cancer (sklearn). Binary classification (malignant vs benign).</li>
+  <li><strong>Preprocessing:</strong> 80% train / 20% validation (stratified). Features standardized with <code>StandardScaler</code>.</li>
+  <li><strong>Base architecture:</strong> Input (30) → Dense(64, ReLU) → Dense(64, ReLU) → Dense(32, ReLU) → Dense(1, sigmoid).</li>
+  <li><strong>Training:</strong> 50 epochs, batch size 32, binary cross-entropy. Default: Adam, lr=0.001.</li>
+</ul>
+<p>Code: <code>lab5_experiments.py</code>. Run from repo root: <code>./venv/bin/python3 "Lab 5/Zarmeena Jawad's Lab/lab5_experiments.py"</code> or from this folder: <code>../../venv/bin/python3 lab5_experiments.py</code></p>
+<hr>
+
+<h2>Task 1: Baseline Model (No Dropout, No BatchNorm)</h2>
+<p>We build a deep network with no Dropout and no BatchNorm, train for 50 epochs, and plot training loss, validation loss, and accuracy.</p>
+<h3>Implementation</h3>
+<p>The baseline is a sequential model with three hidden layers (64, 64, 32 units) and ReLU, then a sigmoid output. The script uses <code>baseline_mlp(input_dim)</code> and <code>run_training()</code>.</p>
+<h3>Findings</h3>
+<p>The baseline often shows a growing gap between training and validation loss (overfitting).</p>
+<p><strong>Figure 1.1:</strong> Task 1 – Training loss, validation loss, and accuracy.</p>
+<img src="plots/task1_baseline.png" alt="Task 1 – Baseline" width="800">
+<hr>
+
+<h2>Task 2: Add Dropout</h2>
+<p>We add Dropout (rate 0.3) after each hidden layer and compare overfitting behavior and accuracy with the baseline.</p>
+<h3>Comparison (overfitting behavior and accuracy)</h3>
+<ul>
+  <li><strong>Overfitting behavior:</strong> Validation loss tracks training loss better; train–validation gap is smaller.</li>
+  <li><strong>Accuracy:</strong> Validation accuracy comparable or better (see Comparison Table).</li>
+</ul>
+<p><strong>Figure 2.1:</strong> Task 2 – Dropout.</p>
+<img src="plots/task2_dropout.png" alt="Task 2 – Dropout" width="800">
+<hr>
+
+<h2>Task 3: Add BatchNorm</h2>
+<p>We add BatchNorm after each Dense layer (before ReLU) and compare convergence speed, stability, and final performance.</p>
+<h3>Comparison (convergence speed, stability, final performance)</h3>
+<ul>
+  <li><strong>Convergence speed:</strong> Loss decreases faster and more steadily.</li>
+  <li><strong>Stability:</strong> Curves are smoother and less noisy.</li>
+  <li><strong>Final performance:</strong> Validation loss and accuracy improve (see Comparison Table).</li>
+</ul>
+<p><strong>Figure 3.1:</strong> Task 3 – BatchNorm.</p>
+<img src="plots/task3_batchnorm.png" alt="Task 3 – BatchNorm" width="800">
+<hr>
+
+<h2>Task 4: Combine Dropout and BatchNorm</h2>
+<p>We use both BatchNorm and Dropout in the same model, train, and analyze.</p>
+<p><strong>Figure 4.1:</strong> Task 4 – Dropout + BatchNorm.</p>
+<img src="plots/task4_combined.png" alt="Task 4 – Combined" width="800">
+<hr>
+
+<h2>Task 5: Optimizer Comparison (SGD vs Adam)</h2>
+<p>We train the same baseline with SGD (lr=0.01) and Adam (lr=0.001), plot loss curves on the same graph, and compare speed, smoothness, and final performance.</p>
+<h3>Comparison</h3>
+<ul>
+  <li><strong>Speed:</strong> Adam usually reaches a good validation loss in fewer epochs.</li>
+  <li><strong>Smoothness:</strong> Adam's curves are typically smoother; SGD can show more oscillation.</li>
+  <li><strong>Final performance:</strong> See Comparison Table.</li>
+</ul>
+<p><strong>Figure 5.1:</strong> Task 5 – Loss curves on same graph (SGD vs Adam).</p>
+<img src="plots/task5_optimizer_comparison.png" alt="Task 5 – SGD vs Adam" width="800">
+<hr>
+
+<h2>Task 6: Learning Rate Sensitivity</h2>
+<p>We train the baseline with Adam using lr = 0.0001, 0.01, and 0.5 and observe stability or divergence.</p>
+<ul>
+  <li><strong>lr = 0.0001:</strong> Stable but slow.</li>
+  <li><strong>lr = 0.01:</strong> Good convergence, generally stable.</li>
+  <li><strong>lr = 0.5:</strong> Can diverge or oscillate; illustrates instability.</li>
+</ul>
+<p><strong>Figure 6.1:</strong> Task 6 – Learning rate sensitivity.</p>
+<img src="plots/task6_learning_rate_sensitivity.png" alt="Task 6 – Learning rate sensitivity" width="800">
+<hr>
+
+<h2>Comparison Table (Final Epoch)</h2>
+<table>
+  <thead>
+    <tr><th>Model</th><th>Val Loss</th><th>Val Acc</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Baseline</td><td>0.1260</td><td>0.9649</td></tr>
+    <tr><td>Dropout</td><td>0.1247</td><td>0.9649</td></tr>
+    <tr><td>BatchNorm</td><td>0.0773</td><td>0.9649</td></tr>
+    <tr><td>Dropout+BatchNorm</td><td>0.0951</td><td>0.9561</td></tr>
+    <tr><td>SGD (lr=0.01)</td><td>0.1021</td><td>0.9649</td></tr>
+    <tr><td>Adam (lr=0.001)</td><td>0.1753</td><td>0.9561</td></tr>
+  </tbody>
+</table>
+<p><em>All models trained for 50 epochs.</em></p>
+<hr>
+
+<h2>Results (All Loss Plots)</h2>
+<p>All plots are embedded above. Reference: task1_baseline.png, task2_dropout.png, task3_batchnorm.png, task4_combined.png, task5_optimizer_comparison.png, task6_learning_rate_sensitivity.png in the <code>plots/</code> folder.</p>
+<hr>
+
+<h2>Discussion</h2>
+<p><strong>Overfitting and regularization:</strong> The baseline overfits; Dropout reduces the gap by randomly disabling neurons. BatchNorm stabilizes layer inputs and speeds convergence; combining both gives stable training and good validation performance.</p>
+<p><strong>Optimizers:</strong> Adam converges quickly and smoothly; SGD can reach similar accuracy with more epochs and more oscillation.</p>
+<p><strong>Learning rate:</strong> Too small slows convergence; too large can cause divergence. A moderate value (e.g. 0.001 for Adam) works well.</p>
+<hr>
+
+<h2>Conclusions</h2>
+<p>We implemented and compared Dropout, BatchNorm, and optimizers on the Breast Cancer dataset. The baseline overfit; Dropout improved generalization; BatchNorm improved convergence and stability; the combined model gave a good balance. Adam converged faster and more smoothly than SGD. Learning rate experiments showed that an appropriate value is essential for stable training.</p>
+<hr>
+
+<h2>References</h2>
+<ul>
+  <li>Lab 05 Manual (Lab 05.pdf): Dropout, Batch Normalization, Optimizers, Lab Tasks (Tasks 1–6).</li>
+</ul>
+
+</body>
+</html>
