@@ -9,7 +9,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-FIG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "figures")
+# Always use this script's directory (Ali Hamza's assignment folder)
+_SCRIPT_DIR = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+FIG_DIR = os.path.join(_SCRIPT_DIR, "figures")
 os.makedirs(FIG_DIR, exist_ok=True)
 
 # Data (bipolar)

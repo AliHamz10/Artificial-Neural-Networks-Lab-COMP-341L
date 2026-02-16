@@ -1,7 +1,9 @@
 # Assignment 1: Perceptron vs Adaline and the XOR Problem
 
-**Roll number:** [INSERT ROLL NUMBER ONLY – no name]  
-**Course:** Artificial Neural Networks (ANN) — BSAI F23 Red  
+**Name:** Ali Hamza  
+**Registration Number:** B23F0063AI106  
+**Course:** Artificial Neural Networks (ANN)  
+**Professor:** Dr. Abid Ali  
 **Due date:** 21-02-2026
 
 ---
@@ -16,7 +18,7 @@ Datasets for the AND, OR, and XOR logic functions were created in **bipolar form
 
 **Figure 1** shows scatter plots of the inputs (x₁, x₂) with points coloured by target class (+1 or −1). For **AND** and **OR**, the two classes can be separated by a single straight line: these problems are **linearly separable**. For **XOR**, the positive class lies at (1,−1) and (−1,1) and the negative class at (1,1) and (−1,−1), forming a checkerboard pattern. **No single line** can separate the two classes, so XOR is **not linearly separable**. This geometric fact is the reason single-layer networks (Perceptron and Adaline) cannot solve XOR.
 
-![Linear separability: AND, OR, and XOR in bipolar format](figures/fig1_linear_separability.png)
+![Linear separability: AND, OR, and XOR in bipolar format](figures/separability.png)
 
 **Figure 1.** AND and OR are linearly separable; XOR is not. (Bipolar format: −1 and +1.)
 
@@ -30,7 +32,7 @@ The **Perceptron** uses **error-driven** updates: weights change only when the c
 
 When the notebook is run, the Perceptron **converges on AND in 3 epochs** and **on OR in 3 epochs**, reaching zero misclassifications. **Figure 2** shows the learned decision boundaries: a single line correctly separates the two classes in each case.
 
-![Perceptron decision boundaries on AND and OR](figures/fig2_perceptron_boundaries.png)
+![Perceptron decision boundaries on AND and OR](figures/perceptron_boundaries.png)
 
 **Figure 2.** Perceptron decision boundaries after training on AND and OR (bipolar data).
 
@@ -40,7 +42,7 @@ When the notebook is run, the Perceptron **converges on AND in 3 epochs** and **
 
 On AND and OR, Adaline’s MSE decreases over training and the learned linear boundary matches the separable solution. **Figure 3** shows MSE versus epoch for both tasks; the notebook contains the corresponding decision-boundary plots.
 
-![Adaline MSE vs epoch on AND and OR](figures/fig3_adaline_mse_and_or.png)
+![Adaline MSE vs epoch on AND and OR](figures/adaline_mse.png)
 
 **Figure 3.** Adaline: MSE vs epoch for AND and OR. Convergence behaviour is visible in the notebook run.
 
@@ -54,17 +56,17 @@ When the same Perceptron and Adaline models are trained on the **XOR** dataset, 
 
 **Perceptron on XOR:** The number of misclassifications **does not converge to zero**; it remains constant (e.g. 4 misclassifications every epoch). **Figure 4** illustrates that training does not converge.
 
-![Perceptron on XOR: misclassifications do not go to zero](figures/fig4_xor_perceptron_fail.png)
+![Perceptron on XOR: misclassifications do not go to zero](figures/xor_perceptron.png)
 
 **Figure 4.** Perceptron on XOR — misclassifications per epoch (no convergence).
 
 **Adaline on XOR:** The MSE **does not converge to a near-zero error**. **Figure 5** shows MSE versus epoch; the final MSE remains around **1.02**. **Figure 6** shows the XOR data and the final decision boundary line learned by Adaline; the line cannot separate the two classes.
 
-![Adaline on XOR: MSE does not go to zero](figures/fig5_xor_adaline_mse.png)
+![Adaline on XOR: MSE does not go to zero](figures/xor_adaline_mse.png)
 
 **Figure 5.** Adaline on XOR — MSE vs epoch (does not converge to zero).
 
-![XOR data and Adaline decision boundary](figures/fig6_xor_adaline_boundary.png)
+![XOR data and Adaline decision boundary](figures/xor_adaline_line.png)
 
 **Figure 6.** XOR data and the Adaline decision boundary. No single line can separate the two classes.
 
@@ -99,7 +101,7 @@ A **multi-layer network** with one **hidden layer** can represent XOR by combini
 
 **Figure 7** shows the architecture. The input layer has two inputs (x₁, x₂) and a bias (1). The hidden layer has two neurons (H1, H2), each with step activation. The output layer has one neuron with step activation.
 
-![2–2–1 MLP architecture for XOR](figures/fig7_architecture_mlp_xor.png)
+![2–2–1 MLP architecture for XOR](figures/architecture_xor.png)
 
 **Figure 7.** Two–two–one (2–2–1) multi-layer network for XOR. Weights are set manually; all neurons use step activation.
 

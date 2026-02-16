@@ -1,0 +1,16 @@
+{
+  "perceptron_and_epochs": 3,
+  "perceptron_or_epochs": 3,
+  "adaline_and_epochs": 500,
+  "adaline_and_final_mse": 0.25432525951557095,
+  "adaline_or_epochs": 500,
+  "adaline_or_final_mse": 0.25432525951557095,
+  "perceptron_xor_last_err": 4,
+  "adaline_xor_final_mse": 1.0173010380622838,
+  "adaline_xor_weights": [
+    -4.163336342344337e-17,
+    0.05882352941176468,
+    0.11764705882352944
+  ],
+  "adaline_xor_boundary_eq": "-0.0000 + 0.0588*x1 + 0.1176*x2 = 0"
+}
