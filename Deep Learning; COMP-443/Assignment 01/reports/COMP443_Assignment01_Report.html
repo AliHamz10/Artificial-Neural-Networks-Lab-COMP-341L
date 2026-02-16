@@ -3,137 +3,344 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>COMP-443 Assignment 01 – Classical vs Deep Models on Fashion-MNIST</title>
+  <title>COMP-443 Assignment 01 - Classical vs Deep Models on Fashion-MNIST</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #222; }
-    h1 { font-size: 1.75rem; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; }
-    h2 { font-size: 1.35rem; margin-top: 2rem; }
-    h3 { font-size: 1.1rem; margin-top: 1.25rem; }
-    hr { border: none; border-top: 1px solid #ddd; margin: 1.5rem 0; }
+    :root {
+      --text: #1f1f1f;
+      --muted: #555;
+      --border: #d9d9d9;
+      --bg: #ffffff;
+      --accent: #1c4e80;
+    }
+    body {
+      font-family: "Source Serif 4", "Times New Roman", serif;
+      color: var(--text);
+      background: var(--bg);
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+      line-height: 1.6;
+    }
+    h1, h2, h3 {
+      font-family: "Source Sans 3", "Arial", sans-serif;
+      color: var(--accent);
+      margin: 1.2rem 0 0.5rem;
+    }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.45rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
+    h3 { font-size: 1.15rem; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
     p { margin: 0.75rem 0; }
-    ul { margin: 0.75rem 0; padding-left: 1.5rem; }
-    li { margin: 0.35rem 0; }
-    code, pre { background: #f5f5f5; font-family: ui-monospace, monospace; font-size: 0.9em; }
-    code { padding: 0.15em 0.4em; border-radius: 3px; }
-    pre { padding: 1rem; overflow-x: auto; border-radius: 6px; margin: 1rem 0; }
-    pre code { padding: 0; background: none; }
-    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
-    th, td { border: 1px solid #ccc; padding: 0.5rem 0.75rem; text-align: left; }
-    th { background: #f0f0f0; }
-    img { max-width: 100%; height: auto; display: block; margin: 1rem 0; border: 1px solid #eee; }
-    .meta { color: #555; font-size: 0.95rem; }
-    strong { font-weight: 600; }
-    em { font-style: italic; }
-    a { color: #0066cc; }
+    ul { margin: 0.5rem 0 0.75rem 1.1rem; padding-left: 1rem; }
+    li { margin: 0.3rem 0; }
+    code, pre {
+      background: #f6f6f6;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.92em;
+    }
+    code { padding: 0.15em 0.35em; border-radius: 3px; }
+    pre { padding: 0.8rem 1rem; border-radius: 6px; overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; margin: 0.8rem 0 1.2rem; }
+    th, td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: left; }
+    th { background: #f1f3f5; }
+    img { max-width: 100%; height: auto; display: block; margin: 0.75rem 0 0.4rem; border: 1px solid #eee; }
+    .meta { color: var(--muted); font-size: 0.98rem; }
+    .center { text-align: center; }
+    .title-block { margin-top: 0.75rem; }
   </style>
 </head>
 <body>
 
-<h1>COMP-443 – Deep Learning<br>Assignment 01: Classical vs Deep Models on Fashion-MNIST</h1>
+  <div class="center title-block">
+    <h1>COMP-443 - Deep Learning</h1>
+    <h2>Assignment 01 Report</h2>
+    <h3>Classical vs Deep Models on Fashion-MNIST</h3>
+    <p class="meta"><strong>Students:</strong><br>
+    Ali Hamza (Registration No.: B23F0063AI106)<br>
+    Zarmeena Jawad (Registration No.: B23F0115AI125)<br>
+    <strong>Course:</strong> Deep Learning (COMP-443)<br>
+    <strong>Instructor:</strong> Dr. Arshad Iqbal<br>
+    <strong>Submission Date:</strong> 16 February 2026</p>
+  </div>
 
-<hr>
-<p class="meta"><strong>Student:</strong> Ali Hamza<br>
-<strong>Registration No.:</strong> B23F0063AI106<br>
-<strong>Course:</strong> Deep Learning (COMP-443)<br>
-<strong>Submission Date:</strong> 16 February 2026</p>
-<hr>
+  <hr>
 
-<h2>1. Problem Statement and Requirements</h2>
-<p>The whiteboard instructions for Assignment 01 can be summarised as:</p>
-<ul>
-  <li>Choose one good dataset (from Kaggle or another public source).</li>
-  <li>Implement 4 algorithms total: 2 conventional (classical ML) and 2 deep learning models.</li>
-  <li>Train and evaluate all four models on the same dataset, compare their performance, and present the work in a properly formatted report suitable for printing.</li>
-</ul>
-<p>Here we use the <strong>Fashion-MNIST</strong> dataset and implement:</p>
-<ul>
-  <li>Logistic Regression (classical baseline)</li>
-  <li>Random Forest (classical baseline)</li>
-  <li>Simple CNN (small convolutional neural network)</li>
-  <li>Deeper CNN (deeper convolutional neural network)</li>
-</ul>
+  <h2>Abstract</h2>
+  <p>This report compares two classical machine-learning models and two convolutional neural networks on the Fashion-MNIST dataset. All models are trained and evaluated on the same train/validation split. Results show that CNNs outperform classical models by a clear margin, confirming the importance of spatial feature learning for image classification.</p>
 
-<hr>
-<h2>2. Dataset and Preprocessing</h2>
-<h3>2.1 Fashion-MNIST overview</h3>
-<p>Fashion-MNIST is a 10-class image classification dataset with 28×28 grayscale images of clothing items (60k train, 10k test). Classes include T-shirt/top, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker, Bag, and Ankle boot.</p>
+  <hr>
 
-<h3>2.2 Splits and preprocessing</h3>
-<ul>
-  <li>Download via <code>tf.keras.datasets.fashion_mnist</code>.</li>
-  <li>Normalise pixels from [0, 255] to [0, 1].</li>
-  <li>Split original training set into train/validation (80%/20%, fixed seed).</li>
-  <li>Add channel dimension (28×28×1) for CNNs; flatten to 784 features for classical models.</li>
-</ul>
+  <h2>Table of Contents</h2>
+  <ul>
+    <li>1. Problem Statement and Requirements</li>
+    <li>2. Dataset and Preprocessing</li>
+    <li>3. Methodology (Step-by-Step)</li>
+    <li>4. Model Selection and Rationale</li>
+    <li>5. Model Specifications</li>
+    <li>6. Training Setup and Evaluation Metrics</li>
+    <li>7. Quantitative Results</li>
+    <li>8. Figures and Explanations</li>
+    <li>9. Discussion</li>
+    <li>10. Conclusions</li>
+    <li>11. How to Reproduce</li>
+  </ul>
 
-<hr>
-<h2>3. Classical Baselines</h2>
-<h3>3.1 Logistic Regression</h3>
-<ul>
-  <li>Multinomial logistic regression, lbfgs solver, L2 regularisation (C=1.0).</li>
-  <li>Trained on flattened features, evaluated on validation set.</li>
-</ul>
-<p><strong>Figure 1:</strong> Logistic Regression confusion matrix (validation).</p>
-<img src="../figures/logreg_confusion.png" alt="Logistic Regression confusion matrix">
+  <hr>
 
-<h3>3.2 Random Forest</h3>
-<ul>
-  <li>RandomForestClassifier with 150 trees, <code>max_depth=None</code>, random_state=42.</li>
-  <li>Trained on flattened features; provides a stronger classical baseline.</li>
-</ul>
-<p><strong>Figure 2:</strong> Random Forest confusion matrix (validation).</p>
-<img src="../figures/rf_confusion.png" alt="Random Forest confusion matrix">
+  <h2>1. Problem Statement and Requirements</h2>
+  <p>The assignment requires the following:</p>
+  <ul>
+    <li>Select one suitable dataset from a public source.</li>
+    <li>Implement 4 algorithms in total.</li>
+    <li>Use 2 classical (conventional) models.</li>
+    <li>Use 2 deep learning models.</li>
+    <li>Train, evaluate, and compare all four models in a properly formatted report.</li>
+  </ul>
+  <p>This report uses the <strong>Fashion-MNIST</strong> dataset and implements:</p>
+  <ul>
+    <li>Logistic Regression (classical baseline)</li>
+    <li>Random Forest (classical baseline)</li>
+    <li>Simple CNN (deep model)</li>
+    <li>Deeper CNN (deep model)</li>
+  </ul>
 
-<hr>
-<h2>4. Deep Learning Models</h2>
-<h3>4.1 Simple CNN</h3>
-<p>Architecture: two Conv2D(32) layers with ReLU and same padding, MaxPooling2D, Flatten, Dense(128, ReLU), Dropout(0.3), Dense(10, softmax). Trained with Adam (lr=1e-3), batch size 128, up to 50 epochs with early stopping.</p>
-<p><strong>Figure 3:</strong> Simple CNN – loss and accuracy curves.</p>
-<img src="../figures/simple_cnn_curves.png" alt="Simple CNN learning curves">
+  <hr>
 
-<h3>4.2 Deeper CNN</h3>
-<p>Architecture: two Conv2D(32) layers + MaxPool, then two Conv2D(64) layers + MaxPool, followed by Dense(256, ReLU), Dropout(0.4), Dense(10, softmax). Same training settings as Simple CNN.</p>
-<p><strong>Figure 4:</strong> Deeper CNN – loss and accuracy curves.</p>
-<img src="../figures/deeper_cnn_curves.png" alt="Deeper CNN learning curves">
+  <h2>2. Dataset and Preprocessing</h2>
+  <h3>2.1 Dataset overview</h3>
+  <p>Fashion-MNIST consists of 28x28 grayscale images across 10 clothing categories. The dataset contains 60,000 training images and 10,000 test images.</p>
+  <p>Class labels: T-shirt/top, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker, Bag, Ankle boot.</p>
 
-<hr>
-<h2>5. Quantitative Results</h2>
-<p>Validation-set performance (from <code>reports/assignment01_results.json</code>):</p>
-<table>
-  <thead>
-    <tr><th>Model</th><th>Type</th><th>Val Loss</th><th>Val Acc</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>Logistic Regression</td><td>Classical</td><td>≈</td><td>0.857</td></tr>
-    <tr><td>Random Forest</td><td>Classical</td><td>≈</td><td>0.885</td></tr>
-    <tr><td>Simple CNN</td><td>Deep (CNN)</td><td>0.2293</td><td>0.9148</td></tr>
-    <tr><td>Deeper CNN</td><td>Deep (CNN)</td><td>0.2071</td><td>0.9206</td></tr>
-  </tbody>
-</table>
-<p>Classical models are strong baselines, but CNNs clearly achieve higher accuracy.</p>
+  <h3>2.2 Preprocessing pipeline</h3>
+  <ul>
+    <li>Load Fashion-MNIST using <code>tf.keras.datasets.fashion_mnist</code>.</li>
+    <li>Normalize pixels from <code>[0, 255]</code> to <code>[0, 1]</code> as <code>float32</code>.</li>
+    <li>Create a validation split (seed = 42).</li>
+    <li>Split sizes: Training 48,000 (80%), Validation 12,000 (20%), Test 10,000 (held out; not used for model selection).</li>
+    <li>Add channel dimension to create <code>(28, 28, 1)</code> for CNNs.</li>
+    <li>Flatten to 784-dimensional vectors for classical models.</li>
+  </ul>
 
-<hr>
-<h2>6. Discussion</h2>
-<p><strong>Classical vs deep models:</strong> Classical models treat each pixel as an independent feature and ignore spatial structure. Random Forest improves over logistic regression by modelling non-linear interactions, but both are limited. CNNs exploit local patterns through convolutions and pooling, yielding better performance, particularly on confusing clothing categories.</p>
-<p><strong>Overfitting and regularisation:</strong> Dropout and early stopping prevent the CNNs from severely overfitting. Validation curves stabilise while training loss continues to decrease slowly.</p>
-<p><strong>Practical takeaway:</strong> On image data like Fashion-MNIST, CNNs are the natural choice, but classical models remain valuable baselines and may still be preferable when compute or explainability constraints dominate.</p>
+  <hr>
 
-<hr>
-<h2>7. Conclusions</h2>
-<ul>
-  <li>Random Forest outperforms logistic regression among classical methods (≈88.5% vs 85.7% accuracy).</li>
-  <li>Simple and deeper CNNs further improve accuracy (≈91.5–92.1%), demonstrating the advantage of deep models on image tasks.</li>
-  <li>Appropriate preprocessing, regularisation, and learning-rate choices are crucial for stable deep learning training.</li>
-</ul>
+  <h2>3. Methodology (Step-by-Step)</h2>
+  <ol>
+    <li>Select Fashion-MNIST as a balanced, standard benchmark for image classification.</li>
+    <li>Apply the same preprocessing pipeline to ensure fair comparison.</li>
+    <li>Train two classical baselines on flattened features.</li>
+    <li>Train two CNNs on image tensors with the same train/val split.</li>
+    <li>Evaluate all models on the validation set using accuracy and confusion matrices.</li>
+    <li>Compare results and analyze errors by class.</li>
+    <li>Summarize findings and discuss limitations and improvements.</li>
+  </ol>
 
-<hr>
-<h2>8. Reproducibility</h2>
-<ol>
-  <li>Install requirements and activate the project venv.</li>
-  <li>Run <code>run_experiments.py</code> from the <code>src/</code> directory to regenerate figures and results.</li>
-  <li>Open this HTML in a browser and use “Print → Save as PDF” for submission.</li>
-</ol>
+  <hr>
+
+  <h2>4. Model Selection and Rationale</h2>
+  <ul>
+    <li>Logistic Regression: Simple linear baseline, fast to train, interpretable, and useful to establish a minimum performance threshold.</li>
+    <li>Random Forest: Non-linear classical model that captures feature interactions and is often stronger than linear models on flattened image data.</li>
+    <li>Simple CNN: Small convolutional network that learns local spatial patterns with limited capacity and lower overfitting risk.</li>
+    <li>Deeper CNN: Adds a second convolutional block and a larger dense layer to test whether higher capacity improves accuracy.</li>
+  </ul>
+
+  <hr>
+
+  <h2>5. Model Specifications</h2>
+  <h3>5.1 Logistic Regression (Classical)</h3>
+  <ul>
+    <li>Multinomial logistic regression</li>
+    <li>Solver: <code>lbfgs</code></li>
+    <li>Regularization: L2, <code>C = 1.0</code></li>
+    <li>Max iterations: 200</li>
+    <li>Input: 784-dimensional flattened pixels</li>
+  </ul>
+
+  <h3>5.2 Random Forest (Classical)</h3>
+  <ul>
+    <li><code>RandomForestClassifier</code></li>
+    <li>Trees: 150</li>
+    <li>Max depth: None</li>
+    <li><code>random_state = 42</code></li>
+    <li>Input: 784-dimensional flattened pixels</li>
+  </ul>
+
+  <h3>5.3 Simple CNN (Deep)</h3>
+  <ul>
+    <li>Input: <code>(28, 28, 1)</code></li>
+    <li>Conv2D(32, 3x3, ReLU, same)</li>
+    <li>Conv2D(32, 3x3, ReLU, same)</li>
+    <li>MaxPooling2D(2x2)</li>
+    <li>Flatten</li>
+    <li>Dense(128, ReLU)</li>
+    <li>Dropout(0.3)</li>
+    <li>Dense(10, Softmax)</li>
+  </ul>
+
+  <h3>5.4 Deeper CNN (Deep)</h3>
+  <ul>
+    <li>Input: <code>(28, 28, 1)</code></li>
+    <li>Conv2D(32, 3x3, ReLU, same)</li>
+    <li>Conv2D(32, 3x3, ReLU, same)</li>
+    <li>MaxPooling2D(2x2)</li>
+    <li>Conv2D(64, 3x3, ReLU, same)</li>
+    <li>Conv2D(64, 3x3, ReLU, same)</li>
+    <li>MaxPooling2D(2x2)</li>
+    <li>Flatten</li>
+    <li>Dense(256, ReLU)</li>
+    <li>Dropout(0.4)</li>
+    <li>Dense(10, Softmax)</li>
+  </ul>
+
+  <hr>
+
+  <h2>6. Training Setup and Evaluation Metrics</h2>
+  <h3>6.1 Training configuration (CNNs)</h3>
+  <ul>
+    <li>Optimizer: Adam</li>
+    <li>Learning rate: 1e-3</li>
+    <li>Loss: Sparse categorical cross-entropy</li>
+    <li>Batch size: 128</li>
+    <li>Epochs: 50 (with early stopping)</li>
+    <li>Early stopping: patience 5, restore best weights</li>
+  </ul>
+
+  <h3>6.2 Evaluation metrics and formulas</h3>
+  <ul>
+    <li>Accuracy</li>
+    <li>Cross-entropy loss (for CNNs)</li>
+    <li>Confusion matrix</li>
+  </ul>
+  <pre><code>Softmax:          p_i = exp(z_i) / sum_j exp(z_j)
+Cross-entropy:    L = -(1/N) * sum_n log(p_{y_n})
+Accuracy:         Acc = (# correct predictions) / N
+</code></pre>
+  <p>Note: Classical models are not trained with the same Keras loss interface, so "Val Loss" is reported only for CNNs.</p>
+
+  <hr>
+
+  <h2>7. Quantitative Results</h2>
+  <p>Validation results from <code>reports/assignment01_results.json</code>:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Type</th>
+        <th>Val Loss</th>
+        <th>Val Acc</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Logistic Regression</td>
+        <td>Classical</td>
+        <td>N/A</td>
+        <td>0.8573</td>
+      </tr>
+      <tr>
+        <td>Random Forest</td>
+        <td>Classical</td>
+        <td>N/A</td>
+        <td>0.8853</td>
+      </tr>
+      <tr>
+        <td>Simple CNN</td>
+        <td>Deep (CNN)</td>
+        <td>0.2293</td>
+        <td>0.9148</td>
+      </tr>
+      <tr>
+        <td>Deeper CNN</td>
+        <td>Deep (CNN)</td>
+        <td>0.2071</td>
+        <td>0.9206</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Key takeaways:</p>
+  <ul>
+    <li>Random Forest improves the baseline by about 2.8% over Logistic Regression.</li>
+    <li>Simple CNN beats the best classical model by about 2.9%.</li>
+    <li>Deeper CNN gives the best overall accuracy and lowest validation loss.</li>
+  </ul>
+
+  <hr>
+
+  <h2>8. Figures and Explanations</h2>
+
+  <p><strong>Figure 1 - Logistic Regression confusion matrix (validation)</strong></p>
+  <img src="../figures/logreg_confusion.png" alt="Logistic Regression confusion matrix">
+  <ul>
+    <li>Correct predictions appear along the diagonal.</li>
+    <li>The hardest class is <strong>Shirt</strong>, which is frequently confused with <strong>T-shirt/top</strong> and <strong>Pullover</strong>.</li>
+    <li>Overall accuracy is 85.7%, showing a reasonable but limited linear baseline.</li>
+  </ul>
+
+  <p><strong>Figure 2 - Random Forest confusion matrix (validation)</strong></p>
+  <img src="../figures/rf_confusion.png" alt="Random Forest confusion matrix">
+  <ul>
+    <li>The diagonal is stronger than Logistic Regression, indicating fewer mistakes.</li>
+    <li>Confusions among similar upper-body clothing items remain a challenge.</li>
+    <li>Validation accuracy improves to 88.5%, confirming the benefit of non-linear models.</li>
+  </ul>
+
+  <p><strong>Figure 3 - Simple CNN learning curves (loss and accuracy)</strong></p>
+  <img src="../figures/simple_cnn_curves.png" alt="Simple CNN learning curves">
+  <ul>
+    <li>Training and validation losses decrease together, indicating stable learning.</li>
+    <li>The validation accuracy curve reaches about 91.5% and remains steady.</li>
+    <li>Early stopping prevents overfitting as the validation loss plateaus.</li>
+  </ul>
+
+  <p><strong>Figure 4 - Deeper CNN learning curves (loss and accuracy)</strong></p>
+  <img src="../figures/deeper_cnn_curves.png" alt="Deeper CNN learning curves">
+  <ul>
+    <li>Lower validation loss than the simple CNN indicates better fit.</li>
+    <li>Slightly higher validation accuracy (about 92.1%) confirms the benefit of added depth.</li>
+    <li>The gap between training and validation curves stays modest, suggesting good generalization.</li>
+  </ul>
+
+  <hr>
+
+  <h2>9. Discussion</h2>
+  <h3>9.1 Classical vs deep models</h3>
+  <p>Classical models operate on flattened pixel vectors, ignoring 2D spatial structure. This limits their ability to learn shapes and textures. CNNs learn local filters, which directly capture edges, patterns, and spatial relationships, leading to higher accuracy.</p>
+
+  <h3>9.2 Error analysis</h3>
+  <p>From the confusion matrices and classification reports:</p>
+  <ul>
+    <li><strong>Shirt</strong> is the most difficult class for classical models (lowest recall: 0.5929 for Logistic Regression and 0.5954 for Random Forest).</li>
+    <li>Confusions are common between visually similar categories like <strong>T-shirt/top</strong>, <strong>Shirt</strong>, and <strong>Pullover</strong>.</li>
+    <li>CNNs reduce these errors because spatial context is preserved.</li>
+  </ul>
+
+  <h3>9.3 Regularization and overfitting</h3>
+  <p>Dropout (0.3-0.4) and early stopping keep the CNNs from overfitting. The learning curves show steady validation performance without a large gap to training accuracy.</p>
+
+  <hr>
+
+  <h2>10. Conclusions</h2>
+  <ul>
+    <li>Logistic Regression provides a fast, interpretable baseline but lacks spatial awareness.</li>
+    <li>Random Forest improves baseline performance by modeling non-linear feature interactions.</li>
+    <li>CNNs deliver the best results by exploiting image structure.</li>
+    <li>The Deeper CNN is the top performer, confirming that additional capacity improves accuracy on Fashion-MNIST.</li>
+  </ul>
+
+  <hr>
+
+  <h2>11. How to Reproduce</h2>
+  <ol>
+    <li>Install dependencies:
+      <pre><code>cd "Artificial-Neural-Networks-Lab-COMP-341L"
+./venv/bin/pip install -r requirements.txt</code></pre>
+    </li>
+    <li>Run the experiment script:
+      <pre><code>./venv/bin/python3 "Deep Learning; COMP-443/Assignment 01/src/run_experiments.py" --epochs 50</code></pre>
+    </li>
+    <li>Figures will be saved under <code>Deep Learning; COMP-443/Assignment 01/figures/</code> and results in <code>reports/assignment01_results.json</code>.</li>
+  </ol>
 
 </body>
 </html>
-
