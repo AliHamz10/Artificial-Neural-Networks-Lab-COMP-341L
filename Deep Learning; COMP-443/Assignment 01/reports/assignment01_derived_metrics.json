@@ -1,0 +1,243 @@
+{
+  "Logistic Regression": {
+    "macro_f1": 0.8561,
+    "weighted_f1": 0.8564,
+    "per_class": {
+      "T-shirt/top": {
+        "precision": 0.7983,
+        "recall": 0.8336,
+        "f1": 0.8156,
+        "support": 1154
+      },
+      "Trouser": {
+        "precision": 0.9771,
+        "recall": 0.9754,
+        "f1": 0.9762,
+        "support": 1179
+      },
+      "Pullover": {
+        "precision": 0.751,
+        "recall": 0.7609,
+        "f1": 0.7559,
+        "support": 1213
+      },
+      "Dress": {
+        "precision": 0.8629,
+        "recall": 0.8695,
+        "f1": 0.8662,
+        "support": 1180
+      },
+      "Coat": {
+        "precision": 0.7305,
+        "recall": 0.7647,
+        "f1": 0.7472,
+        "support": 1177
+      },
+      "Sandal": {
+        "precision": 0.9472,
+        "recall": 0.9364,
+        "f1": 0.9418,
+        "support": 1227
+      },
+      "Shirt": {
+        "precision": 0.6633,
+        "recall": 0.5929,
+        "f1": 0.6261,
+        "support": 1216
+      },
+      "Sneaker": {
+        "precision": 0.9142,
+        "recall": 0.9338,
+        "f1": 0.9239,
+        "support": 1209
+      },
+      "Bag": {
+        "precision": 0.9577,
+        "recall": 0.9594,
+        "f1": 0.9585,
+        "support": 1181
+      },
+      "Ankle boot": {
+        "precision": 0.9552,
+        "recall": 0.9446,
+        "f1": 0.9499,
+        "support": 1264
+      }
+    },
+    "top_confusions": [
+      {
+        "count": 178,
+        "true": "Shirt",
+        "pred": "T-shirt/top"
+      },
+      {
+        "count": 162,
+        "true": "Pullover",
+        "pred": "Coat"
+      },
+      {
+        "count": 142,
+        "true": "Shirt",
+        "pred": "Pullover"
+      },
+      {
+        "count": 128,
+        "true": "Shirt",
+        "pred": "Coat"
+      },
+      {
+        "count": 123,
+        "true": "Coat",
+        "pred": "Pullover"
+      },
+      {
+        "count": 109,
+        "true": "Coat",
+        "pred": "Shirt"
+      },
+      {
+        "count": 96,
+        "true": "Pullover",
+        "pred": "Shirt"
+      },
+      {
+        "count": 96,
+        "true": "T-shirt/top",
+        "pred": "Shirt"
+      },
+      {
+        "count": 54,
+        "true": "T-shirt/top",
+        "pred": "Dress"
+      },
+      {
+        "count": 50,
+        "true": "Sandal",
+        "pred": "Sneaker"
+      }
+    ]
+  },
+  "Random Forest": {
+    "macro_f1": 0.8834,
+    "weighted_f1": 0.8836,
+    "per_class": {
+      "T-shirt/top": {
+        "precision": 0.8151,
+        "recall": 0.8787,
+        "f1": 0.8457,
+        "support": 1154
+      },
+      "Trouser": {
+        "precision": 0.9974,
+        "recall": 0.9729,
+        "f1": 0.985,
+        "support": 1179
+      },
+      "Pullover": {
+        "precision": 0.789,
+        "recall": 0.8137,
+        "f1": 0.8011,
+        "support": 1213
+      },
+      "Dress": {
+        "precision": 0.8894,
+        "recall": 0.9136,
+        "f1": 0.9013,
+        "support": 1180
+      },
+      "Coat": {
+        "precision": 0.7672,
+        "recall": 0.8454,
+        "f1": 0.8044,
+        "support": 1177
+      },
+      "Sandal": {
+        "precision": 0.9729,
+        "recall": 0.965,
+        "f1": 0.9689,
+        "support": 1227
+      },
+      "Shirt": {
+        "precision": 0.7653,
+        "recall": 0.5954,
+        "f1": 0.6698,
+        "support": 1216
+      },
+      "Sneaker": {
+        "precision": 0.9373,
+        "recall": 0.9396,
+        "f1": 0.9385,
+        "support": 1209
+      },
+      "Bag": {
+        "precision": 0.9649,
+        "recall": 0.9788,
+        "f1": 0.9718,
+        "support": 1181
+      },
+      "Ankle boot": {
+        "precision": 0.9442,
+        "recall": 0.9509,
+        "f1": 0.9476,
+        "support": 1264
+      }
+    },
+    "top_confusions": [
+      {
+        "count": 193,
+        "true": "Shirt",
+        "pred": "T-shirt/top"
+      },
+      {
+        "count": 148,
+        "true": "Pullover",
+        "pred": "Coat"
+      },
+      {
+        "count": 138,
+        "true": "Shirt",
+        "pred": "Pullover"
+      },
+      {
+        "count": 111,
+        "true": "Shirt",
+        "pred": "Coat"
+      },
+      {
+        "count": 97,
+        "true": "Coat",
+        "pred": "Pullover"
+      },
+      {
+        "count": 75,
+        "true": "T-shirt/top",
+        "pred": "Shirt"
+      },
+      {
+        "count": 58,
+        "true": "Sneaker",
+        "pred": "Ankle boot"
+      },
+      {
+        "count": 57,
+        "true": "Pullover",
+        "pred": "Shirt"
+      },
+      {
+        "count": 52,
+        "true": "Coat",
+        "pred": "Shirt"
+      },
+      {
+        "count": 45,
+        "true": "Ankle boot",
+        "pred": "Sneaker"
+      }
+    ]
+  },
+  "parameter_counts": {
+    "Logistic Regression": 7850,
+    "Simple CNN": 813802,
+    "Deeper CNN": 870634
+  }
+}
