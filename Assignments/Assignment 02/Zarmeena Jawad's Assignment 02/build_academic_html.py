@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build polished academic HTML from report markdown (Zarmeena Assignment 02)."""
+"""Render Zarmeena Assignment-02 report markdown to a distinct academic HTML layout."""
 
 from __future__ import annotations
 
@@ -9,13 +9,13 @@ import re
 from pathlib import Path
 
 
-def slugify(text: str) -> str:
+def slug(text: str) -> str:
     text = re.sub(r"[^a-zA-Z0-9\s-]", "", text).strip().lower()
     text = re.sub(r"\s+", "-", text)
     return text or "section"
 
 
-def inline_md(s: str) -> str:
+def fmt_inline(s: str) -> str:
     s = html.escape(s)
     s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
     s = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", s)
@@ -27,9 +27,11 @@ def inline_md(s: str) -> str:
 def parse_table(lines: list[str], i: int):
     if i + 1 >= len(lines):
         return None, i
-    head = lines[i].rstrip("\n")
+
+    h = lines[i].rstrip("\n")
     sep = lines[i + 1].rstrip("\n")
-    if "|" not in head or "|" not in sep:
+
+    if "|" not in h or "|" not in sep:
         return None, i
     if not re.match(r"^\s*\|?\s*[:\- ]+\|", sep):
         return None, i
@@ -40,35 +42,35 @@ def parse_table(lines: list[str], i: int):
             row = row[1:]
         if row.endswith("|"):
             row = row[:-1]
-        return [c.strip() for c in row.split("|")]
+        return [x.strip() for x in row.split("|")]
 
-    headers = split_row(head)
+    heads = split_row(h)
     rows = []
     j = i + 2
     while j < len(lines):
-        r = lines[j].rstrip("\n")
-        if "|" not in r or not r.strip():
+        row = lines[j].rstrip("\n")
+        if not row.strip() or "|" not in row:
             break
-        rows.append(split_row(r))
+        rows.append(split_row(row))
         j += 1
 
-    out = ["<div class=\"table-wrap\">\n<table>\n<thead><tr>"]
-    for h in headers:
-        out.append(f"<th>{inline_md(h)}</th>")
+    out = ["<div class=\"tbl-wrap\">\n<table>\n<thead><tr>"]
+    for c in heads:
+        out.append(f"<th>{fmt_inline(c)}</th>")
     out.append("</tr></thead>\n<tbody>\n")
 
     for r in rows:
         out.append("<tr>")
         for c in r:
-            out.append(f"<td>{inline_md(c)}</td>")
+            out.append(f"<td>{fmt_inline(c)}</td>")
         out.append("</tr>\n")
 
     out.append("</tbody></table>\n</div>\n")
     return "".join(out), j
 
 
-def parse_markdown(md_text: str):
-    lines = md_text.splitlines(keepends=True)
+def md_to_html(md: str):
+    lines = md.splitlines(keepends=True)
     out = []
     toc = []
 
@@ -82,8 +84,8 @@ def parse_markdown(md_text: str):
     def flush_para():
         nonlocal para_buf
         if para_buf:
-            p = " ".join(x.strip() for x in para_buf if x.strip())
-            out.append(f"<p>{inline_md(p)}</p>\n")
+            text = " ".join(x.strip() for x in para_buf if x.strip())
+            out.append(f"<p>{fmt_inline(text)}</p>\n")
             para_buf = []
 
     def close_list():
@@ -133,15 +135,15 @@ def parse_markdown(md_text: str):
         if s == r"\[":
             flush_para()
             close_list()
-            math = [line]
+            math_lines = [line]
             j = i + 1
             while j < len(lines):
-                ml = lines[j].rstrip("\n")
-                math.append(ml)
-                if ml.strip() == r"\]":
+                mline = lines[j].rstrip("\n")
+                math_lines.append(mline)
+                if mline.strip() == r"\]":
                     break
                 j += 1
-            out.append("<div class=\"display-math\">\n" + "\n".join(math) + "\n</div>\n")
+            out.append("<div class=\"display-math\">\n" + "\n".join(math_lines) + "\n</div>\n")
             i = j + 1
             continue
 
@@ -151,9 +153,9 @@ def parse_markdown(md_text: str):
             close_list()
             lvl = len(hm.group(1))
             title = hm.group(2).strip()
-            hid = slugify(title)
+            hid = slug(title)
             toc.append((lvl, title, hid))
-            out.append(f"<h{lvl} id=\"{hid}\">{inline_md(title)}</h{lvl}>\n")
+            out.append(f"<h{lvl} id=\"{hid}\">{fmt_inline(title)}</h{lvl}>\n")
             i += 1
             continue
 
@@ -171,12 +173,12 @@ def parse_markdown(md_text: str):
             i += 1
             continue
 
-        table_html, new_i = parse_table(lines, i)
+        table_html, ni = parse_table(lines, i)
         if table_html:
             flush_para()
             close_list()
             out.append(table_html)
-            i = new_i
+            i = ni
             continue
 
         lm = re.match(r"^[-*]\s+(.*)$", s)
@@ -185,7 +187,7 @@ def parse_markdown(md_text: str):
             if not in_list:
                 out.append("<ul>\n")
                 in_list = True
-            out.append(f"<li>{inline_md(lm.group(1).strip())}</li>\n")
+            out.append(f"<li>{fmt_inline(lm.group(1).strip())}</li>\n")
             i += 1
             continue
 
@@ -197,20 +199,22 @@ def parse_markdown(md_text: str):
     return "".join(out), toc
 
 
-def make_toc(toc):
-    items = [(l, t, h) for l, t, h in toc if 2 <= l <= 4]
-    if not items:
+def build_toc(toc):
+    # Keep major levels only for a cleaner visual.
+    use = [(l, t, h) for l, t, h in toc if 2 <= l <= 3]
+    if not use:
         return ""
-    out = ["<nav class=\"toc\">\n<h2>Table Of Contents</h2>\n<ol>\n"]
-    for l, t, h in items:
-        out.append(f"<li class=\"toc-l{l}\"><a href=\"#{h}\">{html.escape(t)}</a></li>\n")
-    out.append("</ol>\n</nav>\n")
-    return "".join(out)
+
+    items = ["<section class=\"toc-card\">\n<h2>Contents</h2>\n<ul>\n"]
+    for lvl, title, hid in use:
+        cls = "minor" if lvl == 3 else "major"
+        items.append(f"<li class=\"{cls}\"><a href=\"#{hid}\">{html.escape(title)}</a></li>\n")
+    items.append("</ul>\n</section>\n")
+    return "".join(items)
 
 
-def extract_cover(preface: str):
+def cover_meta(preface: str):
     lines = [x.strip() for x in preface.splitlines() if x.strip()]
-
     title = "Assignment Report"
     subtitle = ""
     meta = {}
@@ -222,7 +226,6 @@ def extract_cover(preface: str):
         if line.startswith("## ") and not subtitle:
             subtitle = line[3:].strip()
             continue
-
         m = re.match(r"^\*\*(.+?):\*\*\s*(.+)$", line)
         if m:
             meta[m.group(1).strip()] = m.group(2).strip()
@@ -230,189 +233,228 @@ def extract_cover(preface: str):
     return {
         'title': title,
         'subtitle': subtitle,
-        'student': meta.get('Student Name', 'Zarmeena Jawad'),
-        'roll': meta.get('Roll Number', 'B23F0115AI125'),
+        'author': meta.get('Author', 'Zarmeena Jawad'),
+        'roll': meta.get('Registration ID', 'B23F0115AI125'),
         'course': meta.get('Course', 'Artificial Neural Network (COMP-341)'),
-        'instructor': meta.get('Instructor', 'Dr. Abid Ali'),
+        'supervisor': meta.get('Supervisor', 'Dr. Abid Ali'),
     }
 
 
-def build_html(cover, toc_html, body_html):
-    today = dt.date.today().strftime('%d %B %Y')
+def render_html(meta, toc_html, body_html):
+    today = dt.date.today().strftime("%d %B %Y")
 
     css = r'''
 :root {
-  --ink: #16243a;
-  --muted: #4d5f79;
-  --line: #d8dee9;
-  --accent: #20457c;
-  --bg: #f7f9fc;
+  --bg: #f2f5f8;
+  --panel: #ffffff;
+  --ink: #1b2430;
+  --muted: #556272;
+  --accent: #0f766e;
+  --accent-soft: #d8f0ed;
+  --line: #d4dde6;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  padding: 0;
-  font-family: "Georgia", "Times New Roman", serif;
+  background: radial-gradient(circle at 20% 10%, #eef7f6 0%, var(--bg) 45%, #ecf1f6 100%);
   color: var(--ink);
-  background: #fff;
-  line-height: 1.55;
+  font-family: "Cambria", "Times New Roman", serif;
+  line-height: 1.58;
 }
-.page { width: min(980px, 92vw); margin: 28px auto 56px; }
-.cover {
-  min-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border: 1px solid var(--line);
-  padding: 56px 64px;
-  background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+.shell {
+  width: min(1100px, 94vw);
+  margin: 26px auto 52px;
 }
-.cover .inst {
-  letter-spacing: 0.06em;
-  font-size: 0.85rem;
+.hero {
+  background: linear-gradient(135deg, #0f766e 0%, #155e75 65%, #1d4e89 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 38px 44px;
+  box-shadow: 0 10px 28px rgba(12, 36, 62, 0.18);
+}
+.hero .dept {
   text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 18px;
+  letter-spacing: 0.07em;
+  font-size: 0.78rem;
+  opacity: 0.92;
+  margin-bottom: 14px;
 }
-.cover h1 {
-  margin: 0 0 8px;
-  font-size: 2.05rem;
-  color: var(--accent);
+.hero h1 {
+  margin: 0 0 6px;
+  font-size: 2rem;
   line-height: 1.2;
 }
-.cover h2 {
-  margin: 0 0 30px;
-  font-size: 1.14rem;
-  color: var(--muted);
+.hero h2 {
+  margin: 0 0 24px;
+  font-size: 1.08rem;
   font-weight: 500;
+  opacity: 0.95;
 }
-.meta-grid {
+.meta {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 6px 12px;
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  gap: 10px 22px;
+  font-size: 0.97rem;
+}
+.meta .k { opacity: 0.86; display: inline-block; min-width: 132px; }
+.meta .v { font-weight: 600; }
+.meta .date {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  opacity: 0.9;
+}
+
+.report {
   margin-top: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px 30px 30px;
 }
-.meta-grid .k { color: var(--muted); }
-.meta-grid .v { font-weight: 600; }
-.cover .date { margin-top: 34px; color: var(--muted); font-size: 0.95rem; }
 
-.section { margin-top: 32px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 26px 0; }
-
-h1,h2,h3,h4,h5,h6 {
-  color: var(--accent);
-  line-height: 1.28;
-  margin-top: 1.3em;
-  margin-bottom: 0.55em;
+.toc-card {
+  background: #f9fffe;
+  border: 1px solid #cceae6;
+  border-left: 6px solid var(--accent);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
 }
-h1 { font-size: 1.95rem; }
-h2 { font-size: 1.45rem; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
-h3 { font-size: 1.15rem; }
-h4 { font-size: 1.03rem; }
+.toc-card h2 {
+  margin: 0 0 8px;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-size: 1.02rem;
+  color: #115e59;
+  border: none;
+  padding: 0;
+}
+.toc-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  column-count: 2;
+  column-gap: 28px;
+}
+.toc-card li { margin: 0.25em 0; break-inside: avoid; }
+.toc-card li.minor { margin-left: 10px; }
+.toc-card a {
+  color: #0b4f4a;
+  text-decoration: none;
+}
+.toc-card a:hover { text-decoration: underline; }
 
-p { margin: 0.5em 0 0.85em; }
+h1, h2, h3, h4, h5, h6 {
+  color: #153b5c;
+  line-height: 1.3;
+  margin-top: 1.28em;
+  margin-bottom: 0.52em;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+h1 { font-size: 1.82rem; }
+h2 {
+  font-size: 1.34rem;
+  border-bottom: 2px solid #e5eef7;
+  padding-bottom: 6px;
+}
+h3 { font-size: 1.08rem; }
+h4 { font-size: 1.0rem; }
+
+p { margin: 0.52em 0 0.9em; }
 ul { margin: 0.45em 0 1em 1.2em; }
-li { margin: 0.2em 0; }
+li { margin: 0.22em 0; }
 
-a { color: #214f8f; text-decoration: none; }
+a { color: #0f766e; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 code {
   font-family: "SFMono-Regular", Menlo, Consolas, monospace;
   font-size: 0.9em;
-  background: #eef3fa;
-  border: 1px solid #dce5f2;
-  padding: 1px 4px;
+  background: #eef6ff;
+  border: 1px solid #d7e7fb;
   border-radius: 4px;
+  padding: 1px 4px;
 }
 pre {
-  background: #0f172a;
-  color: #e6edf7;
-  border-radius: 8px;
-  padding: 14px;
+  background: #111827;
+  color: #f3f4f6;
+  border: 1px solid #2f3d53;
+  border-radius: 9px;
+  padding: 13px;
   overflow-x: auto;
-  border: 1px solid #202c44;
 }
-pre code { background: transparent; border: none; padding: 0; color: inherit; }
+pre code {
+  background: transparent;
+  border: none;
+  color: inherit;
+  padding: 0;
+}
 
 figure {
-  margin: 18px auto 22px;
-  padding: 12px;
-  border: 1px solid var(--line);
+  margin: 18px 0 22px;
   background: #fff;
+  border: 1px solid #d7e0eb;
+  border-radius: 10px;
+  padding: 10px;
 }
 figure img {
   width: 100%;
   height: auto;
+  border-radius: 6px;
   display: block;
 }
 figcaption {
-  margin-top: 8px;
-  text-align: center;
+  margin-top: 7px;
   color: var(--muted);
+  text-align: center;
   font-size: 0.92rem;
 }
 
-.table-wrap {
+.tbl-wrap {
   overflow-x: auto;
-  margin: 14px 0 18px;
+  margin: 14px 0 20px;
   break-inside: avoid;
   page-break-inside: avoid;
 }
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
   table-layout: fixed;
+  font-size: 0.94rem;
 }
 th, td {
-  border: 1px solid var(--line);
-  padding: 8px 10px;
+  border: 1px solid #d5dee8;
+  padding: 8px 9px;
+  text-align: left;
   vertical-align: top;
-  word-wrap: break-word;
   overflow-wrap: anywhere;
 }
 th {
-  background: #edf3fb;
-  color: var(--accent);
-  text-align: left;
+  background: #edf6ff;
+  color: #12406b;
 }
 
-.toc {
-  border: 1px solid var(--line);
-  background: #fafcff;
-  padding: 16px 20px;
-  margin: 26px 0 24px;
-}
-.toc h2 {
-  border: none;
-  margin-top: 0;
-  margin-bottom: 10px;
-  padding-bottom: 0;
-  font-size: 1.2rem;
-}
-.toc ol { margin: 0; padding-left: 1.2em; }
-.toc li { margin: 0.3em 0; }
-.toc .toc-l3 { margin-left: 1.1em; }
-.toc .toc-l4 { margin-left: 2.1em; }
-
-.display-math { margin: 12px 0; padding: 6px 0; }
+.display-math { margin: 11px 0; }
 
 @media print {
   @page { size: A4; margin: 10mm 11mm; }
-  body { background: white; }
-  .page { width: 100%; margin: 0; }
-  .section { margin-top: 0; }
-  .cover {
+  body { background: #fff; }
+  .shell { width: 100%; margin: 0; }
+  .hero {
+    border-radius: 0;
+    box-shadow: none;
     page-break-after: always;
-    min-height: 100vh;
-    border: none;
-    padding: 36px 44px;
+    min-height: 98vh;
   }
-  .toc { page-break-after: always; }
+  .report {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin-top: 0;
+  }
+  .toc-card { page-break-after: always; }
+  .toc-card ul { column-count: 1; }
   h2, h3, h4 { page-break-after: avoid; }
-  figure, table, pre, .table-wrap { page-break-inside: avoid; break-inside: avoid; }
-  table { font-size: 0.9rem; }
+  figure, pre, table, .tbl-wrap { break-inside: avoid; page-break-inside: avoid; }
   th, td { padding: 6px 8px; }
 }
 '''
@@ -422,7 +464,7 @@ th {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{html.escape(cover['title'])} - {html.escape(cover['roll'])}</title>
+  <title>{html.escape(meta['title'])} — {html.escape(meta['roll'])}</title>
   <style>{css}</style>
   <script>
     window.MathJax = {{
@@ -433,27 +475,24 @@ th {
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
-  <div class="page">
-    <section class="cover">
-      <div class="inst">PAF Institute Of Applied Sciences And Technology · Department Of Computer Science & Artificial Intelligence</div>
-      <h1>{html.escape(cover['title'])}</h1>
-      <h2>{html.escape(cover['subtitle'])}</h2>
-
-      <div class="meta-grid">
-        <div class="k">Student Name</div><div class="v">{html.escape(cover['student'])}</div>
-        <div class="k">Roll Number</div><div class="v">{html.escape(cover['roll'])}</div>
-        <div class="k">Course</div><div class="v">{html.escape(cover['course'])}</div>
-        <div class="k">Instructor</div><div class="v">{html.escape(cover['instructor'])}</div>
-        <div class="k">Report Type</div><div class="v">Technical Assignment Report</div>
+  <div class="shell">
+    <section class="hero">
+      <div class="dept">PAF-IAST · Department of Computer Science & Artificial Intelligence</div>
+      <h1>{html.escape(meta['title'])}</h1>
+      <h2>{html.escape(meta['subtitle'])}</h2>
+      <div class="meta">
+        <div><span class="k">Author:</span> <span class="v">{html.escape(meta['author'])}</span></div>
+        <div><span class="k">Registration ID:</span> <span class="v">{html.escape(meta['roll'])}</span></div>
+        <div><span class="k">Course:</span> <span class="v">{html.escape(meta['course'])}</span></div>
+        <div><span class="k">Supervisor:</span> <span class="v">{html.escape(meta['supervisor'])}</span></div>
+        <div class="date"><span class="k">Generated:</span> <span class="v">{dt.date.today().strftime('%d %B %Y')}</span></div>
       </div>
-
-      <div class="date">Prepared on {today}</div>
     </section>
 
-    <section class="section">
+    <main class="report">
       {toc_html}
       {body_html}
-    </section>
+    </main>
   </div>
 </body>
 </html>
@@ -465,18 +504,18 @@ def main():
     html_path = Path('Assignment_B23F0115AI125_report_proper.html')
 
     if not md_path.exists():
-        raise FileNotFoundError(f'Report markdown not found: {md_path}')
+        raise FileNotFoundError(f'Markdown file missing: {md_path}')
 
     text = md_path.read_text(encoding='utf-8')
     parts = text.split('\n---\n', 1)
     preface = parts[0]
     body = parts[1] if len(parts) > 1 else text
 
-    cover = extract_cover(preface)
-    body_html, toc = parse_markdown(body)
-    toc_html = make_toc(toc)
+    meta = cover_meta(preface)
+    body_html, toc = md_to_html(body)
+    toc_html = build_toc(toc)
 
-    html_doc = build_html(cover, toc_html, body_html)
+    html_doc = render_html(meta, toc_html, body_html)
     html_path.write_text(html_doc, encoding='utf-8')
 
     print('Generated:', html_path)
