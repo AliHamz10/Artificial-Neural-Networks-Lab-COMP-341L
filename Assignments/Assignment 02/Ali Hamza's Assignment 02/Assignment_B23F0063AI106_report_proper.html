@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>COMP-341 Assignment 02 Report - B23F0063AI106</title>
+  <style>
+:root {
+  --ink: #16243a;
+  --muted: #4c5d75;
+  --line: #d8dee9;
+  --accent: #234a84;
+  --bg: #f7f9fc;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Georgia", "Times New Roman", serif;
+  color: var(--ink);
+  background: white;
+  line-height: 1.55;
+}
+.page {
+  width: min(980px, 92vw);
+  margin: 28px auto 56px;
+}
+.cover {
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid var(--line);
+  padding: 56px 64px;
+  background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+}
+.cover .inst {
+  letter-spacing: 0.06em;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+.cover h1 {
+  margin: 0 0 8px;
+  font-size: 2.1rem;
+  color: var(--accent);
+  line-height: 1.2;
+}
+.cover h2 {
+  margin: 0 0 30px;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.meta-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 6px 12px;
+  margin: 20px 0 0;
+  font-size: 1rem;
+}
+.meta-grid .k { color: var(--muted); }
+.meta-grid .v { font-weight: 600; }
+.cover .date {
+  margin-top: 34px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.section {
+  margin-top: 32px;
+}
+hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 26px 0;
+}
+h1,h2,h3,h4,h5,h6 {
+  color: var(--accent);
+  line-height: 1.28;
+  margin-top: 1.3em;
+  margin-bottom: 0.55em;
+}
+h1 { font-size: 1.95rem; }
+h2 { font-size: 1.45rem; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+h3 { font-size: 1.15rem; }
+h4 { font-size: 1.03rem; }
+p { margin: 0.5em 0 0.85em; }
+ul { margin: 0.45em 0 1em 1.2em; }
+li { margin: 0.2em 0; }
+code {
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background: #eef3fa;
+  border: 1px solid #dce5f2;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+pre {
+  background: #0f172a;
+  color: #e6edf7;
+  border-radius: 8px;
+  padding: 14px;
+  overflow-x: auto;
+  border: 1px solid #202c44;
+}
+pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+figure {
+  margin: 18px auto 22px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+figcaption {
+  margin-top: 8px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.table-wrap {
+  overflow-x: auto;
+  margin: 14px 0 18px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  table-layout: fixed;
+}
+th, td {
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+th {
+  background: #edf3fb;
+  color: var(--accent);
+  text-align: left;
+}
+.toc {
+  border: 1px solid var(--line);
+  background: #fafcff;
+  padding: 16px 20px;
+  margin: 26px 0 24px;
+}
+.toc h2 {
+  border: none;
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding-bottom: 0;
+  font-size: 1.2rem;
+}
+.toc ol {
+  margin: 0;
+  padding-left: 1.2em;
+}
+.toc li { margin: 0.3em 0; }
+.toc .toc-l3 { margin-left: 1.1em; }
+.toc .toc-l4 { margin-left: 2.1em; }
+.toc a {
+  color: #1d3f72;
+  text-decoration: none;
+}
+.toc a:hover { text-decoration: underline; }
+.display-math {
+  margin: 12px 0;
+  padding: 6px 0;
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm 11mm;
+  }
+  body { background: white; }
+  .page { width: 100%; margin: 0; }
+  .section { margin-top: 0; }
+  .cover {
+    page-break-after: always;
+    min-height: 100vh;
+    border: none;
+    padding: 36px 44px;
+  }
+  .toc { page-break-after: always; }
+  h2, h3, h4 { page-break-after: avoid; }
+  figure, table, pre, .table-wrap { page-break-inside: avoid; break-inside: avoid; }
+  table { font-size: 0.9rem; }
+  th, td { padding: 6px 8px; }
+}
+</style>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+  <div class="page">
+    <section class="cover">
+      <div class="inst">PAF Institute Of Applied Sciences And Technology · Department Of Computer Science & Artificial Intelligence</div>
+      <h1>COMP-341 Assignment 02 Report</h1>
+      <h2>Hebbian / Neo-Hebbian Learning and STDP</h2>
+
+      <div class="meta-grid">
+        <div class="k">Student Name</div><div class="v">Ali Hamza</div>
+        <div class="k">Roll Number</div><div class="v">B23F0063AI106</div>
+        <div class="k">Course</div><div class="v">Artificial Neural Network (COMP-341)</div>
+        <div class="k">Instructor</div><div class="v">Dr. Abid Ali</div>
+        <div class="k">Report Type</div><div class="v">Technical Assignment Report</div>
+      </div>
+
+      <div class="date">Prepared on 28 February 2026</div>
+    </section>
+
+    <section class="section">
+      <nav class="toc">
+<h2>Table Of Contents</h2>
+<ol>
+<li class="toc-l2"><a href="#1-introduction">1. Introduction</a></li>
+<li class="toc-l2"><a href="#2-q1-ojas-rule-and-unsupervised-pca-20-marks">2. Q1: Oja&#x27;s Rule and Unsupervised PCA (20 Marks)</a></li>
+<li class="toc-l3"><a href="#21-task-21---basic-hebbian-rule-unstable-5-marks">2.1 Task 2.1 - Basic Hebbian Rule (Unstable) [5 Marks]</a></li>
+<li class="toc-l3"><a href="#211-task-objective">2.1.1 Task Objective</a></li>
+<li class="toc-l3"><a href="#212-core-method">2.1.2 Core Method</a></li>
+<li class="toc-l3"><a href="#213-data-and-observed-outputs">2.1.3 Data and Observed Outputs</a></li>
+<li class="toc-l3"><a href="#214-visual-results">2.1.4 Visual Results</a></li>
+<li class="toc-l3"><a href="#215-interpretation">2.1.5 Interpretation</a></li>
+<li class="toc-l3"><a href="#22-task-22---ojas-rule-stable-pca-10-marks">2.2 Task 2.2 - Oja&#x27;s Rule (Stable PCA) [10 Marks]</a></li>
+<li class="toc-l3"><a href="#221-task-objective">2.2.1 Task Objective</a></li>
+<li class="toc-l3"><a href="#222-core-method">2.2.2 Core Method</a></li>
+<li class="toc-l3"><a href="#223-observed-outputs">2.2.3 Observed Outputs</a></li>
+<li class="toc-l3"><a href="#224-visual-results">2.2.4 Visual Results</a></li>
+<li class="toc-l3"><a href="#225-interpretation">2.2.5 Interpretation</a></li>
+<li class="toc-l3"><a href="#226-why-oja-is-neo-hebbian">2.2.6 Why Oja is Neo-Hebbian</a></li>
+<li class="toc-l3"><a href="#23-task-23---receptive-fields-from-natural-image-patches-5-marks">2.3 Task 2.3 - Receptive Fields from Natural Image Patches [5 Marks]</a></li>
+<li class="toc-l3"><a href="#231-task-objective">2.3.1 Task Objective</a></li>
+<li class="toc-l3"><a href="#232-core-method">2.3.2 Core Method</a></li>
+<li class="toc-l3"><a href="#233-observed-outputs">2.3.3 Observed Outputs</a></li>
+<li class="toc-l3"><a href="#234-visual-results">2.3.4 Visual Results</a></li>
+<li class="toc-l3"><a href="#235-interpretation">2.3.5 Interpretation</a></li>
+<li class="toc-l2"><a href="#3-q3-differential-hebbian-learning-and-neo-hebbian-extensions-20-marks">3. Q3: Differential Hebbian Learning and Neo-Hebbian Extensions (20 Marks)</a></li>
+<li class="toc-l3"><a href="#31-part-a---theory-8-marks">3.1 Part A - Theory [8 Marks]</a></li>
+<li class="toc-l3"><a href="#311-q3a-differential-hebbian-learning">3.1.1 Q3(a) Differential Hebbian Learning</a></li>
+<li class="toc-l3"><a href="#312-q3b-stdp-and-temporal-window">3.1.2 Q3(b) STDP and Temporal Window</a></li>
+<li class="toc-l3"><a href="#313-q3c-mexican-hat-correlation-and-orientation-selectivity">3.1.3 Q3(c) Mexican-Hat Correlation and Orientation Selectivity</a></li>
+<li class="toc-l3"><a href="#32-part-b---python-stdp-simulation-12-marks">3.2 Part B - Python STDP Simulation [12 Marks]</a></li>
+<li class="toc-l3"><a href="#321-task-objective">3.2.1 Task Objective</a></li>
+<li class="toc-l3"><a href="#322-parameters-used">3.2.2 Parameters Used</a></li>
+<li class="toc-l3"><a href="#323-essential-window-logic">3.2.3 Essential Window Logic</a></li>
+<li class="toc-l3"><a href="#324-observed-outputs">3.2.4 Observed Outputs</a></li>
+<li class="toc-l3"><a href="#325-visual-results">3.2.5 Visual Results</a></li>
+<li class="toc-l3"><a href="#326-interpretation">3.2.6 Interpretation</a></li>
+<li class="toc-l2"><a href="#4-consolidated-result-summary">4. Consolidated Result Summary</a></li>
+</ol>
+</nav>
+
+      <h2 id="1-introduction">1. Introduction</h2>
+<p>This report presents the implementation and analysis of the assignment tasks related to Hebbian learning, Oja&#x27;s rule, principal component extraction, and Spike-Timing Dependent Plasticity (STDP). The work is organized exactly by assignment tasks and evaluated with emphasis on:</p>
+<ul>
+<li>conceptual correctness,</li>
+<li>code-to-theory consistency,</li>
+<li>plot quality and interpretation,</li>
+<li>mathematically consistent notation.</li>
+</ul>
+<p>The report includes only essential code logic and focuses primarily on method, outputs, and interpretation.</p>
+<hr/>
+<h2 id="2-q1-ojas-rule-and-unsupervised-pca-20-marks">2. Q1: Oja&#x27;s Rule and Unsupervised PCA (20 Marks)</h2>
+<h3 id="21-task-21---basic-hebbian-rule-unstable-5-marks">2.1 Task 2.1 - Basic Hebbian Rule (Unstable) [5 Marks]</h3>
+<h3 id="211-task-objective">2.1.1 Task Objective</h3>
+<p>Implement the classical Hebbian update on correlated 2D data and demonstrate instability of the weight dynamics.</p>
+<h3 id="212-core-method">2.1.2 Core Method</h3>
+<p>Basic Hebbian update used:</p>
+<div class="display-math">
+\[
+\Delta w = \eta yx, \quad y = w^T x
+\]
+</div>
+<p>Minimal implementation idea:</p>
+<pre><code class="language-python">for x in X:
+    y = np.dot(w, x)
+    w += eta * y * x</code></pre>
+<h3 id="213-data-and-observed-outputs">2.1.3 Data and Observed Outputs</h3>
+<pre><code class="language-text">Dataset shape: (200, 2)
+Empirical covariance matrix:
+[[2.95632304 2.3439734 ]
+ [2.3439734  1.92483448]]
+
+Basic Hebbian final alignment: angle=nan deg, |cosine|=nan
+Final ||w||: nan</code></pre>
+<h3 id="214-visual-results">2.1.4 Visual Results</h3>
+<figure>
+<img src="Assignment_B23F0063AI106_report_assets/cell_008_output_01.png" alt="Task 2.1 Dataset"/>
+<figcaption>Task 2.1 Dataset</figcaption>
+</figure>
+<figure>
+<img src="Assignment_B23F0063AI106_report_assets/cell_011_output_01.png" alt="Task 2.1 Instability Curves"/>
+<figcaption>Task 2.1 Instability Curves</figcaption>
+</figure>
+<figure>
+<img src="Assignment_B23F0063AI106_report_assets/cell_012_output_01.png" alt="Task 2.1 PCA vs Basic Hebbian Direction"/>
+<figcaption>Task 2.1 PCA vs Basic Hebbian Direction</figcaption>
+</figure>
+<h3 id="215-interpretation">2.1.5 Interpretation</h3>
+<p>The run diverged numerically (<code>nan</code>), which is consistent with the expected instability of unconstrained Hebbian growth on correlated inputs. Since there is no normalization/competition term, weight norm can blow up, and direction comparison with true PC becomes invalid. This directly supports the assignment requirement to show unstable behavior and lack of reliable principal-component convergence.</p>
+<hr/>
+<h3 id="22-task-22---ojas-rule-stable-pca-10-marks">2.2 Task 2.2 - Oja&#x27;s Rule (Stable PCA) [10 Marks]</h3>
+<h3 id="221-task-objective">2.2.1 Task Objective</h3>
+<p>Implement Oja&#x27;s rule and verify convergence toward the first principal component obtained from sklearn PCA.</p>
+<h3 id="222-core-method">2.2.2 Core Method</h3>
+<p>Oja update used:</p>
+<div class="display-math">
+\[
+\Delta w = \eta y(x - yw)
+\]
+</div>
+<p>Equivalent decomposition:</p>
+<div class="display-math">
+\[
+\Delta w = \eta(yx) - \eta(y^2w)
+\]
+</div>
+<p>The second term acts as normalization/stabilization.</p>
+<p>Minimal implementation idea:</p>
+<pre><code class="language-python">for x in X:
+    y = np.dot(w, x)
+    w += eta * y * (x - y * w)</code></pre>
+<h3 id="223-observed-outputs">2.2.3 Observed Outputs</h3>
+<pre><code class="language-text">Oja final alignment: angle=0.4779 deg, |cosine|=0.999965
+Final ||w|| before final unit-normalization (last epoch): 1.0001874864718119
+
+Comparison Summary
+------------------
+Basic Hebbian: final ||w|| = nan, final angle to PC1 = nan deg
+Oja&#x27;s Rule    : final ||w|| ~ 1.000000 (unit), final angle to PC1 = 0.4779 deg</code></pre>
+<h3 id="224-visual-results">2.2.4 Visual Results</h3>
+<figure>
+<img src="Assignment_B23F0063AI106_report_assets/cell_017_output_01.png" alt="Task 2.2 Oja Convergence"/>
+<figcaption>Task 2.2 Oja Convergence</figcaption>
+</figure>
+<figure>
+<img src="Assignment_B23F0063AI106_report_assets/cell_018_output_01.png" alt="Task 2.2 PCA vs Oja Direction"/>
+<figcaption>Task 2.2 PCA vs Oja Direction</figcaption>
+</figure>
+<h3 id="225-interpretation">2.2.5 Interpretation</h3>
+<p>The very small angle to PCA PC1 (0.4779°) and unit-scale norm confirm stable convergence to the dominant principal direction. This result validates Oja&#x27;s rule as a stable unsupervised PCA-like learner.</p>
+<h3 id="226-why-oja-is-neo-hebbian">2.2.6 Why Oja is Neo-Hebbian</h3>
+<p>Oja&#x27;s rule preserves the Hebbian correlation term but augments it with a local stabilizing term proportional to \(y^2w\). Therefore, it is a modified Hebbian rule (Neo-Hebbian), not purely classical Hebbian.</p>
+<hr/>
+<h3 id="23-task-23---receptive-fields-from-natural-image-patches-5-marks">2.3 Task 2.3 - Receptive Fields from Natural Image Patches [5 Marks]</h3>
+<h3 id="231-task-objective">2.3.1 Task Objective</h3>
+<p>Learn first 10 principal directions from 10,000 random 8×8 patches and analyze visual structure of learned weights.</p>
+<h3 id="232-core-method">2.3.2 Core Method</h3>
+<ul>
+<li>Source patches from <code>olivetti_faces</code>.</li>
+<li>Flatten each 8×8 patch to a 64D vector.</li>
+<li>Mean-center/standardize.</li>
+<li>Learn components sequentially with Oja + deflation.</li>
+</ul>
+<p>Essential multi-component logic:</p>
+<pre><code class="language-python">for i in range(n_components):
+    w = ojas_rule(residual_X)
+    components.append(w)
+    residual_X = residual_X - np.outer(residual_X @ w, w)</code></pre>
+<h3 id="233-observed-outputs">2.3.3 Observed Outputs</h3>
+<pre><code class="language-text">Patch source: olivetti_faces
+Patch matrix shape: (10000, 64)
+Learned components shape: (10, 64)
+
+Mean similarity over 10 components: 0.888234999486834</code></pre>
+<h3 id="234-visual-results">2.3.4 Visual Results</h3>
+<figure>
+<img src="Assignment_B23F0063AI106_report_assets/cell_025_output_01.png" alt="Task 2.3 Learned Receptive Fields"/>
+<figcaption>Task 2.3 Learned Receptive Fields</figcaption>
+</figure>
+<figure>
+<img src="Assignment_B23F0063AI106_report_assets/cell_026_output_01.png" alt="Task 2.3 Oja vs PCA Similarity"/>
+<figcaption>Task 2.3 Oja vs PCA Similarity</figcaption>
+</figure>
+<h3 id="235-interpretation">2.3.5 Interpretation</h3>
+<p>The learned components show oriented and contrast-sensitive structures typical of natural-image statistics. Quantitatively, the high mean cosine similarity (0.8882) between Oja-learned and PCA components supports the expected Hebbian-&gt;Oja-&gt;PCA linkage. Qualitatively, several filters are edge-like and resemble Gabor-like receptive-field behavior often discussed for V1.</p>
+<hr/>
+<h2 id="3-q3-differential-hebbian-learning-and-neo-hebbian-extensions-20-marks">3. Q3: Differential Hebbian Learning and Neo-Hebbian Extensions (20 Marks)</h2>
+<h3 id="31-part-a---theory-8-marks">3.1 Part A - Theory [8 Marks]</h3>
+<h3 id="311-q3a-differential-hebbian-learning">3.1.1 Q3(a) Differential Hebbian Learning</h3>
+<p>Standard Hebbian rule:</p>
+<div class="display-math">
+\[
+\frac{dw}{dt} = \eta x(t)y(t)
+\]
+</div>
+<p>Differential Hebbian rule:</p>
+<div class="display-math">
+\[
+\frac{dw}{dt} = \eta \frac{dx}{dt}\frac{dy}{dt}
+\]
+</div>
+<p>Difference: standard Hebbian uses instantaneous co-activation; differential Hebbian emphasizes temporal co-variation (changes), so it is better aligned with predictive timing relationships.</p>
+<h3 id="312-q3b-stdp-and-temporal-window">3.1.2 Q3(b) STDP and Temporal Window</h3>
+<p>Define timing difference \(\Delta t = t<em>{post} - t</em>{pre}\). A standard pair-based model is:</p>
+<div class="display-math">
+\[
+\Delta w =
+\begin{cases}
+A*+ e^{-\lvert\Delta t\rvert/\tau*+}, & \Delta t > 0 \quad (\text{LTP})\\
+-A*- e^{-\lvert\Delta t\rvert/\tau*-}, & \Delta t < 0 \quad (\text{LTD})
+\end{cases}
+\]
+</div>
+<p>So if pre-synaptic firing precedes post-synaptic firing, potentiation occurs; for reverse order, depression occurs.</p>
+<h3 id="313-q3c-mexican-hat-correlation-and-orientation-selectivity">3.1.3 Q3(c) Mexican-Hat Correlation and Orientation Selectivity</h3>
+<p>A Mexican-hat correlation profile (local excitation, surround inhibition) encourages structured positive and negative receptive subregions under Hebbian-like adaptation. This supports emergence of orientation-selective filters in Linsker-style self-organization models.</p>
+<hr/>
+<h3 id="32-part-b---python-stdp-simulation-12-marks">3.2 Part B - Python STDP Simulation [12 Marks]</h3>
+<h3 id="321-task-objective">3.2.1 Task Objective</h3>
+<p>Simulate STDP using required parameters and compare random, causal, and anti-causal timing conditions.</p>
+<h3 id="322-parameters-used">3.2.2 Parameters Used</h3>
+<ul>
+<li>\(A\_+ = 0.01\)</li>
+<li>\(A\_- = 0.012\)</li>
+<li>\(\tau\_+ = 20\,ms\)</li>
+<li>\(\tau\_- = 20\,ms\)</li>
+<li>\(T = 1000\,ms\)</li>
+<li>epochs = 50</li>
+</ul>
+<h3 id="323-essential-window-logic">3.2.3 Essential Window Logic</h3>
+<pre><code class="language-python">if dt &gt; 0:
+    dw = A_plus * exp(-abs(dt)/tau_plus)
+elif dt &lt; 0:
+    dw = -A_minus * exp(-abs(dt)/tau_minus)</code></pre>
+<h3 id="324-observed-outputs">3.2.4 Observed Outputs</h3>
+<pre><code class="language-text">Random case final weight: 0.9994316929072757
+Random case pre spikes: 10 post spikes: 11
+
+Causal final weight     : 1.0
+Anti-causal final weight: 0.0
+
+Expected trend check: causal &gt; anti-causal (usually true under standard STDP parameters).</code></pre>
+<h3 id="325-visual-results">3.2.5 Visual Results</h3>
+<figure>
+<img src="Assignment_B23F0063AI106_report_assets/cell_035_output_01.png" alt="Q3 STDP Window"/>
+<figcaption>Q3 STDP Window</figcaption>
+</figure>
+<figure>
+<img src="Assignment_B23F0063AI106_report_assets/cell_037_output_01.png" alt="Q3 Random Spike Weight Trajectory"/>
+<figcaption>Q3 Random Spike Weight Trajectory</figcaption>
+</figure>
+<figure>
+<img src="Assignment_B23F0063AI106_report_assets/cell_039_output_01.png" alt="Q3 Causal vs Anti-Causal Trajectories"/>
+<figcaption>Q3 Causal vs Anti-Causal Trajectories</figcaption>
+</figure>
+<figure>
+<img src="Assignment_B23F0063AI106_report_assets/cell_040_output_01.png" alt="Q3 Final Weight Comparison"/>
+<figcaption>Q3 Final Weight Comparison</figcaption>
+</figure>
+<h3 id="326-interpretation">3.2.6 Interpretation</h3>
+<p>The simulation outcome is consistent with STDP theory:</p>
+<ul>
+<li>causal ordering (pre before post) increases weight,</li>
+<li>anti-causal ordering decreases weight.</li>
+</ul>
+<p>This directly demonstrates temporal Hebbian plasticity and its connection to differential Hebbian learning principles.</p>
+<hr/>
+<h2 id="4-consolidated-result-summary">4. Consolidated Result Summary</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Section</th><th>Key Quantitative Result</th><th>Conclusion</th></tr></thead>
+<tbody>
+<tr><td>Q1 Task 2.1</td><td>Hebbian <code>norm(w)</code> and angle became <code>nan</code></td><td>Unstable / diverging dynamics</td></tr>
+<tr><td>Q1 Task 2.2</td><td>Oja vs PC1 angle = <strong>0.4779°</strong></td><td>Accurate PCA-direction recovery</td></tr>
+<tr><td>Q1 Task 2.3</td><td>Mean Oja-PCA similarity = <strong>0.8882</strong></td><td>Strong alignment with PCA components</td></tr>
+<tr><td>Q3 Part B</td><td>Causal final \(w=1.0\), Anti-causal final \(w=0.0\)</td><td>Correct LTP/LTD timing behavior</td></tr>
+</tbody></table>
+</div>
+
+    </section>
+  </div>
+</body>
+</html>
