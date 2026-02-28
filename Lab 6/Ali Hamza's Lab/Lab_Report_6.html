@@ -1,15 +1,268 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Lab Report 6 - Ali Hamza</title>
-  <style>body{font-family:Arial,sans-serif;margin:24px;line-height:1.5}</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab Report 6: Implementing a CNN on CIFAR-10</title>
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --muted: #444;
+      --paper: #fff;
+      --rule: #ccc;
+      --codebg: #f6f6f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #e8e8e8;
+      color: var(--ink);
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-size: 12pt;
+      line-height: 1.6;
+      text-align: left;
+      counter-reset: figure section;
+    }
+    .report-sheet {
+      width: 8.5in;
+      max-width: 100%;
+      margin: 24px auto 40px;
+      position: relative;
+    }
+    .page {
+      background: var(--paper);
+      border: 1px solid #d4d4d4;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      padding: 1in 1in 1in;
+      min-height: 11in;
+    }
+    .title-page {
+      min-height: 10in;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2in 1in;
+      page-break-after: always;
+      break-after: page;
+    }
+    .title-page h1 {
+      font-size: 18pt;
+      font-weight: 700;
+      margin: 0 0 0.5in 0;
+      line-height: 1.4;
+      max-width: 6in;
+    }
+    .title-page .subtitle {
+      font-size: 12pt;
+      color: var(--muted);
+      margin-bottom: 1.2in;
+    }
+    .title-page .meta-block {
+      font-size: 11pt;
+      line-height: 2;
+      text-align: center;
+      margin-top: 1in;
+    }
+    .title-page .meta-block p { margin: 0.2em 0; }
+    .title-page .course-info { margin-top: 0.8in; }
+    .title-page .date { margin-top: 0.5in; font-style: italic; }
+    h1, h2, h3, h4 {
+      color: var(--ink);
+      font-weight: 700;
+      margin-top: 1.2em;
+      margin-bottom: 0.4em;
+    }
+    h1 { font-size: 14pt; text-align: center; border-bottom: 1px solid var(--rule); padding-bottom: 0.3em; }
+    h2 { font-size: 12pt; margin-top: 1.5em; }
+    h3 { font-size: 12pt; font-weight: 600; margin-top: 1em; }
+    p { margin: 0.5em 0; text-align: justify; }
+    ul { margin: 0.5em 0; padding-left: 1.5em; }
+    li { margin: 0.25em 0; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1em 0;
+      font-size: 10.5pt;
+    }
+    th, td {
+      border: 1px solid var(--rule);
+      padding: 0.4em 0.6em;
+      text-align: left;
+    }
+    th { background: #f0f0f0; font-weight: 600; }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0.8em auto;
+      border: 1px solid #e0e0e0;
+    }
+    .figure-caption {
+      font-size: 10pt;
+      color: var(--muted);
+      text-align: center;
+      margin: -0.3em 0 1em 0;
+      font-style: italic;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 1.2em 0;
+    }
+    strong { font-weight: 600; }
+    code {
+      background: var(--codebg);
+      font-family: "Consolas", "Monaco", monospace;
+      font-size: 0.9em;
+      padding: 0.1em 0.3em;
+      border-radius: 2px;
+    }
+    @media print {
+      @page { margin: 0.75in; size: letter; }
+      body { background: #fff; }
+      .report-sheet { margin: 0; box-shadow: none; max-width: none; }
+      .page {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        min-height: 0;
+        page-break-inside: avoid;
+      }
+      .title-page {
+        min-height: 0;
+        padding: 1.5in 0;
+        page-break-after: always;
+      }
+      img { max-width: 6.5in; page-break-inside: avoid; }
+      h2 { page-break-after: avoid; }
+      table { page-break-inside: avoid; }
+      .figure-caption { page-break-before: avoid; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Lab Report 6: Implementing a CNN on CIFAR-10</h1>
-  <p><strong>Student:</strong> Ali Hamza<br>
-     <strong>Roll Number:</strong> B23F0063AI106<br>
-     <strong>Execution:</strong> Google Colab only (no macOS package installation)</p>
-  <p>This is a starter HTML report. Run <code>lab6_cnn_colab.ipynb</code> in Google Colab and execute the report export cell to generate the final HTML with actual outputs.</p>
+
+<div class="report-sheet">
+
+  <!-- Title Page -->
+  <div class="page title-page">
+    <h1>Lab Report 6: Implementing Convolutional Neural Networks (CNN) for Image Classification</h1>
+    <p class="subtitle">Implementing a CNN on CIFAR-10</p>
+    <div class="meta-block course-info">
+      <p><strong>Course Code:</strong> COMP-341L</p>
+      <p><strong>Course Name:</strong> Artificial Neural Networks Lab</p>
+      <p><strong>Lab Number:</strong> 6</p>
+      <p><strong>Lab Title:</strong> Implementing Convolutional Neural Networks (CNN) for Image Classification</p>
+    </div>
+    <div class="meta-block">
+      <p><strong>Name:</strong> Ali Hamza</p>
+      <p><strong>Roll Number:</strong> B23F0063AI106</p>
+      <p><strong>Section:</strong> B.S AI - Red</p>
+    </div>
+    <p class="date">February 28, 2026</p>
+  </div>
+
+  <!-- Main Content -->
+  <div class="page">
+    <h1>Lab Report 6: Implementing a CNN on CIFAR-10</h1>
+
+    <h2>1. Objective</h2>
+    <p>Implement and evaluate a CNN on the CIFAR-10 dataset by completing all required tasks: dataset exploration, preprocessing, CNN design, training, evaluation, prediction, visualization, and analysis.</p>
+
+    <h2>2. Task 1: Load and Explore the CIFAR-10 Dataset</h2>
+    <ul>
+      <li>Displayed training and test dataset shapes: <code>x_train (50000, 32, 32, 3)</code>, <code>y_train (50000, 1)</code>, <code>x_test (10000, 32, 32, 3)</code>, <code>y_test (10000, 1)</code>.</li>
+      <li>Visualized the 10 class names: airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck.</li>
+      <li>Displayed 10 sample CIFAR-10 images in a 2×5 grid.</li>
+    </ul>
+
+    <h2>3. Task 2: Preprocess the Data</h2>
+    <ul>
+      <li>Normalized pixel values to the [0, 1] range by dividing by 255.</li>
+      <li>Used sparse integer labels with <code>sparse_categorical_crossentropy</code> loss for multi-class classification.</li>
+    </ul>
+
+    <h2>4. Task 3: Build a CNN Model</h2>
+    <p>The model architecture includes:</p>
+    <ul>
+      <li>Convolution layers with ReLU activation</li>
+      <li>Max-pooling layers for downsampling</li>
+      <li>Dropout for regularization</li>
+      <li>Dense layers with ReLU</li>
+      <li>Softmax output layer for 10-class classification</li>
+    </ul>
+
+    <h2>5. Task 4: Train the CNN (10 Epochs)</h2>
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>Training</th><th>Validation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Accuracy</strong></td><td>0.7230</td><td>0.7488</td></tr>
+        <tr><td><strong>Loss</strong></td><td>0.7827</td><td>0.7341</td></tr>
+      </tbody>
+    </table>
+
+    <h2>6. Task 5: Evaluate the Model</h2>
+    <h3>6.1 Test Set Performance</h3>
+    <p><strong>Test accuracy:</strong> 0.7285 &nbsp;|&nbsp; <strong>Test loss:</strong> 0.7774</p>
+
+    <h3>6.2 Confusion Matrix</h3>
+    <img src="plots/task5_confusion_matrix.png" alt="Confusion matrix">
+    <p class="figure-caption">Figure 1. Confusion matrix showing predicted vs. actual labels on the CIFAR-10 test set.</p>
+
+    <h3>6.3 Classification Report</h3>
+    <table>
+      <thead>
+        <tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>Support</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>airplane</td><td>0.7978</td><td>0.7300</td><td>0.7624</td><td>1000</td></tr>
+        <tr><td>automobile</td><td>0.8783</td><td>0.8590</td><td>0.8686</td><td>1000</td></tr>
+        <tr><td>bird</td><td>0.7945</td><td>0.4370</td><td>0.5639</td><td>1000</td></tr>
+        <tr><td>cat</td><td>0.5698</td><td>0.4900</td><td>0.5269</td><td>1000</td></tr>
+        <tr><td>deer</td><td>0.6959</td><td>0.6340</td><td>0.6635</td><td>1000</td></tr>
+        <tr><td>dog</td><td>0.5568</td><td>0.7210</td><td>0.6283</td><td>1000</td></tr>
+        <tr><td>frog</td><td>0.7012</td><td>0.8450</td><td>0.7664</td><td>1000</td></tr>
+        <tr><td>horse</td><td>0.7540</td><td>0.8090</td><td>0.7805</td><td>1000</td></tr>
+        <tr><td>ship</td><td>0.8375</td><td>0.8710</td><td>0.8539</td><td>1000</td></tr>
+        <tr><td>truck</td><td>0.7579</td><td>0.8890</td><td>0.8182</td><td>1000</td></tr>
+        <tr><td><strong>accuracy</strong></td><td></td><td></td><td><strong>0.7285</strong></td><td>10000</td></tr>
+        <tr><td>macro avg</td><td>0.7344</td><td>0.7285</td><td>0.7233</td><td>10000</td></tr>
+        <tr><td>weighted avg</td><td>0.7344</td><td>0.7285</td><td>0.7233</td><td>10000</td></tr>
+      </tbody>
+    </table>
+
+    <h2>7. Task 6: Make Predictions</h2>
+    <p>Displayed 5 random test images with actual and predicted labels for qualitative inspection.</p>
+    <img src="plots/task6_random_predictions.png" alt="Random predictions">
+    <p class="figure-caption">Figure 2. Five random test images with ground-truth and predicted labels.</p>
+
+    <h2>8. Task 7: Plot Results</h2>
+    <h3>8.1 Training vs. Validation Accuracy</h3>
+    <img src="plots/task7_accuracy_curve.png" alt="Accuracy curve">
+    <p class="figure-caption">Figure 3. Accuracy curves over 10 epochs for training and validation sets.</p>
+
+    <h3>8.2 Training vs. Validation Loss</h3>
+    <img src="plots/task7_loss_curve.png" alt="Loss curve">
+    <p class="figure-caption">Figure 4. Loss curves over 10 epochs for training and validation sets.</p>
+
+    <h2>9. Task 8: Analysis</h2>
+    <p>The CNN achieved good performance on CIFAR-10 with a test accuracy of <strong>0.7285</strong> after 10 epochs. Training accuracy was 0.7230 and validation accuracy was 0.7488 (gap = −0.0258), indicating limited overfitting. CIFAR-10 contains complex natural images, so moderate accuracy is expected with short training. Performance can improve with stronger data augmentation, deeper CNN blocks, better learning-rate scheduling, and longer training.</p>
+    <p><strong>Per-class observations:</strong></p>
+    <ul>
+      <li><strong>Best-performing classes:</strong> automobile (0.87 precision), ship (0.84), truck (0.82)</li>
+      <li><strong>Challenging classes:</strong> cat (0.53 precision), dog (0.56), bird (0.44 recall)</li>
+      <li>Cat–dog confusion is common due to visual similarity in low-resolution 32×32 images.</li>
+    </ul>
+
+    <h2>10. Conclusion</h2>
+    <p>The required Lab 06 workflow was implemented successfully in Google Colab. The model was trained, evaluated, and analyzed using standard metrics and visual diagnostics. The CNN achieved approximately 73% test accuracy with minimal overfitting, and the confusion matrix and classification report provide clear insight into per-class performance.</p>
+  </div>
+
+</div>
+
 </body>
 </html>
