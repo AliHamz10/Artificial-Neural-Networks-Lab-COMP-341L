@@ -119,6 +119,18 @@
       padding: 0.1em 0.3em;
       border-radius: 2px;
     }
+    pre {
+      background: var(--codebg);
+      border: 1px solid var(--rule);
+      padding: 0.6em 0.8em;
+      overflow-x: auto;
+      font-size: 9pt;
+      font-family: "Consolas", "Monaco", monospace;
+      line-height: 1.4;
+      margin: 0.5em 0;
+    }
+    pre code { padding: 0; background: none; }
+    .code-desc { font-size: 10pt; margin-bottom: 0.3em; color: var(--muted); }
     @media print {
       @page { margin: 0.75in; size: letter; }
       body { background: #fff; }
@@ -172,29 +184,57 @@
     <p>Implement and evaluate a CNN on the CIFAR-10 dataset by completing all required tasks: dataset exploration, preprocessing, CNN design, training, evaluation, prediction, visualization, and analysis.</p>
 
     <h2>2. Task 1: Load and Explore the CIFAR-10 Dataset</h2>
+    <p>Load the dataset using TensorFlow/Keras and visualize 10 sample images in a 2×5 grid with class labels.</p>
+    <p class="code-desc"><strong>Code:</strong></p>
+    <pre><code>(x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+
+fig, axes = plt.subplots(2, 5, figsize=(14, 6))
+for i, ax in enumerate(axes.flatten()):
+    ax.imshow(x_train[i])
+    ax.set_title(class_names[int(y_train[i])])
+    ax.axis('off')
+plt.suptitle('Task 1: Sample CIFAR-10 Images')
+plt.savefig('plots/task1_sample_images.png', dpi=130, bbox_inches='tight')</code></pre>
     <ul>
       <li>Displayed training and test dataset shapes: <code>x_train (50000, 32, 32, 3)</code>, <code>y_train (50000, 1)</code>, <code>x_test (10000, 32, 32, 3)</code>, <code>y_test (10000, 1)</code>.</li>
-      <li>Visualized the 10 class names: airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck.</li>
-      <li>Displayed 10 sample CIFAR-10 images in a 2×5 grid.</li>
+      <li>Visualized the 10 class names and 10 sample images in a 2×5 grid.</li>
     </ul>
 
     <h2>3. Task 2: Preprocess the Data</h2>
+    <p>Normalize pixel values and prepare labels for sparse categorical cross-entropy.</p>
+    <p class="code-desc"><strong>Code:</strong></p>
+    <pre><code>x_train = x_train.astype('float32') / 255.0
+x_test = x_test.astype('float32') / 255.0
+y_train = y_train.squeeze().astype('int64')
+y_test = y_test.squeeze().astype('int64')</code></pre>
     <ul>
-      <li>Normalized pixel values to the [0, 1] range by dividing by 255.</li>
-      <li>Used sparse integer labels with <code>sparse_categorical_crossentropy</code> loss for multi-class classification.</li>
+      <li>Pixel values normalized to [0, 1]. Labels kept as sparse integers for <code>sparse_categorical_crossentropy</code>.</li>
     </ul>
 
     <h2>4. Task 3: Build a CNN Model</h2>
-    <p>The model architecture includes:</p>
-    <ul>
-      <li>Convolution layers with ReLU activation</li>
-      <li>Max-pooling layers for downsampling</li>
-      <li>Dropout for regularization</li>
-      <li>Dense layers with ReLU</li>
-      <li>Softmax output layer for 10-class classification</li>
-    </ul>
+    <p>Build a CNN with Conv2D, ReLU, MaxPooling, Dropout, Dense, and Softmax output.</p>
+    <p class="code-desc"><strong>Code (model structure):</strong></p>
+    <pre><code>model = tf.keras.Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)),
+    layers.Conv2D(32, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    layers.Dropout(0.25),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    layers.Dropout(0.25),
+    layers.Flatten(),
+    layers.Dense(512, activation='relu'),
+    layers.Dropout(0.5),
+    layers.Dense(10, activation='softmax')
+])
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])</code></pre>
 
     <h2>5. Task 4: Train the CNN (10 Epochs)</h2>
+    <p class="code-desc"><strong>Code:</strong></p>
+    <pre><code>history = model.fit(x_train, y_train, batch_size=64, epochs=10,
+                    validation_split=0.2, verbose=1)</code></pre>
     <table>
       <thead>
         <tr><th>Metric</th><th>Training</th><th>Validation</th></tr>
@@ -206,6 +246,11 @@
     </table>
 
     <h2>6. Task 5: Evaluate the Model</h2>
+    <p class="code-desc"><strong>Code:</strong></p>
+    <pre><code>test_loss, test_acc = model.evaluate(x_test, y_test, verbose=1)
+y_pred = np.argmax(model.predict(x_test), axis=1)
+cm = confusion_matrix(y_test, y_pred)
+print(classification_report(y_test, y_pred, target_names=class_names))</code></pre>
     <h3>6.1 Test Set Performance</h3>
     <p><strong>Test accuracy:</strong> 0.7285 &nbsp;|&nbsp; <strong>Test loss:</strong> 0.7774</p>
 
@@ -236,11 +281,24 @@
     </table>
 
     <h2>7. Task 6: Make Predictions</h2>
+    <p class="code-desc"><strong>Code:</strong></p>
+    <pre><code>indices = np.random.choice(len(x_test), 5, replace=False)
+for i, idx in enumerate(indices):
+    pred = np.argmax(model.predict(x_test[idx:idx+1]))
+    ax[i].imshow(x_test[idx])
+    ax[i].set_title(f'True: {class_names[y_test[idx]]}\nPred: {class_names[pred]}')</code></pre>
     <p>Displayed 5 random test images with actual and predicted labels for qualitative inspection.</p>
     <img src="plots/task6_random_predictions.png" alt="Random predictions">
     <p class="figure-caption">Figure 2. Five random test images with ground-truth and predicted labels.</p>
 
     <h2>8. Task 7: Plot Results</h2>
+    <p class="code-desc"><strong>Code:</strong></p>
+    <pre><code>plt.plot(history.history['accuracy'], label='Training')
+plt.plot(history.history['val_accuracy'], label='Validation')
+plt.title('Accuracy'); plt.legend(); plt.savefig('plots/task7_accuracy_curve.png')
+plt.plot(history.history['loss'], label='Training')
+plt.plot(history.history['val_loss'], label='Validation')
+plt.title('Loss'); plt.legend(); plt.savefig('plots/task7_loss_curve.png')</code></pre>
     <h3>8.1 Training vs. Validation Accuracy</h3>
     <img src="plots/task7_accuracy_curve.png" alt="Accuracy curve">
     <p class="figure-caption">Figure 3. Accuracy curves over 10 epochs for training and validation sets.</p>
@@ -259,7 +317,7 @@
     </ul>
 
     <h2>10. Conclusion</h2>
-    <p>The required Lab 06 workflow was implemented successfully in Google Colab. The model was trained, evaluated, and analyzed using standard metrics and visual diagnostics. The CNN achieved approximately 73% test accuracy with minimal overfitting, and the confusion matrix and classification report provide clear insight into per-class performance.</p>
+    <p>In this lab I implemented a CNN on CIFAR-10 from scratch in Google Colab. I learned how to load and preprocess image data, design a convolutional architecture with dropout for regularization, and train it using Adam and sparse categorical cross-entropy. The model reached about 73% test accuracy after 10 epochs with limited overfitting. I found that automobile, ship, and truck classes performed best, while cat and dog were often confused—likely due to similar appearance at 32×32 resolution. Plotting training curves helped me see that validation tracked training reasonably well. Going forward, I would try data augmentation, learning-rate scheduling, and longer training to improve results.</p>
   </div>
 
 </div>
