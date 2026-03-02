@@ -14,17 +14,17 @@
 
 ## 1. Abstract
 
-This document reports implementation and evaluation of two assignment modules:
-- **Module I (Q1):** Hebbian vs Oja-based unsupervised component learning.
-- **Module II (Q3):** Differential Hebbian concepts and STDP-based temporal learning.
+This document reports implementation and evaluation of two assignment sections:
+- **Question 1:** Oja's Rule and Unsupervised PCA.
+- **Question 3:** Differential Hebbian Learning and Neo-Hebbian Extensions.
 
 The focus is evidence-driven: each subsection includes compact method notes, captured outputs, and interpretation of observed behavior.
 
 ---
 
-## 2. Module I (Q1): Unsupervised Learning With Hebbian and Neo-Hebbian Rules
+## 2. Question 1: Oja's Rule & Unsupervised PCA [20 Marks]
 
-### 2.1 Experiment A — Classical Hebbian Dynamics (Expected Instability)
+### Task 2.1 – Basic Hebbian Rule (Unstable) [5 Marks]
 
 ### Goal
 Test whether direct Hebbian reinforcement can robustly recover principal structure in correlated 2D data.
@@ -64,7 +64,7 @@ The run overflowed (`nan` norm and angle), confirming unstable growth under unco
 
 ---
 
-### 2.2 Experiment B — Oja-Stabilized Learning (PCA Consistency)
+### Task 2.2 – Oja's Rule (Stable PCA) [10 Marks]
 
 ### Goal
 Apply Oja's rule to the same dataset and verify alignment with first principal component.
@@ -110,7 +110,7 @@ The Hebbian correlation term is preserved, but a local stabilization term is add
 
 ---
 
-### 2.3 Experiment C — 8×8 Patch Basis Learning and Receptive-Field Structure
+### Task 2.3 – Receptive Fields from Natural Image Patches [5 Marks]
 
 ### Goal
 Learn 10 basis vectors from 10,000 random image patches and compare them against PCA components.
@@ -147,9 +147,9 @@ The learned bases exhibit structured edge/contrast patterns, and the measured me
 
 ---
 
-## 3. Module II (Q3): Differential Hebbian Framework and STDP Simulation
+## 3. Question 3: Differential Hebbian Learning & Neo-Hebbian Extensions [20 Marks]
 
-### 3.1 Theory Capsule
+### Part A – Theory [8 Marks]
 
 #### 3.1.1 Differential Hebbian Learning
 Classical activity-product update:
@@ -181,7 +181,7 @@ A local-excitation / surround-inhibition profile promotes spatially structured r
 
 ---
 
-### 3.2 Computational Experiment: STDP Over Random and Ordered Spike Timing
+### Part B – Python: Simulating STDP [12 Marks]
 
 ### Configuration
 - \(A_+=0.01\)
@@ -229,7 +229,7 @@ The simulation therefore provides a direct temporal-learning bridge between STDP
 
 ## 4. Consolidated Findings
 
-| Module/Task | Quantitative Observation | Technical Conclusion |
+| Question/Task | Quantitative Observation | Technical Conclusion |
 | --- | --- | --- |
 | Q1 / 2.1 | Hebbian run reached `nan` norm and angle | Unstable unconstrained update |
 | Q1 / 2.2 | Oja-PC1 angular gap = **0.3719°** | High-accuracy principal-axis recovery |
