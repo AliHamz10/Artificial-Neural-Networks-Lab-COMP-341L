@@ -1,0 +1,7 @@
+Sentiment labels: 0=Negative, 1=Positive
+
+Negative: precision=0.5136, recall=0.3469, f1=0.4141
+Positive: precision=0.5069, recall=0.6714, f1=0.5777
+
+Confusion Matrix [[TN, FP],[FN, TP]]: [[4336, 8164], [4107, 8393]]
+

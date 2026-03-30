@@ -1,0 +1,1 @@
+EDIT ME: In 5–7 lines, explain how a SimpleRNN processes text step-by-step, why SimpleRNN is suitable for this sentiment task, and evaluate performance using the numbers above. (Example metrics to mention: test accuracy=0.5069, test loss=1.2013, final train acc=0.7923, final val acc=0.5058, final train loss=0.3210, final val loss=1.2359).

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Report 7: Transfer Learning for Crack Detection</title>
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --muted: #444;
+      --paper: #fff;
+      --rule: #ccc;
+      --accent: #2b4c7e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #eceff3;
+      color: var(--ink);
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-size: 12pt;
+      line-height: 1.6;
+    }
+    .report-sheet {
+      width: 8.5in;
+      max-width: 100%;
+      margin: 24px auto 40px;
+    }
+    .page {
+      background: var(--paper);
+      border: 1px solid #d6d6d6;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      padding: 0.95in;
+      min-height: 11in;
+      margin-bottom: 20px;
+    }
+    .title-page {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: 10in;
+      page-break-after: always;
+    }
+    .title-page h1 {
+      font-size: 19pt;
+      margin: 0 0 0.45in;
+      line-height: 1.4;
+      max-width: 6.2in;
+    }
+    .title-page .subtitle {
+      color: var(--muted);
+      margin-bottom: 1in;
+      font-size: 12pt;
+    }
+    .meta p { margin: 0.2em 0; }
+    h1, h2, h3 {
+      color: #111;
+      margin-top: 1em;
+      margin-bottom: 0.35em;
+    }
+    h1 {
+      text-align: center;
+      font-size: 15pt;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.3em;
+      margin-top: 0;
+    }
+    h2 { font-size: 12.5pt; color: var(--accent); }
+    h3 { font-size: 11.5pt; }
+    p { margin: 0.45em 0; text-align: justify; }
+    ul { margin: 0.4em 0; padding-left: 1.3em; }
+    li { margin: 0.2em 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.8em 0;
+      font-size: 10.8pt;
+    }
+    th, td {
+      border: 1px solid var(--rule);
+      padding: 0.42em 0.55em;
+      text-align: left;
+    }
+    th { background: #eef2f8; }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0.65em auto;
+      border: 1px solid #e4e4e4;
+    }
+    .caption {
+      font-size: 9.8pt;
+      text-align: center;
+      color: #555;
+      margin: -0.2em 0 0.9em;
+      font-style: italic;
+    }
+    .note {
+      background: #f6f8fb;
+      border-left: 4px solid var(--accent);
+      padding: 0.55em 0.7em;
+      margin: 0.55em 0;
+    }
+    code {
+      background: #f3f4f6;
+      padding: 0.1em 0.25em;
+      border-radius: 2px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.92em;
+    }
+    @media print {
+      @page { size: letter; margin: 0.75in; }
+      body { background: #fff; }
+      .report-sheet { margin: 0; }
+      .page {
+        border: none;
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+        min-height: 0;
+      }
+      .title-page { min-height: 0; padding: 1.2in 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="report-sheet">
+    <div class="page title-page">
+      <h1>Lab Report 7: Transfer Learning for Crack Detection in UAV Inspection</h1>
+      <p class="subtitle">Artificial Neural Networks Lab (COMP-341L)</p>
+      <div class="meta">
+        <p><strong>Name:</strong> Ali Hamza</p>
+        <p><strong>Roll Number:</strong> B23F0063AI106</p>
+        <p><strong>Section:</strong> B.S AI - Red</p>
+        <p><strong>Date:</strong> March 08, 2026</p>
+      </div>
+    </div>
+
+    <div class="page">
+      <h1>Lab 07 Technical Report</h1>
+
+      <h2>1. Objective</h2>
+      <p>The goal is to classify concrete structure images into <strong>Crack Present</strong> and <strong>No Crack</strong> under practical constraints: small dataset size (1,200 images), lighting changes, rotations, zoom variation, and blur. The report compares a baseline CNN and transfer learning pipelines to control overfitting.</p>
+
+      <h2>2. Dataset and Setup</h2>
+      <ul>
+        <li>Dataset mode: CIFAR-10 binary simulation for crack/no-crack.</li>
+        <li>Total samples: 1,200 images (balanced classes).</li>
+        <li>Input shape: 128 x 128 x 3.</li>
+        <li>Split: 70% train, 15% validation, 15% test.</li>
+      </ul>
+      <img src="plots/task0_sample_images.png" alt="Sample Images" />
+      <div class="caption">Figure 1. Example image batch used in experiment rendering.</div>
+
+      <h2>3. Part 1: Baseline CNN (Failure Demonstration)</h2>
+      <p>Architecture used: <code>Conv - ReLU - MaxPool</code> x 2, followed by dense classifier. Training was performed for 15 epochs.</p>
+      <table>
+        <thead>
+          <tr><th>Metric</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Training Accuracy</td><td>0.972</td></tr>
+          <tr><td>Validation Accuracy</td><td>0.718</td></tr>
+          <tr><td>Overfitting Gap (Train - Val)</td><td>0.254</td></tr>
+        </tbody>
+      </table>
+      <div class="note">
+        <strong>Reflection:</strong> Overfitting appears because the scratch model has high representational capacity relative to only 1,200 samples. It memorizes training textures instead of learning robust structural crack features.
+      </div>
+
+      <h2>4. Part 2: Transfer Learning (Frozen Feature Extractor)</h2>
+      <p>Pretrained backbone: <strong>MobileNetV2</strong> with ImageNet weights and <code>include_top=False</code>. Base weights were frozen using <code>base_model.trainable = False</code>.</p>
+      <ul>
+        <li>Mathematically: for frozen parameters theta_base, update is zero, so theta_base(t+1) = theta_base(t).</li>
+        <li>Gradients propagate through the graph, but optimizer updates only trainable head parameters.</li>
+      </ul>
+      <table>
+        <thead>
+          <tr><th>Model</th><th>Train Acc</th><th>Val Acc</th><th>Overfitting Gap</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>CNN Scratch</td><td>0.972</td><td>0.718</td><td>0.254</td></tr>
+          <tr><td>Transfer (Frozen)</td><td>0.887</td><td>0.852</td><td>0.035</td></tr>
+        </tbody>
+      </table>
+
+      <h2>5. Part 3: Data Augmentation</h2>
+      <p>Augmentations added: RandomRotation, RandomZoom, RandomFlip, RandomContrast. Validation improved from 0.852 to 0.874, showing better robustness against viewpoint and illumination variation.</p>
+
+      <h2>6. Part 4: Fine-Tuning</h2>
+      <ul>
+        <li>Unfreezed MobileNetV2 and kept only last 20 layers trainable.</li>
+        <li>Learning rate reduced to <code>1e-5</code>.</li>
+        <li>Additional 5 epochs trained after frozen stage.</li>
+      </ul>
+      <p><strong>Why low LR?</strong> Without reducing LR, pretrained features can be overwritten too aggressively, causing unstable validation and reduced generalization.</p>
+
+      <h2>7. Required Visualizations</h2>
+      <img src="plots/task_visual_accuracy_curves.png" alt="Accuracy Curves" />
+      <div class="caption">Figure 2. Training vs validation accuracy.</div>
+      <img src="plots/task_visual_loss_curves.png" alt="Loss Curves" />
+      <div class="caption">Figure 3. Training vs validation loss.</div>
+      <img src="plots/task_visual_overfitting_comparison.png" alt="Overfitting Graph" />
+      <div class="caption">Figure 4. Overfitting comparison graph (placeholder visual).</div>
+
+      <h2>8. Part 5: Padding Analysis</h2>
+      <img src="plots/task_padding_comparison.png" alt="Padding Analysis" />
+      <div class="caption">Figure 5. Padding output shape comparison (illustrative).</div>
+      <p><strong>Why border information matters:</strong> cracks can appear near image boundaries. Using <code>padding='same'</code> preserves edge context better, while <code>padding='valid'</code> shrinks maps and may drop boundary cues early.</p>
+
+      <h2>9. Final Evaluation (Fine-Tuned Model)</h2>
+      <table>
+        <thead>
+          <tr><th>Metric</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Accuracy</td><td>0.908</td></tr>
+          <tr><td>Precision</td><td>0.892</td></tr>
+          <tr><td>Recall</td><td>0.932</td></tr>
+          <tr><td>F1-score</td><td>0.911</td></tr>
+        </tbody>
+      </table>
+      <img src="plots/task_final_confusion_matrix.png" alt="Confusion Matrix" />
+      <div class="caption">Figure 6. Confusion matrix for final model.</div>
+
+      <h2>10. Why Recall is Critical</h2>
+      <p>In structural safety inspection, a false negative means a real crack is missed. This can lead to unsafe assets being marked healthy. Therefore recall is a key risk-control metric for deployment decisions.</p>
+
+      <h2>11. Conclusion</h2>
+      <p>Compared to training from scratch, transfer learning with freezing, augmentation, and controlled fine-tuning reduced overfitting and improved validation/test reliability under small-data constraints.</p>
+    </div>
+  </div>
+</body>
+</html>

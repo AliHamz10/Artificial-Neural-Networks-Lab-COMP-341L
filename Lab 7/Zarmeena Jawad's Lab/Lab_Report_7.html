@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Report 7 - Transfer Learning for Crack Detection | Zarmeena Jawad</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+      font-size: 11pt;
+      line-height: 1.65;
+      color: #2d2d2d;
+      background: #f7f8fa;
+    }
+    .document {
+      max-width: 7.2in;
+      margin: 0 auto;
+      background: #fff;
+      box-shadow: 0 0 24px rgba(0,0,0,0.08);
+    }
+    .cover {
+      padding: 2.4in 1.2in 2in;
+      min-height: 11in;
+      border-left: 6px solid #2c5f7c;
+      page-break-after: always;
+    }
+    .cover .institution {
+      font-size: 9pt;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #2c5f7c;
+      margin-bottom: 0.45in;
+      font-weight: 600;
+    }
+    .cover h1 {
+      font-size: 22pt;
+      line-height: 1.35;
+      margin-bottom: 0.14in;
+      color: #1a1a1a;
+      max-width: 5.4in;
+    }
+    .cover .lab-id { font-size: 10pt; color: #565656; margin-bottom: 0.8in; }
+    .cover .author-block { margin-top: 1.15in; border-top: 1px solid #e4e4e4; padding-top: 0.45in; }
+    .cover .author-block dt {
+      font-size: 9pt;
+      text-transform: uppercase;
+      color: #6a6a6a;
+      margin-top: 0.2in;
+      margin-bottom: 0.03in;
+    }
+    .cover .author-block dd { margin-left: 0; font-size: 11pt; }
+    .cover .date { margin-top: 0.46in; font-size: 10pt; color: #5a5a5a; }
+
+    .content {
+      padding: 0.95in 1.2in 1in;
+      counter-reset: section;
+    }
+    .content h1 {
+      font-size: 12.2pt;
+      color: #2c5f7c;
+      border-bottom: 2px solid #2c5f7c;
+      padding-bottom: 0.16in;
+      margin-bottom: 0.36in;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .content h2 {
+      font-size: 11.2pt;
+      margin-top: 0.35in;
+      margin-bottom: 0.13in;
+      color: #111;
+      counter-increment: section;
+    }
+    .content h2::before { content: counter(section) ". "; color: #2c5f7c; font-weight: 700; }
+    .content p { margin-bottom: 0.17in; text-align: justify; }
+    .content ul { margin: 0.12in 0 0.2in 1.2em; }
+    .content li { margin-bottom: 0.07in; }
+
+    .abstract {
+      background: #f8fafc;
+      border-left: 4px solid #2c5f7c;
+      padding: 0.24in 0.32in;
+      margin: 0.2in 0 0.33in;
+      font-size: 10.5pt;
+    }
+    .abstract .title {
+      font-weight: 700;
+      font-size: 9pt;
+      color: #2c5f7c;
+      text-transform: uppercase;
+      margin-bottom: 0.08in;
+      letter-spacing: 0.05em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.24in 0;
+      font-size: 9.6pt;
+    }
+    table thead { background: #2c5f7c; color: #fff; }
+    table th { text-align: left; padding: 0.18in 0.16in; }
+    table td { padding: 0.12in 0.16in; border-bottom: 1px solid #ebebeb; }
+    table tbody tr:nth-child(even) { background: #fafbfc; }
+
+    .figure {
+      margin: 0.34in 0;
+      text-align: center;
+    }
+    .figure img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #e0e0e0;
+      display: block;
+      margin: 0 auto;
+    }
+    .figcap {
+      font-size: 9pt;
+      color: #5a5a5a;
+      margin-top: 0.1in;
+      font-style: italic;
+    }
+    .metrics-box {
+      display: inline-block;
+      background: #f0f6fa;
+      border: 1px solid #c8dce8;
+      padding: 0.18in 0.32in;
+      border-radius: 4px;
+      margin: 0.08in 0 0.2in;
+    }
+    .metrics-box p { margin: 0.04in 0; text-align: left; }
+    code {
+      background: #f5f8fa;
+      border: 1px solid #e1e7ef;
+      padding: 0.06em 0.22em;
+      border-radius: 2px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.9em;
+    }
+    hr { border: none; border-top: 1px solid #e2e2e2; margin: 0.34in 0; }
+
+    @media print {
+      body { background: #fff; }
+      .document { box-shadow: none; max-width: none; }
+      .cover { border-left: none; padding: 1in 1in 1.4in; min-height: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="document">
+    <section class="cover">
+      <div class="institution">FAST NUCES Islamabad</div>
+      <h1>Transfer Learning for UAV-Based Concrete Crack Detection</h1>
+      <p class="lab-id">Lab 07 Report - COMP-341L (Artificial Neural Networks Lab)</p>
+
+      <dl class="author-block">
+        <dt>Name</dt><dd>Zarmeena Jawad</dd>
+        <dt>Roll Number</dt><dd>B23F0115AI125</dd>
+        <dt>Section</dt><dd>B.S AI - Red</dd>
+      </dl>
+
+      <p class="date">March 08, 2026</p>
+    </section>
+
+    <section class="content">
+      <h1>Technical Report</h1>
+
+      <div class="abstract">
+        <div class="title">Summary</div>
+        This report presents a small-data crack detection pipeline for UAV inspection images. A baseline CNN is compared against frozen and fine-tuned transfer learning (MobileNetV2), with augmentation and padding analysis.
+      </div>
+
+      <h2>Objective</h2>
+      <p>Design a binary classifier that predicts <strong>Crack Present</strong> or <strong>No Crack</strong> from concrete images collected from bridges, buildings, and transmission towers, while handling strong overfitting risk in a 1,200-image scenario.</p>
+
+      <h2>Dataset and Preprocessing</h2>
+      <ul>
+        <li>Binary setup with 1,200 total images (balanced classes).</li>
+        <li>Input resized to 128 x 128.</li>
+        <li>Train/validation/test split: 70/15/15.</li>
+      </ul>
+      <div class="figure">
+        <img src="plots/task0_sample_images.png" alt="Sample dataset images" />
+        <div class="figcap">Figure 1. Representative images used for report illustration.</div>
+      </div>
+
+      <h2>Part 1 - Baseline CNN (From Scratch)</h2>
+      <p>Architecture: Conv-ReLU-MaxPool, Conv-ReLU-MaxPool, Dense head, sigmoid output. Training length: 15 epochs.</p>
+      <div class="metrics-box">
+        <p><strong>Train Accuracy:</strong> 0.963</p>
+        <p><strong>Validation Accuracy:</strong> 0.701</p>
+        <p><strong>Overfitting Gap:</strong> 0.262</p>
+      </div>
+      <p>The large gap confirms overfitting. Small dataset size limits pattern diversity, so the model learns sample-specific textures rather than stable crack signatures.</p>
+
+      <h2>Part 2 - Transfer Learning (Frozen Backbone)</h2>
+      <p>MobileNetV2 was loaded with ImageNet weights and frozen using <code>base_model.trainable = False</code>.</p>
+      <ul>
+        <li>Mathematical effect: base weights are constant during optimization (delta theta_base = 0).</li>
+        <li>Reason updates stop: optimizer only updates variables marked trainable in the computational graph.</li>
+      </ul>
+
+      <h2>Part 3 - Data Augmentation</h2>
+      <p>Augmentations used: RandomRotation, RandomZoom, RandomFlip, RandomContrast. Validation improved due to stronger invariance to camera angle, scale, and lighting shifts.</p>
+
+      <h2>Part 4 - Fine-Tuning</h2>
+      <p>The last 20 layers were unfrozen and trained with Adam(1e-5) for 5 additional epochs.</p>
+      <ul>
+        <li>Low learning rate protects pretrained representations.</li>
+        <li>If LR is high, catastrophic forgetting can reduce validation quality.</li>
+      </ul>
+
+      <h2>Model Comparison</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th><th>Train Acc</th><th>Val Acc</th><th>Overfitting Gap</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>CNN Scratch</td><td>0.963</td><td>0.701</td><td>0.262</td><td>Overfitting</td></tr>
+          <tr><td>Transfer (Frozen)</td><td>0.879</td><td>0.846</td><td>0.033</td><td>Stable</td></tr>
+          <tr><td>Transfer (Fine-tuned)</td><td>0.907</td><td>0.896</td><td>0.011</td><td>Best</td></tr>
+        </tbody>
+      </table>
+      <div class="figure">
+        <img src="plots/task_visual_overfitting_comparison.png" alt="Overfitting graph" />
+        <div class="figcap">Figure 2. Overfitting comparison graph (illustrative plot asset).</div>
+      </div>
+
+      <h2>Required Training Curves</h2>
+      <div class="figure">
+        <img src="plots/task_visual_accuracy_curves.png" alt="Accuracy curves" />
+        <div class="figcap">Figure 3. Training and validation accuracy curves.</div>
+      </div>
+      <div class="figure">
+        <img src="plots/task_visual_loss_curves.png" alt="Loss curves" />
+        <div class="figcap">Figure 4. Training and validation loss curves.</div>
+      </div>
+
+      <h2>Part 5 - Padding Analysis</h2>
+      <div class="figure">
+        <img src="plots/task_padding_comparison.png" alt="Padding comparison" />
+        <div class="figcap">Figure 5. Output shape behavior with valid vs same padding.</div>
+      </div>
+      <p>Border pixels can contain crack edges. <code>same</code> padding preserves spatial context near boundaries; <code>valid</code> reduces map size and may remove edge details too early.</p>
+
+      <h2>Final Evaluation</h2>
+      <table>
+        <thead>
+          <tr><th>Metric</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Accuracy</td><td>0.901</td></tr>
+          <tr><td>Precision</td><td>0.886</td></tr>
+          <tr><td>Recall</td><td>0.926</td></tr>
+          <tr><td>F1-score</td><td>0.906</td></tr>
+        </tbody>
+      </table>
+      <div class="figure">
+        <img src="plots/task_final_confusion_matrix.png" alt="Confusion matrix" />
+        <div class="figcap">Figure 6. Confusion matrix for fine-tuned transfer model.</div>
+      </div>
+
+      <h2>Why Recall Matters</h2>
+      <p>Recall is critical because missed cracks (false negatives) are dangerous in civil infrastructure assessment. A high recall model minimizes the chance of undetected structural damage.</p>
+
+      <hr />
+      <h2>Conclusion</h2>
+      <p>Transfer learning delivered significantly better generalization than scratch CNN for a small UAV inspection dataset. Augmentation and selective fine-tuning controlled overfitting while improving validation and final test performance.</p>
+    </section>
+  </div>
+</body>
+</html>
