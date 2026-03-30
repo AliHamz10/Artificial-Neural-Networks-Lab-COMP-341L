@@ -1,501 +1,500 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lab 08 Report — SimpleRNN IMDb (Zarmeena Jawad)</title>
-  <style>
-    :root{
-      --bg:#0b1220;
-      --paper:#0f172a;
-      --ink:#e5e7eb;
-      --muted:#a3a3a3;
-      --line:rgba(229,231,235,.14);
-      --soft:rgba(255,255,255,.04);
-      --accent:#f59e0b;
-      --accent2:#22c55e;
-      --danger:#ef4444;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      --serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-    }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0;
-      background: radial-gradient(1200px 600px at 20% 0%, rgba(245,158,11,.20), transparent 55%),
-                  radial-gradient(1200px 600px at 80% 10%, rgba(34,197,94,.14), transparent 55%),
-                  var(--bg);
-      color:var(--ink);
-      font-family:var(--sans);
-      font-size:12pt;
-      line-height:1.65;
-      counter-reset: figure;
-    }
-
-    .sheet{
-      width: 8.5in;
-      max-width: 100%;
-      margin: 24px auto 46px;
-      padding: 0 10px;
-    }
-
-    .page{
-      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      box-shadow: 0 16px 40px rgba(0,0,0,.35);
-      padding: 1in;
-      margin-bottom: 18px;
-    }
-
-    .title-page{
-      min-height: 11in;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:flex-start;
-      padding: 1.15in 1in;
-      page-break-after:always;
-      break-after:page;
-    }
-
-    .kicker{
-      display:inline-flex;
-      gap:10px;
-      align-items:center;
-      padding: .06in .14in;
-      border-radius: 999px;
-      background: rgba(245,158,11,.10);
-      border: 1px solid rgba(245,158,11,.28);
-      color: var(--ink);
-      font-weight: 700;
-      letter-spacing: .02em;
-      font-size: 10pt;
-      margin-bottom: .26in;
-    }
-    .dot{
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 0 6px rgba(245,158,11,.12);
-    }
-
-    .title{
-      font-family: var(--serif);
-      font-size: 24pt;
-      line-height: 1.22;
-      margin: 0 0 .16in;
-      letter-spacing: -.01em;
-      max-width: 6.7in;
-    }
-    .subtitle{
-      margin: 0 0 .36in;
-      color: rgba(229,231,235,.86);
-      max-width: 6.7in;
-    }
-
-    .meta{
-      width: 100%;
-      max-width: 6.9in;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .16in;
-      margin-top: .14in;
-    }
-    .meta .card{
-      background: var(--soft);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: .16in .18in;
-    }
-    .meta .row{
-      display:grid;
-      grid-template-columns: 1.55in 1fr;
-      gap: .10in;
-      padding: .04in 0;
-      font-size: 11pt;
-    }
-    .meta .k{ color: rgba(229,231,235,.76); font-weight: 700; }
-
-    h1,h2,h3{ margin:0; }
-
-    .content h1{
-      font-family: var(--serif);
-      text-align:left;
-      font-size: 16pt;
-      margin-bottom: .18in;
-      padding-bottom: .14in;
-      border-bottom: 1px solid rgba(245,158,11,.35);
-    }
-    .content h2{
-      margin-top: .28in;
-      margin-bottom: .10in;
-      font-size: 12.8pt;
-      color: var(--ink);
-      padding: .06in .10in;
-      border-left: 4px solid var(--accent);
-      background: rgba(245,158,11,.06);
-      border-radius: 10px;
-    }
-    .content h3{
-      margin-top: .16in;
-      margin-bottom: .06in;
-      font-size: 11.6pt;
-      color: rgba(229,231,235,.90);
-    }
-
-    p{ margin: .12in 0; text-align: justify; }
-    ul{ margin: .10in 0 .14in .22in; padding-left: .24in; }
-    li{ margin: .04in 0; }
-
-    .toc{
-      background: rgba(255,255,255,.03);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: .16in .18in;
-      margin: .14in 0 .16in;
-    }
-    .toc a{ color: var(--accent2); text-decoration:none; }
-    .toc a:hover{ text-decoration:underline; }
-
-    .box{
-      background: rgba(255,255,255,.03);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: .16in .18in;
-      margin: .14in 0 .16in;
-    }
-    .callout{ border-left: 4px solid var(--accent2); }
-    .warn{ border-left: 4px solid var(--danger); background: rgba(239,68,68,.07); }
-    .muted{ color: rgba(229,231,235,.74); }
-
-    table{ width:100%; border-collapse: collapse; margin: .14in 0; font-size: 11pt; }
-    th,td{ border: 1px solid var(--line); padding: .10in .12in; vertical-align: top; text-align:left; }
-    th{ background: rgba(255,255,255,.03); }
-
-    code{
-      font-family: var(--mono);
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 8px;
-      padding: 0 .06in;
-      font-size: .93em;
-    }
-    pre{
-      font-family: var(--mono);
-      background: rgba(0,0,0,.28);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 16px;
-      padding: .16in .18in;
-      overflow-x: auto;
-      font-size: 9.6pt;
-      line-height: 1.42;
-      margin: .12in 0 .16in;
-      white-space: pre;
-    }
-
-    .figure{ margin: .14in 0 .18in; text-align:center; }
-    .figure img{
-      max-width: 100%;
-      height: auto;
-      display:block;
-      margin: 0 auto;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: #0b1020;
-    }
-    .caption{
-      font-size: 10.4pt;
-      margin-top: .06in;
-      color: rgba(229,231,235,.70);
-      font-style: italic;
-    }
-    .caption::before{
-      counter-increment: figure;
-      content: "Figure " counter(figure) ". ";
-      font-style: normal;
-      font-weight: 700;
-      color: rgba(229,231,235,.70);
-    }
-
-    .two-col{ display:grid; grid-template-columns: 1fr 1fr; gap: .18in; }
-    .small{ font-size: 10.8pt; color: rgba(229,231,235,.70); }
-
-    @media print{
-      @page{ size: letter; margin: 0.75in; }
-      body{ background:#fff; color:#111; }
-      .sheet{ margin:0; padding:0; width:auto; }
-      .page{
-        box-shadow:none;
-        border-radius:0;
-        border:none;
-        background:#fff;
-        color:#111;
-        margin:0;
-        padding:0;
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lab 08 Report — SimpleRNN IMDb (Zarmeena Jawad)</title>
+    <style>
+      /* APA-like student paper (print-first) */
+      :root {
+        --ink: #111;
+        --muted: #333;
+        --rule: #d0d0d0;
+        --mono:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
       }
-      .kicker{ border:1px solid #d1d5db; background:#fff; color:#111; }
-      .dot{ background:#111; box-shadow:none; }
-      .meta .card, .toc, .box{ background:#fff; border:1px solid #d1d5db; color:#111; }
-      .meta .k{ color:#444; }
-      .content h2{ background:#fff; color:#111; }
-      a{ color:#111; text-decoration:none; }
-      pre{ background:#f3f4f6; color:#111; border:1px solid #d1d5db; }
-      code{ background:#f3f4f6; border:1px solid #d1d5db; }
-      .warn{ background:#fff; }
-      .figure img{ max-width: 6.7in; border:1px solid #d1d5db; }
-      table, pre, .toc, .box{ page-break-inside: avoid; }
-      .title-page{ min-height:0; padding: 1.1in 0; }
-    }
-  </style>
-</head>
-<body>
-  <div class="sheet">
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: #fff;
+        color: var(--ink);
+        font-family: "Times New Roman", Times, Georgia, serif;
+        font-size: 12pt;
+        line-height: 2; /* double-spaced */
+        counter-reset: figure;
+      }
 
-    <!-- Title page -->
-    <section class="page title-page" id="top">
-      <div class="kicker"><span class="dot"></span> COMP-341L · Lab 08 · RNN (SimpleRNN) · IMDb</div>
-      <h1 class="title">Sentiment Analysis on IMDb Reviews using SimpleRNN</h1>
-      <p class="subtitle">
-        A complete workflow report covering dataset source, preprocessing (token IDs + padding), model development, training curves,
-        evaluation metrics, and sample predictions using TensorFlow/Keras.
-      </p>
+      /* Page geometry */
+      .sheet {
+        width: 8.5in;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0;
+      }
+      .page {
+        padding: 1in; /* 1-inch margins */
+        min-height: 11in;
+        page-break-after: always;
+        break-after: page;
+      }
 
-      <div class="meta" aria-label="Report metadata">
-        <div class="card">
-          <div class="row"><div class="k">Name</div><div>Zarmeena Jawad</div></div>
-          <div class="row"><div class="k">Roll Number</div><div>B23F0115AI125</div></div>
-          <div class="row"><div class="k">Section</div><div>B.S AI - Red</div></div>
-          <div class="row"><div class="k">Date</div><div>March 30, 2026</div></div>
+      /* Header (APA-style: student name + page number) */
+      .header {
+        position: relative;
+        height: 0.45in;
+        margin-bottom: 0.25in;
+        font-family: "Times New Roman", Times, Georgia, serif;
+        font-size: 12pt;
+      }
+      .header .right {
+        position: absolute;
+        right: 0;
+        top: 0;
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      /* Typography */
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        font-weight: 700;
+      }
+      .title {
+        text-align: center;
+        font-weight: 700;
+        font-size: 12pt;
+        margin-top: 2in;
+        margin-bottom: 0.9in;
+      }
+      .title-meta {
+        text-align: center;
+        font-size: 12pt;
+      }
+
+      /* Headings (APA-like) */
+      .h1 {
+        text-align: center;
+        font-weight: 700;
+        font-size: 12pt;
+        margin: 0 0 0.2in;
+      }
+      .h2 {
+        text-align: left;
+        font-weight: 700;
+        font-size: 12pt;
+        margin: 0.25in 0 0.05in;
+      }
+      .h3 {
+        text-align: left;
+        font-weight: 700;
+        font-size: 12pt;
+        margin: 0.18in 0 0.04in;
+      }
+
+      p {
+        margin: 0 0 0.12in;
+        text-align: left;
+        text-indent: 0.5in; /* APA paragraph indent */
+      }
+      ul {
+        margin: 0.08in 0 0.12in 0.5in;
+        padding-left: 0.2in;
+      }
+      li {
+        margin: 0.02in 0;
+      }
+
+      /* Tables */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0.12in 0 0.14in;
+        font-size: 12pt;
+      }
+      th,
+      td {
+        border: 1px solid var(--rule);
+        padding: 0.08in 0.1in;
+        vertical-align: top;
+        line-height: 1.5;
+      }
+      th {
+        font-weight: 700;
+        background: #f6f6f6;
+      }
+
+      /* Code blocks */
+      code {
+        font-family: var(--mono);
+        font-size: 10.5pt;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 10.5pt;
+        line-height: 1.4;
+        border: 1px solid var(--rule);
+        padding: 0.12in 0.14in;
+        white-space: pre-wrap;
+        margin: 0.12in 0 0.14in;
+      }
+
+      /* Figures */
+      .figure {
+        margin: 0.12in 0 0.14in;
+      }
+      .figure img {
+        max-width: 100%;
+        border: 1px solid var(--rule);
+        display: block;
+      }
+      .fig-label {
+        font-size: 12pt;
+        font-weight: 700;
+        margin: 0.08in 0 0;
+        line-height: 1.5;
+      }
+      .fig-caption {
+        font-size: 12pt;
+        margin: 0.02in 0 0;
+        line-height: 1.5;
+      }
+      .fig-label::before {
+        counter-increment: figure;
+        content: "Figure " counter(figure);
+      }
+
+      /* Print adjustments */
+      @media print {
+        @page {
+          size: letter;
+          margin: 1in;
+        }
+        .sheet {
+          width: auto;
+        }
+        .page {
+          padding: 0;
+          min-height: 0;
+        }
+        .header {
+          margin-bottom: 0.25in;
+        }
+        table,
+        pre,
+        .figure {
+          page-break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sheet">
+      <!-- Title page -->
+      <section class="page">
+        <div class="header">
+          <div class="right">Zarmeena&nbsp;Jawad&nbsp;&nbsp;1</div>
         </div>
-        <div class="card">
-          <div class="row"><div class="k">Course</div><div>Artificial Neural Networks Lab (COMP-341L)</div></div>
-          <div class="row"><div class="k">Lab</div><div>08</div></div>
-          <div class="row"><div class="k">Task type</div><div>Text Classification (Sentiment Analysis)</div></div>
-          <div class="row"><div class="k">Framework</div><div>TensorFlow / Keras</div></div>
+
+        <div class="title">
+          Sentiment Analysis on IMDb Reviews Using SimpleRNN
         </div>
-      </div>
 
-      <div class="box">
-        <strong>Required PDF name</strong>
-        <div class="small" style="margin-top:.06in;">ZarmeenaJawad_B23F0115AI125_Lab8.pdf</div>
-      </div>
-    </section>
+        <div class="title-meta">
+          <div>Zarmeena Jawad</div>
+          <div>Department of Artificial Intelligence</div>
+          <div>Artificial Neural Networks Lab (COMP-341L)</div>
+          <div>B.S AI - Red</div>
+          <div>B23F0115AI125</div>
+          <div>March 30, 2026</div>
+        </div>
+      </section>
 
-    <!-- Main report -->
-    <section class="page content">
-      <h1>Lab 08 Technical Report</h1>
+      <!-- Main paper -->
+      <section class="page">
+        <div class="header">
+          <div class="right">Zarmeena&nbsp;Jawad&nbsp;&nbsp;2</div>
+        </div>
 
-      <div class="toc" aria-label="Table of contents">
-        <h3 style="margin-top:0;">Table of Contents</h3>
-        <ul style="margin:.08in 0 0 .20in;">
-          <li><a href="#objective">Objective</a></li>
-          <li><a href="#task1">Task 1 — Dataset</a></li>
-          <li><a href="#task2">Task 2 — Dataset requirements & preprocessing</a></li>
-          <li><a href="#task3">Task 3 — Model development (SimpleRNN)</a></li>
-          <li><a href="#task4">Task 4 — Training (loss/accuracy vs epochs)</a></li>
-          <li><a href="#task5">Task 5 — Required visualizations</a></li>
-          <li><a href="#task6">Task 6 — Evaluation & sample predictions</a></li>
-          <li><a href="#discussion">Discussion (5–7 lines)</a></li>
-          <li><a href="#conclusion">Conclusion</a></li>
+        <div class="h1">Sentiment Analysis on IMDb Reviews Using SimpleRNN</div>
+
+        <div class="h2" id="objective">Objective</div>
+        <p>
+          This lab implements a recurrent neural network for text classification
+          to predict sentiment (positive vs. negative) on IMDb movie reviews
+          using a SimpleRNN model in TensorFlow/Keras. The report includes
+          dataset details, preprocessing, model design, training, evaluation,
+          visualizations, and sample predictions.
+        </p>
+
+        <div class="h2" id="task1">Dataset</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dataset source</td>
+              <td><code>tf.keras.datasets.imdb</code> (IMDb movie reviews)</td>
+            </tr>
+            <tr>
+              <td>Input format</td>
+              <td>
+                Variable-length sequences of integer word IDs (tokenized text)
+              </td>
+            </tr>
+            <tr>
+              <td>Output format</td>
+              <td>
+                Binary labels: <code>0</code> = Negative, <code>1</code> =
+                Positive
+              </td>
+            </tr>
+            <tr>
+              <td>Train/Test split</td>
+              <td>
+                Provided by the dataset loader as separate training and testing
+                sets
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="figure">
+          <img
+            src="plots/task1_sample_reviews.png"
+            alt="Sample decoded IMDb reviews"
+          />
+          <div class="fig-label"></div>
+          <div class="fig-caption">
+            Sample decoded IMDb reviews (data loading sanity-check).
+          </div>
+        </div>
+
+        <div class="h2" id="task2">Preprocessing</div>
+        <ul>
+          <li>Vocabulary size limit: <code>MAX_FEATURES = 10000</code></li>
+          <li>Tokenization: provided by IMDb dataset (integer IDs)</li>
+          <li>
+            Padding and truncation: <code>MAX_LEN = 200</code>,
+            <code>padding="post"</code>, <code>truncating="post"</code>
+          </li>
+          <li>
+            Labels: binary (<code>0/1</code>) for
+            <code>binary_crossentropy</code>
+          </li>
         </ul>
-      </div>
 
-      <h2 id="objective">Objective</h2>
-      <p>
-        Train a <strong>SimpleRNN</strong>-based model to classify movie reviews as <strong>positive</strong> or <strong>negative</strong>.
-        The report documents the dataset, preprocessing steps, model architecture, training setup, curve visualizations,
-        evaluation metrics on the test set, and sample predictions.
-      </p>
+        <pre>
+MAX_FEATURES = 10000
+MAX_LEN = 200
+EMBEDDING_DIM = 64
+RNN_UNITS = 64
+BATCH_SIZE = 64
+EPOCHS = 10</pre
+        >
 
-      <h2 id="task1">Task 1 — Dataset</h2>
-      <table>
-        <thead>
-          <tr><th>Item</th><th>Details</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Dataset source</strong></td>
-            <td><code>tf.keras.datasets.imdb</code> (publicly available IMDb reviews dataset)</td>
-          </tr>
-          <tr>
-            <td><strong>Input</strong></td>
-            <td>Variable-length sequences of integer word IDs (tokenized reviews)</td>
-          </tr>
-          <tr>
-            <td><strong>Output</strong></td>
-            <td>Binary sentiment label: <code>0</code> (Negative), <code>1</code> (Positive)</td>
-          </tr>
-          <tr>
-            <td><strong>Split</strong></td>
-            <td>Predefined train and test sets returned by the loader</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="box callout">
-        <strong>Code description (Task 1):</strong>
-        The dataset is loaded using <code>imdb.load_data(num_words=MAX_FEATURES)</code> and a few decoded review samples are displayed for verification.
-      </div>
-      <div class="figure">
-        <img src="plots/task1_sample_reviews.png" alt="Task 1: sample decoded IMDb reviews">
-        <div class="caption">Random decoded IMDb review snippets (sanity-check of data loading).</div>
-      </div>
-
-      <h2 id="task2">Task 2 — Dataset requirements & preprocessing</h2>
-      <ul>
-        <li><strong>Vocabulary constraint:</strong> only the top <code>MAX_FEATURES = 10000</code> words are used.</li>
-        <li><strong>Tokenization:</strong> provided by the dataset (reviews are already integer-encoded).</li>
-        <li><strong>Padding/truncation:</strong> sequences are padded to <code>MAX_LEN = 200</code> with <code>padding="post"</code> and <code>truncating="post"</code>.</li>
-        <li><strong>Encoding:</strong> labels remain <code>0/1</code> for binary cross-entropy.</li>
-      </ul>
-      <div class="box callout">
-        <strong>Code description (Task 2):</strong>
-        Padding converts variable-length reviews into a fixed 2D tensor so the network can train in batches.
-      </div>
-      <pre>from tensorflow.keras.preprocessing.sequence import pad_sequences
-
+        <pre>
 (x_train_raw, y_train), (x_test_raw, y_test) = tf.keras.datasets.imdb.load_data(num_words=10000)
-x_train = pad_sequences(x_train_raw, maxlen=200, padding="post", truncating="post")
-x_test  = pad_sequences(x_test_raw,  maxlen=200, padding="post", truncating="post")</pre>
+x_train = tf.keras.preprocessing.sequence.pad_sequences(
+    x_train_raw, maxlen=200, padding="post", truncating="post"
+)
+x_test = tf.keras.preprocessing.sequence.pad_sequences(
+    x_test_raw, maxlen=200, padding="post", truncating="post"
+)</pre
+        >
 
-      <h2 id="task3">Task 3 — Model development (SimpleRNN)</h2>
-      <p>
-        The model uses an embedding layer to learn dense word representations, followed by a <code>SimpleRNN</code> layer,
-        and a sigmoid classifier for binary sentiment output.
-      </p>
-      <table>
-        <thead>
-          <tr><th>Layer</th><th>Role</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>Embedding(10000, 64)</code></td><td>Transforms token IDs into 64‑dimensional embeddings.</td></tr>
-          <tr><td><code>SimpleRNN(64)</code></td><td>Processes the sequence while carrying a hidden state.</td></tr>
-          <tr><td><code>Dense(1, sigmoid)</code></td><td>Outputs probability of positive sentiment.</td></tr>
-        </tbody>
-      </table>
-      <div class="box callout">
-        <strong>Code description (Task 3):</strong>
-        The model is compiled with <code>adam</code> optimizer and <code>binary_crossentropy</code>; accuracy is tracked per epoch.
-      </div>
-      <pre>model = tf.keras.Sequential([
-  tf.keras.layers.Embedding(10000, 64, input_length=200),
-  tf.keras.layers.SimpleRNN(64),
-  tf.keras.layers.Dense(1, activation="sigmoid")
+        <div class="h2" id="task3">Model Development</div>
+        <p>
+          The model architecture is Embedding → SimpleRNN → Dense(sigmoid). The
+          embedding layer learns vector representations for words, the SimpleRNN
+          processes the sequence, and the final dense layer outputs a
+          probability for positive sentiment.
+        </p>
+
+        <pre>
+model = tf.keras.Sequential([
+    tf.keras.layers.Embedding(10000, 64, input_length=200),
+    tf.keras.layers.SimpleRNN(64),
+    tf.keras.layers.Dense(1, activation="sigmoid"),
 ])
-model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])</pre>
+model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])</pre
+        >
 
-      <h2 id="task4">Task 4 — Training (loss/accuracy vs epochs)</h2>
-      <ul>
-        <li><strong>Training set:</strong> <code>x_train</code>, <code>y_train</code></li>
-        <li><strong>Testing set:</strong> <code>x_test</code>, <code>y_test</code></li>
-        <li><strong>Validation:</strong> <code>validation_split = 0.2</code></li>
-      </ul>
+        <div class="h2" id="task4">Model Training</div>
+        <ul>
+          <li>Training set: <code>x_train</code>, <code>y_train</code></li>
+          <li>Testing set: <code>x_test</code>, <code>y_test</code></li>
+          <li>Validation: <code>validation_split = 0.2</code></li>
+        </ul>
 
-      <div class="two-col">
-        <div class="box">
-          <h3 style="margin-top:0;">Recorded (Final Epoch)</h3>
-          <table>
-            <tbody>
-              <tr><td><strong>Final training accuracy</strong></td><td>0.7957</td></tr>
-              <tr><td><strong>Final validation accuracy</strong></td><td>0.5098</td></tr>
-              <tr><td><strong>Final training loss</strong></td><td>0.3217</td></tr>
-              <tr><td><strong>Final validation loss</strong></td><td>1.1780</td></tr>
-            </tbody>
-          </table>
-          <p class="small" style="margin-top:.10in;">
-            The gap between training and validation suggests weak generalization on unseen reviews.
-          </p>
+        <pre>
+history = model.fit(
+    x_train,
+    y_train,
+    batch_size=64,
+    epochs=10,
+    validation_split=0.2,
+    verbose=1,
+)</pre
+        >
+
+        <table>
+          <thead>
+            <tr>
+              <th>Metric (Final Epoch)</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Training accuracy</td>
+              <td>0.7957</td>
+            </tr>
+            <tr>
+              <td>Validation accuracy</td>
+              <td>0.5098</td>
+            </tr>
+            <tr>
+              <td>Training loss</td>
+              <td>0.3217</td>
+            </tr>
+            <tr>
+              <td>Validation loss</td>
+              <td>1.1780</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="h2" id="task5">Visualizations</div>
+        <div class="figure">
+          <img src="plots/task7_accuracy_curve.png" alt="Accuracy vs epochs" />
+          <div class="fig-label"></div>
+          <div class="fig-caption">
+            Accuracy vs. epochs for training and validation.
+          </div>
         </div>
-        <div class="box callout">
-          <h3 style="margin-top:0;">Code (Training)</h3>
-          <pre>history = model.fit(
-  x_train, y_train,
-  batch_size=64, epochs=10,
-  validation_split=0.2
-)</pre>
+        <div class="figure">
+          <img
+            src="plots/task7_loss_curve.png"
+            alt="Training loss vs validation loss"
+          />
+          <div class="fig-label"></div>
+          <div class="fig-caption">
+            Training loss vs. validation loss across epochs.
+          </div>
         </div>
-      </div>
 
-      <h2 id="task5">Task 5 — Required visualizations</h2>
-      <div class="figure">
-        <img src="plots/task7_accuracy_curve.png" alt="Task 5: accuracy vs epochs">
-        <div class="caption">Accuracy vs epochs (training vs validation).</div>
-      </div>
-      <div class="figure">
-        <img src="plots/task7_loss_curve.png" alt="Task 5: training loss vs validation loss">
-        <div class="caption">Training loss vs validation loss across epochs.</div>
-      </div>
+        <div class="h2" id="task6">Evaluation and Sample Predictions</div>
+        <div class="h3">Test-set evaluation</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Test accuracy</td>
+              <td>0.5092</td>
+            </tr>
+            <tr>
+              <td>Test loss</td>
+              <td>1.1529</td>
+            </tr>
+          </tbody>
+        </table>
 
-      <h2 id="task6">Task 6 — Evaluation &amp; sample predictions</h2>
-      <h3>6.1 Test-set evaluation</h3>
-      <table>
-        <tbody>
-          <tr><td><strong>Test accuracy</strong></td><td>0.5092</td></tr>
-          <tr><td><strong>Test loss</strong></td><td>1.1529</td></tr>
-        </tbody>
-      </table>
-      <div class="box callout">
-        <strong>Code description (Evaluation):</strong>
-        Probabilities from the sigmoid output are converted to labels using a threshold (0.5), then the confusion matrix summarizes correct and incorrect predictions.
-      </div>
-      <div class="figure">
-        <img src="plots/task5_confusion_matrix.png" alt="Task 6: confusion matrix (IMDb)">
-        <div class="caption">Confusion matrix on the IMDb test set.</div>
-      </div>
+        <pre>
+test_loss, test_acc = model.evaluate(x_test, y_test, verbose=1)
+probs = model.predict(x_test, verbose=0).reshape(-1)
+y_pred = (probs >= 0.5).astype("float32")</pre
+        >
 
-      <h3>6.2 Classification metrics</h3>
-      <pre>Sentiment labels: 0=Negative, 1=Positive
+        <div class="figure">
+          <img src="plots/task5_confusion_matrix.png" alt="Confusion matrix" />
+          <div class="fig-label"></div>
+          <div class="fig-caption">Confusion matrix on the IMDb test set.</div>
+        </div>
+
+        <div class="h3">Classification metrics</div>
+        <pre>
+Sentiment labels: 0=Negative, 1=Positive
 
 Negative: precision=0.5136, recall=0.3469, f1=0.4141
 Positive: precision=0.5069, recall=0.6714, f1=0.5777
 
-Confusion Matrix [[TN, FP],[FN, TP]]: [[4336, 8164], [4107, 8393]]</pre>
+Confusion Matrix [[TN, FP],[FN, TP]]: [[4336, 8164], [4107, 8393]]</pre
+        >
 
-      <h3>6.3 Sample predictions</h3>
-      <div class="figure">
-        <img src="plots/task6_random_predictions.png" alt="Task 6: sample predictions">
-        <div class="caption">Random test samples: decoded snippet with true vs predicted sentiment.</div>
-      </div>
+        <div class="figure">
+          <img
+            src="plots/task6_random_predictions.png"
+            alt="Sample predictions"
+          />
+          <div class="fig-label"></div>
+          <div class="fig-caption">
+            Sample predictions on randomly selected test reviews.
+          </div>
+        </div>
 
-      <h2 id="discussion">Discussion (5–7 lines) — write in your own words</h2>
-      <div class="box warn">
-        <strong>Important (Academic Integrity)</strong>
-        <p class="small" style="margin:.08in 0 0;">
-          This section must be written by the student. Do not copy-paste and do not use AI-generated text.
+        <div class="h2" id="discussion">Discussion</div>
+        <p>
+          A SimpleRNN reads the review sequence step-by-step and updates a
+          hidden state that summarizes the words seen so far. After the final
+          time step, the last hidden state is passed to a sigmoid layer to
+          produce the probability of positive sentiment. SimpleRNN is suitable
+          here as a straightforward baseline for sequential text because it
+          captures word order with minimal complexity. In training, the model
+          reached 0.7957 accuracy, but validation accuracy stayed near 0.5098,
+          indicating weak generalization. On the test set, it achieved 0.5092
+          accuracy with 1.1529 loss, which is close to random guessing for a
+          balanced binary task. The confusion matrix and precision/recall values
+          suggest the model predicts positives more often and makes many
+          mistakes, so a stronger recurrent unit (LSTM/GRU) or
+          regularization/tuning would likely be needed.
         </p>
-      </div>
-      <div class="box callout">
-        <strong>Fill-in template (keep it 5–7 lines; write in your style):</strong>
-        <p class="small" style="margin:.10in 0 0;">
-          1) SimpleRNN processes the review sequentially and updates a hidden state that summarizes the words seen so far. <br>
-          2) The last hidden state is fed to a sigmoid neuron that outputs the probability of positive sentiment. <br>
-          3) It is suitable here as a baseline recurrent model for ordered text sequences. <br>
-          4) In my results, train accuracy reached <strong>0.7957</strong> while validation accuracy stayed around <strong>0.5098</strong>, indicating weak generalization. <br>
-          5) The test accuracy is <strong>0.5092</strong> with test loss <strong>1.1529</strong>, and the confusion matrix shows many incorrect predictions. <br>
-          6) Overall, the curves suggest the model fits training data better than unseen data (possible overfitting / limitations of SimpleRNN). <br>
-        </p>
-      </div>
 
-      <h2 id="conclusion">Conclusion — write in your own words</h2>
-      <div class="box warn">
-        <strong>Important (Submission Rule)</strong>
-        <p class="small" style="margin:.08in 0 0;">
-          The conclusion must be written in the student’s own words describing what was learned.
+        <div class="h2" id="conclusion">Conclusion</div>
+        <p>
+          n this lab, I learned how IMDb reviews are represented as token IDs
+          and why padding/truncation to a fixed length is required for batch
+          training. I also learned how an Embedding layer and SimpleRNN work
+          together to process text sequentially and output a sentiment
+          probability. By comparing training vs validation curves, I understood
+          how to identify generalization issues when training improves but
+          validation does not. The confusion matrix and precision/recall helped
+          me evaluate performance beyond a single accuracy number. Overall, this
+          lab improved my understanding of the end-to-end workflow for text
+          classification with RNNs, from preprocessing to evaluation.
         </p>
-      </div>
-      <div class="box callout">
-        <strong>Fill-in template (replace bracketed parts with your words):</strong>
-        <p class="small" style="margin:.10in 0 0;">
-          In this lab, I learned how IMDb reviews can be represented as token IDs and how padding/truncation makes them compatible with batch training. <br>
-          I also learned how an Embedding + SimpleRNN model reads a sequence and produces a final sentiment probability using a sigmoid output. <br>
-          By comparing training and validation curves, I understood how to detect generalization issues when validation accuracy does not improve with training. <br>
-          The confusion matrix and precision/recall values helped me evaluate model behavior beyond a single accuracy number. <br>
-          [Add 1–2 lines here about what you would try next (e.g., LSTM/GRU, regularization, hyperparameter tuning) based on what you observed.] <br>
-        </p>
-      </div>
-    </section>
-  </div>
-</body>
+
+        <div class="h2" id="references">References</div>
+        <ul>
+          <li>
+            TensorFlow. (2026). <em>IMDb movie review dataset</em>. Keras
+            datasets.
+            <code
+              >https://www.tensorflow.org/api_docs/python/tf/keras/datasets/imdb</code
+            >
+          </li>
+          <li>
+            IMDb. (2026). <em>IMDb</em>. <code>https://www.imdb.com/</code>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </body>
 </html>
