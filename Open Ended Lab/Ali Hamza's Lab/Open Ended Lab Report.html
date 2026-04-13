@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Open Ended Lab Report - Ali Hamza</title>
+    <title>Open Ended Lab Report - Ali Hamza & Zarmeena Jawad</title>
     <style>
       :root {
         --ink: #1d2433;
@@ -208,9 +208,11 @@
             <strong>Lab Title:</strong> Open Ended Lab - Waste Classification
           </div>
           <div class="meta-item"><strong>Date:</strong> April 13, 2026</div>
-          <div class="meta-item"><strong>Name:</strong> Ali Hamza</div>
           <div class="meta-item">
-            <strong>Roll Number:</strong> B23F0063AI106
+            <strong>Name:</strong> Ali Hamza & Zarmeena Jawad
+          </div>
+          <div class="meta-item">
+            <strong>Roll Number:</strong> B23F0063AI106 & B23F0115AI125
           </div>
           <div class="meta-item"><strong>Section:</strong> B.S AI - Red</div>
           <div class="meta-item"><strong>Platform:</strong> Google Colab</div>
@@ -254,7 +256,8 @@
         </p>
 
         <h3>Important Code: Data Pipeline</h3>
-        <pre>def preprocess_for_cnn(images, labels):
+        <pre>
+def preprocess_for_cnn(images, labels):
     images = tf.cast(images, tf.float32) / 255.0
     labels = tf.cast(labels, tf.int32)
     return images, labels
@@ -272,7 +275,8 @@ def make_dataset(x, y, preprocess_fn, training=False):
         ds = ds.shuffle(len(x), seed=SEED)
     ds = ds.map(preprocess_fn, num_parallel_calls=AUTOTUNE)
     ds = ds.batch(BATCH_SIZE).prefetch(AUTOTUNE)
-    return ds</pre>
+    return ds</pre
+        >
 
         <figure>
           <img
@@ -296,7 +300,8 @@ def make_dataset(x, y, preprocess_fn, training=False):
             </p>
 
             <h3>Important Code: Baseline Model</h3>
-            <pre>def build_baseline_model():
+            <pre>
+def build_baseline_model():
     model = tf.keras.Sequential([
         tf.keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=(32, 32, 3)),
         tf.keras.layers.MaxPooling2D(2, 2),
@@ -311,7 +316,8 @@ def make_dataset(x, y, preprocess_fn, training=False):
         loss="sparse_categorical_crossentropy",
         metrics=["accuracy"],
     )
-    return model</pre>
+    return model</pre
+            >
           </div>
 
           <div>
@@ -340,8 +346,7 @@ def make_dataset(x, y, preprocess_fn, training=False):
             <div class="summary-box">
               Training accuracy is substantially higher than validation
               accuracy. This indicates that the model fits the training set more
-              strongly than unseen data, which is a direct sign of
-              overfitting.
+              strongly than unseen data, which is a direct sign of overfitting.
             </div>
           </div>
         </div>
@@ -374,7 +379,8 @@ def make_dataset(x, y, preprocess_fn, training=False):
         </p>
 
         <h3>Important Code: Modified CNN</h3>
-        <pre>def build_modified_model():
+        <pre>
+def build_modified_model():
     model = tf.keras.Sequential([
         tf.keras.layers.Input(shape=(32, 32, 3)),
         tf.keras.layers.Conv2D(32, (3, 3), padding="same", activation=None),
@@ -400,7 +406,8 @@ def make_dataset(x, y, preprocess_fn, training=False):
         loss="sparse_categorical_crossentropy",
         metrics=["accuracy"],
     )
-    return model</pre>
+    return model</pre
+        >
 
         <table>
           <tr>
@@ -450,12 +457,12 @@ def make_dataset(x, y, preprocess_fn, training=False):
         <p>
           The CNN was replaced with a pretrained MobileNetV2 backbone using
           <code>include_top=False</code>. The base layers were frozen, a compact
-          classification head was added, and the model was trained for 5
-          epochs.
+          classification head was added, and the model was trained for 5 epochs.
         </p>
 
         <h3>Important Code: Transfer-Learning Model</h3>
-        <pre>base_model = tf.keras.applications.MobileNetV2(
+        <pre>
+base_model = tf.keras.applications.MobileNetV2(
     input_shape=TRANSFER_IMG_SIZE + (3,),
     include_top=False,
     weights="imagenet",
@@ -474,7 +481,8 @@ transfer_model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
     loss="sparse_categorical_crossentropy",
     metrics=["accuracy"],
-)</pre>
+)</pre
+        >
 
         <table>
           <tr>
@@ -519,7 +527,8 @@ transfer_model.compile(
         </p>
 
         <h3>Important Code: Fine-Tuning Step</h3>
-        <pre>mobilenet_base.trainable = True
+        <pre>
+mobilenet_base.trainable = True
 
 for layer in mobilenet_base.layers[:-10]:
     layer.trainable = False
@@ -535,7 +544,8 @@ history_finetune = transfer_model.fit(
     validation_data=val_transfer_ds,
     epochs=3,
     verbose=1,
-)</pre>
+)</pre
+        >
 
         <table>
           <tr>
@@ -598,7 +608,8 @@ history_finetune = transfer_model.fit(
 
       <section>
         <h2>7. Final Classification Report</h2>
-        <pre class="report-code">              precision    recall  f1-score   support
+        <pre class="report-code">
+              precision    recall  f1-score   support
 
      Plastic     0.9535    0.8039    0.8723       102
        Paper     0.9541    0.9720    0.9630       107
@@ -606,13 +617,15 @@ history_finetune = transfer_model.fit(
 
     accuracy                         0.9079       315
    macro avg     0.9137    0.9064    0.9068       315
-weighted avg     0.9133    0.9079    0.9074       315</pre>
+weighted avg     0.9133    0.9079    0.9074       315</pre
+        >
 
         <p>
-          The strongest class-wise performance appeared on <strong>Paper</strong>,
-          while <strong>Plastic</strong> showed the lowest recall among the
-          three classes. Even so, all three categories achieved solid F1-scores,
-          which supports the overall 90.79% test accuracy.
+          The strongest class-wise performance appeared on
+          <strong>Paper</strong>, while <strong>Plastic</strong> showed the
+          lowest recall among the three classes. Even so, all three categories
+          achieved solid F1-scores, which supports the overall 90.79% test
+          accuracy.
         </p>
       </section>
 
