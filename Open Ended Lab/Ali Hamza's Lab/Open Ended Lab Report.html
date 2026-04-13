@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Open Ended Lab Report - Ali Hamza</title>
+    <style>
+      :root {
+        --ink: #1d2433;
+        --muted: #5a6475;
+        --line: #ccd3df;
+        --soft: #eef3f8;
+        --panel: #f8fafc;
+        --accent: #183b67;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #eef2f7;
+        color: var(--ink);
+        font-family: "Times New Roman", Georgia, serif;
+        line-height: 1.6;
+      }
+
+      .page {
+        max-width: 980px;
+        margin: 32px auto;
+        background: #fff;
+        border: 1px solid var(--line);
+        box-shadow: 0 18px 40px rgba(18, 38, 63, 0.08);
+        padding: 38px 42px 52px;
+      }
+
+      .title-block {
+        border-bottom: 3px solid var(--accent);
+        padding-bottom: 18px;
+        margin-bottom: 28px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0 0 12px;
+        color: #0f223d;
+      }
+
+      h1 {
+        font-size: 30px;
+        line-height: 1.2;
+      }
+
+      h2 {
+        font-size: 22px;
+        margin-top: 30px;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 6px;
+      }
+
+      h3 {
+        font-size: 18px;
+        margin-top: 22px;
+      }
+
+      p,
+      li {
+        font-size: 16px;
+      }
+
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 24px;
+        margin-top: 18px;
+      }
+
+      .meta-item {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        padding: 10px 12px;
+      }
+
+      .meta-item strong {
+        display: inline-block;
+        min-width: 130px;
+      }
+
+      .summary-box {
+        background: linear-gradient(180deg, #f8fbff 0%, #f3f7fb 100%);
+        border-left: 5px solid var(--accent);
+        padding: 14px 16px;
+        margin: 18px 0;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 24px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 14px 0 20px;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 10px 11px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: var(--soft);
+      }
+
+      code {
+        font-family: "Courier New", monospace;
+        font-size: 0.95em;
+      }
+
+      pre {
+        background: #10151d;
+        color: #edf3ff;
+        border-radius: 8px;
+        padding: 14px 16px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: "Courier New", monospace;
+        font-size: 13.5px;
+        line-height: 1.5;
+        margin: 14px 0 20px;
+      }
+
+      .report-code {
+        background: #fbfcfe;
+        color: var(--ink);
+        border: 1px solid var(--line);
+      }
+
+      figure {
+        margin: 18px 0 24px;
+      }
+
+      img {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: #fff;
+      }
+
+      figcaption {
+        color: var(--muted);
+        font-size: 14px;
+        margin-top: 8px;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border: 1px solid #b8c6d9;
+        background: #f5f8fc;
+        font-size: 13px;
+        margin-right: 6px;
+        margin-bottom: 6px;
+      }
+
+      .small-note {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      @media print {
+        body {
+          background: #fff;
+        }
+
+        .page {
+          box-shadow: none;
+          border: none;
+          margin: 0;
+          max-width: none;
+          padding: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="title-block">
+        <h1>Open Ended Lab Report: Real-Time Waste Classification</h1>
+        <p>
+          This report documents the baseline CNN experiment, parameter tuning,
+          transfer learning with MobileNetV2, and fine-tuning results for the
+          open-ended ANN lab.
+        </p>
+        <div class="meta-grid">
+          <div class="meta-item"><strong>Course Code:</strong> COMP-341L</div>
+          <div class="meta-item">
+            <strong>Course Name:</strong> Artificial Neural Networks Lab
+          </div>
+          <div class="meta-item">
+            <strong>Lab Title:</strong> Open Ended Lab - Waste Classification
+          </div>
+          <div class="meta-item"><strong>Date:</strong> April 13, 2026</div>
+          <div class="meta-item"><strong>Name:</strong> Ali Hamza</div>
+          <div class="meta-item">
+            <strong>Roll Number:</strong> B23F0063AI106
+          </div>
+          <div class="meta-item"><strong>Section:</strong> B.S AI - Red</div>
+          <div class="meta-item"><strong>Platform:</strong> Google Colab</div>
+        </div>
+      </section>
+
+      <section>
+        <h2>1. Objective</h2>
+        <p>
+          The goal of this lab was to study model generalization in image
+          classification. The work started with a simple CNN to diagnose
+          overfitting, then moved to parameter tuning, pretrained feature
+          extraction, and controlled fine-tuning to examine how each design
+          choice affects validation and test performance.
+        </p>
+        <div class="summary-box">
+          <strong>Key finding:</strong> the strongest results came from transfer
+          learning. The baseline CNN overfit heavily, the modified CNN performed
+          worse than expected, and MobileNetV2 produced the best overall
+          generalization.
+        </div>
+      </section>
+
+      <section>
+        <h2>2. Dataset and Setup</h2>
+        <p>
+          The lab manual allows the use of a CIFAR-10 subset or a custom waste
+          dataset. For a reproducible Colab workflow, a three-class CIFAR-10
+          subset was used as a proxy:
+        </p>
+        <p>
+          <span class="badge">airplane -&gt; Plastic</span>
+          <span class="badge">automobile -&gt; Paper</span>
+          <span class="badge">ship -&gt; Metal</span>
+        </p>
+        <p>
+          Images were split into training, validation, and test sets. The
+          standard CNN pipeline used normalized 32x32 inputs, while the
+          transfer-learning pipeline resized images to 96x96 and applied
+          <code>mobilenet_v2.preprocess_input</code>.
+        </p>
+
+        <h3>Important Code: Data Pipeline</h3>
+        <pre>def preprocess_for_cnn(images, labels):
+    images = tf.cast(images, tf.float32) / 255.0
+    labels = tf.cast(labels, tf.int32)
+    return images, labels
+
+def preprocess_for_transfer(images, labels):
+    images = tf.cast(images, tf.float32)
+    images = tf.image.resize(images, TRANSFER_IMG_SIZE)
+    images = tf.keras.applications.mobilenet_v2.preprocess_input(images)
+    labels = tf.cast(labels, tf.int32)
+    return images, labels
+
+def make_dataset(x, y, preprocess_fn, training=False):
+    ds = tf.data.Dataset.from_tensor_slices((x, y))
+    if training:
+        ds = ds.shuffle(len(x), seed=SEED)
+    ds = ds.map(preprocess_fn, num_parallel_calls=AUTOTUNE)
+    ds = ds.batch(BATCH_SIZE).prefetch(AUTOTUNE)
+    return ds</pre>
+
+        <figure>
+          <img
+            src="Final Results/plots/task0_sample_images.png"
+            alt="Sample proxy waste dataset images"
+          />
+          <figcaption>
+            Figure 1. Sample images from the three-class proxy waste dataset.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2>3. Task 1: Baseline CNN and Overfitting Diagnosis</h2>
+        <div class="two-col">
+          <div>
+            <p>
+              The first experiment used the baseline architecture provided in
+              the lab. It was trained for 10 epochs and evaluated through
+              training versus validation accuracy.
+            </p>
+
+            <h3>Important Code: Baseline Model</h3>
+            <pre>def build_baseline_model():
+    model = tf.keras.Sequential([
+        tf.keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=(32, 32, 3)),
+        tf.keras.layers.MaxPooling2D(2, 2),
+        tf.keras.layers.Conv2D(64, (3, 3), activation="relu"),
+        tf.keras.layers.MaxPooling2D(2, 2),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(128, activation="relu"),
+        tf.keras.layers.Dense(3, activation="softmax"),
+    ])
+    model.compile(
+        optimizer="adam",
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+    return model</pre>
+          </div>
+
+          <div>
+            <table>
+              <tr>
+                <th>Metric</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>Baseline train accuracy</td>
+                <td>0.9197</td>
+              </tr>
+              <tr>
+                <td>Baseline validation accuracy</td>
+                <td>0.7841</td>
+              </tr>
+              <tr>
+                <td>Generalization gap</td>
+                <td>0.1356</td>
+              </tr>
+              <tr>
+                <td>Decision</td>
+                <td>Yes, the model is overfitting.</td>
+              </tr>
+            </table>
+            <div class="summary-box">
+              Training accuracy is substantially higher than validation
+              accuracy. This indicates that the model fits the training set more
+              strongly than unseen data, which is a direct sign of
+              overfitting.
+            </div>
+          </div>
+        </div>
+
+        <h3>Interpretation</h3>
+        <p>
+          The 13.56% gap shows that the baseline CNN learned class-specific
+          patterns from the training split but did not generalize with the same
+          strength to validation images. This established the need for
+          regularization or stronger feature extraction.
+        </p>
+
+        <figure>
+          <img
+            src="Final Results/plots/task1_accuracy_curve.png"
+            alt="Baseline training versus validation accuracy"
+          />
+          <figcaption>
+            Figure 2. Accuracy curves for the baseline CNN over 10 epochs.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2>4. Task 2: Network Parameter Modification</h2>
+        <p>
+          To reduce overfitting, the network was modified with four changes:
+          Batch Normalization, Dropout, fewer dense units, and a smaller Adam
+          learning rate.
+        </p>
+
+        <h3>Important Code: Modified CNN</h3>
+        <pre>def build_modified_model():
+    model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(32, 32, 3)),
+        tf.keras.layers.Conv2D(32, (3, 3), padding="same", activation=None),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Activation("relu"),
+        tf.keras.layers.MaxPooling2D(2, 2),
+        tf.keras.layers.Dropout(0.25),
+
+        tf.keras.layers.Conv2D(64, (3, 3), padding="same", activation=None),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Activation("relu"),
+        tf.keras.layers.MaxPooling2D(2, 2),
+        tf.keras.layers.Dropout(0.30),
+
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(64, activation="relu"),
+        tf.keras.layers.Dropout(0.40),
+        tf.keras.layers.Dense(3, activation="softmax"),
+    ])
+
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=3e-4),
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+    return model</pre>
+
+        <table>
+          <tr>
+            <th>Model Version</th>
+            <th>Train Acc</th>
+            <th>Val Acc</th>
+            <th>Observation</th>
+          </tr>
+          <tr>
+            <td>Original</td>
+            <td>0.9197</td>
+            <td>0.7841</td>
+            <td>Strong fitting but clear overfitting</td>
+          </tr>
+          <tr>
+            <td>Modified</td>
+            <td>0.7136</td>
+            <td>0.5238</td>
+            <td>Regularization became too aggressive for this setup</td>
+          </tr>
+        </table>
+
+        <p>
+          The modified model decreased validation accuracy by
+          <strong>0.2603</strong>. Although the intention was to improve
+          generalization, the final result shows that not every combination of
+          regularization and hyperparameter changes helps performance.
+          Academically, this is still a valid and meaningful result because it
+          demonstrates the importance of empirical comparison rather than
+          assumption.
+        </p>
+
+        <figure>
+          <img
+            src="Final Results/plots/task2_validation_comparison.png"
+            alt="Validation comparison of original and modified CNN"
+          />
+          <figcaption>
+            Figure 3. Validation accuracy comparison between the original and
+            modified CNN versions.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2>5. Task 3: Transfer Learning with MobileNetV2</h2>
+        <p>
+          The CNN was replaced with a pretrained MobileNetV2 backbone using
+          <code>include_top=False</code>. The base layers were frozen, a compact
+          classification head was added, and the model was trained for 5
+          epochs.
+        </p>
+
+        <h3>Important Code: Transfer-Learning Model</h3>
+        <pre>base_model = tf.keras.applications.MobileNetV2(
+    input_shape=TRANSFER_IMG_SIZE + (3,),
+    include_top=False,
+    weights="imagenet",
+)
+base_model.trainable = False
+
+inputs = tf.keras.Input(shape=TRANSFER_IMG_SIZE + (3,))
+x = data_augmentation(inputs)
+x = base_model(x, training=False)
+x = tf.keras.layers.GlobalAveragePooling2D()(x)
+x = tf.keras.layers.Dropout(0.30)(x)
+outputs = tf.keras.layers.Dense(NUM_CLASSES, activation="softmax")(x)
+
+transfer_model = tf.keras.Model(inputs, outputs)
+transfer_model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"],
+)</pre>
+
+        <table>
+          <tr>
+            <th>Metric</th>
+            <th>Value</th>
+          </tr>
+          <tr>
+            <td>Transfer train accuracy</td>
+            <td>0.8728</td>
+          </tr>
+          <tr>
+            <td>Transfer validation accuracy</td>
+            <td>0.8921</td>
+          </tr>
+        </table>
+
+        <p>
+          Validation accuracy became higher than the baseline CNN result and
+          even slightly higher than transfer-model training accuracy. This is a
+          strong indicator that pretrained ImageNet features were more suitable
+          for this task than learning all features from scratch.
+        </p>
+
+        <figure>
+          <img
+            src="Final Results/plots/task3_transfer_accuracy.png"
+            alt="Transfer learning accuracy plot"
+          />
+          <figcaption>
+            Figure 4. MobileNetV2 training and validation accuracy during frozen
+            feature extraction.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2>6. Task 4: Fine-Tuning Decision</h2>
+        <p>
+          After transfer learning, the last 10 layers of MobileNetV2 were
+          unfrozen. The learning rate was reduced to
+          <code>1e-5</code> and the model was trained for 3 more epochs.
+        </p>
+
+        <h3>Important Code: Fine-Tuning Step</h3>
+        <pre>mobilenet_base.trainable = True
+
+for layer in mobilenet_base.layers[:-10]:
+    layer.trainable = False
+
+transfer_model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5),
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"],
+)
+
+history_finetune = transfer_model.fit(
+    train_transfer_ds,
+    validation_data=val_transfer_ds,
+    epochs=3,
+    verbose=1,
+)</pre>
+
+        <table>
+          <tr>
+            <th>Metric</th>
+            <th>Value</th>
+          </tr>
+          <tr>
+            <td>Fine-tuned train accuracy</td>
+            <td>0.8748</td>
+          </tr>
+          <tr>
+            <td>Fine-tuned validation accuracy</td>
+            <td>0.8730</td>
+          </tr>
+          <tr>
+            <td>Final test accuracy</td>
+            <td>0.9079</td>
+          </tr>
+          <tr>
+            <td>Final test loss</td>
+            <td>0.1921</td>
+          </tr>
+        </table>
+
+        <div class="summary-box">
+          <strong>Did validation improve?</strong> No. Validation accuracy
+          changed from 0.8921 to 0.8730, so there was no improvement in this
+          run.
+        </div>
+
+        <p>
+          <strong>Why reduce the learning rate during fine-tuning?</strong>
+          Pretrained weights already contain useful visual features. A small
+          learning rate updates them gradually, which lowers the risk of
+          destroying previously learned representations through overly large
+          optimization steps.
+        </p>
+
+        <figure>
+          <img
+            src="Final Results/plots/task4_finetune_accuracy.png"
+            alt="Fine-tuning accuracy plot"
+          />
+          <figcaption>
+            Figure 5. Accuracy trend during the fine-tuning stage.
+          </figcaption>
+        </figure>
+
+        <figure>
+          <img
+            src="Final Results/plots/task4_confusion_matrix.png"
+            alt="Final confusion matrix"
+          />
+          <figcaption>
+            Figure 6. Confusion matrix on the final test set after transfer
+            learning and fine-tuning.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2>7. Final Classification Report</h2>
+        <pre class="report-code">              precision    recall  f1-score   support
+
+     Plastic     0.9535    0.8039    0.8723       102
+       Paper     0.9541    0.9720    0.9630       107
+       Metal     0.8333    0.9434    0.8850       106
+
+    accuracy                         0.9079       315
+   macro avg     0.9137    0.9064    0.9068       315
+weighted avg     0.9133    0.9079    0.9074       315</pre>
+
+        <p>
+          The strongest class-wise performance appeared on <strong>Paper</strong>,
+          while <strong>Plastic</strong> showed the lowest recall among the
+          three classes. Even so, all three categories achieved solid F1-scores,
+          which supports the overall 90.79% test accuracy.
+        </p>
+      </section>
+
+      <section>
+        <h2>8. Conclusion</h2>
+        <p>
+          This lab clearly showed the progression from a weakly generalizing CNN
+          to a much stronger transfer-learning solution. The baseline CNN
+          overfit, the manually modified CNN did not improve performance, and
+          MobileNetV2 produced the most reliable validation and test results.
+          Fine-tuning did not raise validation accuracy in this particular run,
+          but it still yielded a high final test accuracy of 0.9079. Overall,
+          the experiment highlights that pretrained models often provide a more
+          effective and stable foundation than small CNNs trained from scratch
+          on limited data.
+        </p>
+        <p class="small-note">
+          Report prepared for submission with figures linked from
+          <code>Final Results/plots/</code>.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
