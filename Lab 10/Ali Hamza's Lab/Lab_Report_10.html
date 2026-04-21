@@ -3,473 +3,349 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lab Report 10 - LSTM-Based Sentiment Analysis on IMDb</title>
+  <title>IEEE Style Lab Report 10 - LSTM-Based Sentiment Analysis on IMDb</title>
   <style>
     :root {
-      --bg: #f4f7fb;
-      --page: #ffffff;
-      --ink: #16212f;
-      --muted: #4d5d70;
-      --line: #d8e1eb;
-      --primary: #123b63;
-      --primary-soft: #eaf2fb;
-      --accent: #8b1e3f;
-      --accent-soft: #fceef2;
-      --success: #1b6b4b;
-      --success-soft: #ebf8f1;
-      --code-bg: #0f1720;
-      --code-ink: #e8eef7;
-      --shadow: 0 18px 40px rgba(19, 42, 68, 0.08);
+      --paper-width: 210mm;
+      --ink: #000000;
+      --line: #000000;
+      --screen-bg: #ececec;
     }
 
     * {
       box-sizing: border-box;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
     body {
       margin: 0;
-      font-family: "Georgia", "Times New Roman", serif;
-      background: linear-gradient(180deg, #edf3f9 0%, var(--bg) 100%);
+      background: var(--screen-bg);
       color: var(--ink);
-      line-height: 1.7;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 10.5pt;
+      line-height: 1.4;
     }
 
-    .page {
-      width: min(1120px, calc(100% - 40px));
-      margin: 28px auto;
-      background: var(--page);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
+    .paper {
+      width: min(190mm, calc(100% - 32px));
+      margin: 20px auto;
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+      padding: 18mm 17mm 20mm;
     }
 
-    .hero {
-      padding: 44px 48px 28px;
-      background:
-        radial-gradient(circle at top right, rgba(18, 59, 99, 0.10), transparent 35%),
-        linear-gradient(135deg, #ffffff 0%, #f6f9fd 100%);
-      border-bottom: 1px solid var(--line);
+    .title-block {
+      text-align: center;
+      margin-bottom: 14px;
     }
 
-    .eyebrow {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: var(--primary-soft);
-      color: var(--primary);
-      font-size: 0.86rem;
+    .paper-title {
+      margin: 0 0 10px;
+      font-size: 20pt;
+      line-height: 1.18;
       font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 16px;
     }
 
-    h1, h2, h3, h4 {
+    .author-name {
       margin: 0;
-      color: #102235;
-      line-height: 1.25;
+      font-size: 11pt;
+      font-weight: 700;
     }
 
-    h1 {
-      font-size: clamp(2rem, 3.8vw, 3rem);
-      margin-bottom: 12px;
+    .author-affiliation,
+    .submission-note {
+      margin: 3px 0 0;
+      font-size: 9.5pt;
+    }
+
+    .abstract,
+    .keywords {
+      margin: 12px 0 0;
+      text-align: justify;
+    }
+
+    .abstract strong,
+    .keywords strong {
+      font-style: italic;
+    }
+
+    .content {
+      margin-top: 16px;
+      column-count: 1;
+      counter-reset: section;
+    }
+
+    h2,
+    h3 {
+      line-height: 1.2;
     }
 
     h2 {
-      font-size: 1.75rem;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #edf2f7;
+      margin: 18px 0 8px;
+      font-size: 11pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      counter-increment: section;
+      counter-reset: subsection;
+      break-after: avoid;
+    }
+
+    h2::before {
+      content: counter(section, upper-roman) ". ";
     }
 
     h3 {
-      font-size: 1.2rem;
-      margin-bottom: 10px;
+      margin: 14px 0 6px;
+      font-size: 10.2pt;
+      font-style: italic;
+      font-weight: 700;
+      counter-increment: subsection;
+      break-after: avoid;
+    }
+
+    h3::before {
+      content: counter(subsection, upper-alpha) ". ";
     }
 
     p {
-      margin: 0 0 14px;
+      margin: 0 0 10px;
+      text-align: justify;
+      orphans: 3;
+      widows: 3;
     }
 
-    .lead {
-      max-width: 920px;
-      font-size: 1.05rem;
-      color: var(--muted);
-    }
-
-    .meta-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
-      margin-top: 24px;
-    }
-
-    .meta-card,
-    .card,
-    .summary,
-    .callout {
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 16px;
-      padding: 18px 20px;
-    }
-
-    .meta-card strong,
-    .metric strong {
-      display: block;
-      color: var(--primary);
-      font-size: 0.86rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 6px;
-    }
-
-    .meta-card span {
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .section {
-      padding: 32px 48px;
-      border-bottom: 1px solid #eef2f6;
-    }
-
-    .section:last-child {
-      border-bottom: none;
-    }
-
-    .toc {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .toc a {
-      display: block;
-      padding: 14px 16px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      text-decoration: none;
-      color: var(--ink);
-      background: #fbfdff;
-      font-weight: 600;
-    }
-
-    .toc a:hover {
-      border-color: #bfd1e3;
-      background: #f4f9ff;
-    }
-
-    .task-label {
-      display: inline-block;
-      margin-bottom: 12px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 0.82rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .summary-grid,
-    .metric-grid,
-    .two-col {
-      display: grid;
-      gap: 18px;
-    }
-
-    .summary-grid {
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      margin-top: 18px;
-    }
-
-    .metric-grid {
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      margin-top: 18px;
-    }
-
-    .two-col {
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      align-items: start;
-      margin-top: 18px;
-    }
-
-    .summary {
-      background: linear-gradient(180deg, #fdfefe 0%, #f7fbff 100%);
-    }
-
-    .summary h3 {
-      margin-bottom: 8px;
-    }
-
-    .metric {
-      border: 1px solid var(--line);
-      background: #fbfdff;
-      border-radius: 14px;
-      padding: 14px 16px;
-    }
-
-    .metric .value {
-      font-size: 1.28rem;
-      font-weight: 700;
-      color: #11283e;
-    }
-
-    .callout {
-      background: var(--success-soft);
-      border-color: #cde9d9;
-    }
-
-    .callout strong {
-      color: var(--success);
-    }
-
-    ul, ol {
-      margin: 0 0 14px 22px;
+    ul,
+    ol {
+      margin: 0 0 10px 20px;
       padding: 0;
     }
 
     li {
-      margin-bottom: 8px;
+      margin-bottom: 5px;
+      text-align: justify;
+    }
+
+    .inline-code {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 9pt;
+    }
+
+    .table-block,
+    .listing-block,
+    figure {
+      break-inside: avoid;
+      page-break-inside: avoid;
+      margin: 14px 0 16px;
+    }
+
+    .table-caption,
+    .listing-caption {
+      margin-bottom: 6px;
+      font-size: 9pt;
+      font-weight: 700;
+      text-align: center;
+      text-transform: uppercase;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 14px 0 10px;
-      font-size: 0.96rem;
+      font-size: 9.2pt;
     }
 
-    th, td {
+    th,
+    td {
       border: 1px solid var(--line);
-      padding: 12px 14px;
-      text-align: left;
+      padding: 6px 7px;
       vertical-align: top;
+      text-align: left;
     }
 
     th {
-      background: #edf4fb;
-      color: #16324f;
       font-weight: 700;
     }
 
-    tbody tr:nth-child(even) {
-      background: #fafcff;
+    pre {
+      margin: 0;
+      padding: 8px 9px;
+      border: 1px solid var(--line);
+      background: #fafafa;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 8.4pt;
+      line-height: 1.28;
+    }
+
+    code {
+      font-family: "Courier New", Courier, monospace;
     }
 
     figure {
-      margin: 20px 0 0;
+      text-align: center;
     }
 
     img {
       width: 100%;
       display: block;
       border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #fff;
-      box-shadow: 0 10px 24px rgba(18, 59, 99, 0.08);
     }
 
     figcaption {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 0.95rem;
-      font-style: italic;
+      margin-top: 6px;
+      font-size: 8.8pt;
+      text-align: center;
     }
 
-    pre {
-      margin: 14px 0;
-      padding: 16px 18px;
-      overflow-x: auto;
-      border-radius: 16px;
-      background: var(--code-bg);
-      color: var(--code-ink);
-      border: 1px solid #233244;
-      font-size: 0.92rem;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      word-break: break-word;
+    .results-list {
+      margin: 10px 0;
+      padding: 0;
+      list-style: none;
     }
 
-    code {
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    .results-list li {
+      margin: 0 0 5px;
+      padding: 0;
+      text-align: left;
     }
 
-    .inline-code {
-      padding: 0.12rem 0.38rem;
-      border-radius: 6px;
-      background: #eef3f8;
-      color: #0f3558;
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-      font-size: 0.94em;
+    .references {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 8.8pt;
     }
 
-    .caption-note {
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin-top: 8px;
-    }
-
-    .footer {
-      padding: 24px 48px 40px;
-      color: var(--muted);
-      font-size: 0.93rem;
+    .references li {
+      margin: 0 0 6px;
+      padding-left: 18px;
+      text-indent: -18px;
+      text-align: left;
     }
 
     @media print {
-      body {
-        background: #fff;
+      @page {
+        size: A4;
+        margin: 18mm 16mm 18mm 16mm;
       }
 
-      .page {
+      body {
+        background: #ffffff;
+      }
+
+      .paper {
         width: 100%;
         margin: 0;
+        padding: 0;
         box-shadow: none;
-        border: none;
       }
+    }
 
-      .hero,
-      .section,
-      .footer {
-        padding-left: 28px;
-        padding-right: 28px;
-      }
-
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      .card,
-      .summary,
-      .callout,
-      .meta-card,
-      .metric,
-      figure,
-      table,
-      pre {
-        break-inside: avoid;
+    @media (max-width: 900px) {
+      .paper {
+        width: calc(100% - 16px);
+        padding: 14px;
       }
     }
   </style>
 </head>
 <body>
-  <main class="page">
-    <header class="hero">
-      <div class="eyebrow">Artificial Neural Networks Lab</div>
-      <h1>Lab Report 10: LSTM-Based Sentiment Analysis on IMDb Movie Reviews</h1>
-      <p class="lead">
-        This report presents the complete workflow for Lab 10, including data preprocessing, LSTM model construction,
-        training and evaluation, parameter modification, and final sentiment prediction on custom review samples.
-        The structure is preserved task by task according to the original lab requirements.
-      </p>
-
-      <div class="meta-grid">
-        <div class="meta-card"><strong>Course Code</strong><span>COMP-341L</span></div>
-        <div class="meta-card"><strong>Course Name</strong><span>Artificial Neural Networks Lab</span></div>
-        <div class="meta-card"><strong>Lab Number</strong><span>10</span></div>
-        <div class="meta-card"><strong>Date</strong><span>April 20, 2026</span></div>
-        <div class="meta-card"><strong>Student Name</strong><span>Ali Hamza</span></div>
-        <div class="meta-card"><strong>Roll Number</strong><span>B23F0063AI106</span></div>
-        <div class="meta-card"><strong>Section</strong><span>B.S AI - Red</span></div>
-        <div class="meta-card"><strong>Dataset</strong><span>IMDb 50K Reviews</span></div>
-      </div>
+  <main class="paper">
+    <header class="title-block">
+      <h1 class="paper-title">LSTM-Based Sentiment Analysis on IMDb Movie Reviews</h1>
+      <p class="author-name">Ali Hamza</p>
+      <p class="author-affiliation">Department of Computer Science and Artificial Intelligence, PAF-IAST, Haripur, Pakistan</p>
+      <p class="submission-note">Submitted for COMP-341L Artificial Neural Networks Lab, Lab 10 | Roll No. B23F0063AI106 | Section: B.S. AI - Red | April 21, 2026</p>
     </header>
 
-    <section class="section" id="scenario">
-      <h2>Scenario</h2>
-      <p>
-        A startup requires an automated sentiment analysis system that can classify movie reviews as
-        <strong>positive</strong> or <strong>negative</strong>. Traditional MLP-style text classifiers do not model
-        word order and struggle with contextual phrases such as <span class="inline-code">not good</span>.
-        For that reason, this lab uses an <strong>LSTM (Long Short-Term Memory)</strong> network, which is capable of
-        learning sequential dependencies and preserving useful context across a review.
-      </p>
+    <p class="abstract">
+      <strong>Abstract:</strong> This report presents an LSTM-based approach for binary sentiment classification on
+      the IMDb movie review dataset. The study covers dataset preprocessing, sequence generation, baseline model
+      development, performance evaluation, and parameter modification for improved generalization. A baseline LSTM
+      model achieved a test accuracy of 0.8164, while a modified configuration with 128 hidden units and dropout 0.3
+      improved performance to 0.8318. The results show that sequence-aware neural architectures are effective for
+      sentiment analysis tasks in which contextual order and negation patterns strongly affect semantic interpretation.
+    </p>
 
-      <div class="summary-grid">
-        <article class="summary">
-          <h3>Problem Type</h3>
-          <p>Binary text classification on movie reviews.</p>
-        </article>
-        <article class="summary">
-          <h3>Learning Objective</h3>
-          <p>Use sequence modeling instead of fixed-input MLP processing for sentiment understanding.</p>
-        </article>
-        <article class="summary">
-          <h3>Model Family</h3>
-          <p>Embedding + LSTM + Sigmoid output layer.</p>
-        </article>
-        <article class="summary">
-          <h3>Final Result</h3>
-          <p>The modified LSTM reached <strong>0.8318</strong> test accuracy.</p>
-        </article>
-      </div>
-    </section>
+    <p class="keywords">
+      <strong>Index Terms:</strong> LSTM, sentiment analysis, IMDb dataset, natural language processing, sequence
+      modeling, binary classification.
+    </p>
 
-    <section class="section" id="contents">
-      <h2>Report Structure</h2>
-      <nav class="toc">
-        <a href="#task1">Task 1: Data Preprocessing</a>
-        <a href="#task2">Task 2: Build LSTM Model</a>
-        <a href="#task3">Task 3: Training and Evaluation</a>
-        <a href="#task4">Task 4: Parameter Modification</a>
-        <a href="#task5">Task 5: Prediction Test</a>
-        <a href="#discussion">Discussion and Conclusion</a>
-      </nav>
-    </section>
+    <article class="content">
+      <section id="introduction">
+        <h2>Introduction</h2>
+        <p>
+          Sentiment analysis is a fundamental natural language processing task in which a model must determine whether
+          a text expresses positive or negative opinion. In the present lab, the target application is the automatic
+          classification of IMDb movie reviews into binary sentiment categories. This problem is not ideally handled by
+          fixed-input multilayer perceptrons because sentiment often depends on local word order and long-range
+          contextual relationships.
+        </p>
+        <p>
+          Long Short-Term Memory networks are well suited to this scenario because they process text as an ordered
+          sequence and preserve relevant information through gated memory. Consequently, they can better interpret
+          expressions such as <span class="inline-code">not good</span>, where polarity is determined by interaction
+          between multiple tokens rather than isolated word presence.
+        </p>
+        <p>
+          The objectives of this lab were to preprocess the IMDb 50K review dataset, construct a baseline LSTM model,
+          evaluate its learning behavior, modify critical parameters, and compare the modified system against the
+          original baseline in terms of validation and test performance.
+        </p>
+      </section>
 
-    <section class="section" id="task1">
-      <div class="task-label">Task 1</div>
-      <h2>Data Preprocessing</h2>
-      <p>
-        The IMDb dataset was cleaned and transformed into padded numerical sequences so that it could be used as input
-        to the LSTM model. Reviews were normalized through lowercasing, HTML removal, whitespace cleanup, and tokenization.
-      </p>
+      <section id="methodology">
+        <h2>Methodology</h2>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Component</th>
-            <th>Value / Method</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Dataset Source</td>
-            <td><span class="inline-code">IMDB Dataset.csv</span> containing 50,000 movie reviews</td>
-          </tr>
-          <tr>
-            <td>Vocabulary Size</td>
-            <td><span class="inline-code">Tokenizer(num_words=5000, oov_token="&lt;OOV&gt;")</span></td>
-          </tr>
-          <tr>
-            <td>Sequence Length</td>
-            <td><span class="inline-code">100</span> tokens</td>
-          </tr>
-          <tr>
-            <td>Splitting Strategy</td>
-            <td>Train / Validation / Test = <strong>40000 / 5000 / 5000</strong></td>
-          </tr>
-          <tr>
-            <td>Padding Strategy</td>
-            <td><span class="inline-code">padding="post"</span>, <span class="inline-code">truncating="post"</span></td>
-          </tr>
-          <tr>
-            <td>Label Encoding</td>
-            <td>Negative = 0, Positive = 1</td>
-          </tr>
-        </tbody>
-      </table>
+        <h3>Dataset Preparation</h3>
+        <p>
+          The dataset used in this experiment consists of 50,000 labeled movie reviews. Before training, the raw text
+          was cleaned by removing HTML artifacts, normalizing whitespace, lowercasing the text, and removing unwanted
+          characters. The cleaned reviews were then tokenized and converted into fixed-length integer sequences for
+          input into the LSTM model.
+        </p>
 
-      <div class="two-col">
-        <article class="card">
-          <h3>Important Preprocessing Snippet</h3>
+        <div class="table-block">
+          <div class="table-caption">Table I<br>Preprocessing Configuration</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Value / Method</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Dataset Source</td>
+                <td><span class="inline-code">IMDB Dataset.csv</span> with 50,000 movie reviews</td>
+              </tr>
+              <tr>
+                <td>Vocabulary Size</td>
+                <td><span class="inline-code">Tokenizer(num_words=5000, oov_token="&lt;OOV&gt;")</span></td>
+              </tr>
+              <tr>
+                <td>Sequence Length</td>
+                <td>100 tokens</td>
+              </tr>
+              <tr>
+                <td>Data Split</td>
+                <td>Train / Validation / Test = 40000 / 5000 / 5000</td>
+              </tr>
+              <tr>
+                <td>Padding Strategy</td>
+                <td><span class="inline-code">padding="post"</span>, <span class="inline-code">truncating="post"</span></td>
+              </tr>
+              <tr>
+                <td>Label Encoding</td>
+                <td>Negative = 0, Positive = 1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="listing-block">
+          <div class="listing-caption">Listing 1. Text Cleaning and Sequence Preparation</div>
 <pre><code>def clean_review(text):
     text = html.unescape(str(text))
     text = re.sub(r"&lt;[^&gt;]+&gt;", " ", text)
@@ -483,65 +359,42 @@ tokenizer.fit_on_texts(train_df["review_clean"])
 
 X_train = pad_sequences(train_sequences, maxlen=100,
                         padding="post", truncating="post")</code></pre>
-          <p class="caption-note">
-            This code removes noise from the review text, converts words into integer tokens, and ensures that every
-            review has the same length before training.
-          </p>
-        </article>
+        </div>
 
-        <article class="callout">
-          <h3>Why Padding Is Required</h3>
-          <p><strong>Padding is necessary because neural networks train in batches.</strong></p>
-          <ul>
-            <li>Movie reviews naturally have different lengths.</li>
-            <li>LSTM training expects a uniform 2D input matrix for each batch.</li>
-            <li>Without padding, reviews cannot be stacked into a consistent tensor.</li>
-            <li>Padding also makes the experiment reproducible by fixing the amount of context read per sample.</li>
-          </ul>
-        </article>
-      </div>
+        <p>
+          Padding is necessary because text samples naturally vary in length, whereas mini-batch training requires all
+          inputs in a batch to share a common tensor shape. By selecting a fixed sequence length of 100, the model
+          receives a consistent amount of context while maintaining computational efficiency.
+        </p>
 
-      <figure>
-        <img src="plots/task1_sample_reviews.png" alt="Task 1 sample IMDb reviews">
-        <figcaption>
-          Figure 1. Sample cleaned reviews from the IMDb dataset used to verify that positive and negative samples are
-          correctly loaded and normalized before tokenization.
-        </figcaption>
-      </figure>
+        <figure>
+          <img src="plots/task1_sample_reviews.png" alt="Sample cleaned IMDb reviews">
+          <figcaption>Fig. 1. Sample cleaned reviews used to verify proper normalization before tokenization.</figcaption>
+        </figure>
 
-      <figure>
-        <img src="plots/task1_length_distribution.png" alt="Task 1 review length distribution">
-        <figcaption>
-          Figure 2. Distribution of tokenized review lengths. The dashed red line marks the chosen sequence length of
-          100 tokens, showing that shorter reviews are fully preserved while longer reviews are truncated for training efficiency.
-        </figcaption>
-      </figure>
-    </section>
+        <figure>
+          <img src="plots/task1_length_distribution.png" alt="Distribution of tokenized review lengths">
+          <figcaption>Fig. 2. Distribution of tokenized review lengths with the selected maximum length of 100 tokens.</figcaption>
+        </figure>
 
-    <section class="section" id="task2">
-      <div class="task-label">Task 2</div>
-      <h2>Build LSTM Model</h2>
-      <p>
-        The required baseline architecture consists of an Embedding layer, a single LSTM layer, and a sigmoid output neuron.
-        The Embedding layer maps word IDs to dense vectors, the LSTM processes the sequence in order, and the sigmoid output
-        converts the final representation into a probability for binary sentiment classification.
-      </p>
+        <h3>Baseline LSTM Architecture</h3>
+        <p>
+          The baseline model consists of an Embedding layer, a single LSTM layer with 64 units, and a sigmoid output
+          neuron. The Embedding layer converts token indices into dense vector representations, the LSTM extracts
+          sequential dependencies, and the sigmoid output produces a binary sentiment probability.
+        </p>
 
-      <div class="two-col">
-        <article class="card">
-          <h3>Required Baseline Model</h3>
+        <div class="listing-block">
+          <div class="listing-caption">Listing 2. Baseline and Reusable LSTM Model Definitions</div>
 <pre><code>model = tf.keras.Sequential([
     tf.keras.layers.Embedding(input_dim=5000,
                               output_dim=64,
                               input_length=100),
     tf.keras.layers.LSTM(64),
     tf.keras.layers.Dense(1, activation='sigmoid')
-])</code></pre>
-        </article>
+])
 
-        <article class="card">
-          <h3>Reusable Model Builder</h3>
-<pre><code>def build_lstm_model(max_len, lstm_units=64,
+def build_lstm_model(max_len, lstm_units=64,
                      dropout_rate=0.0, learning_rate=1e-3):
     model = tf.keras.Sequential([
         tf.keras.layers.Embedding(input_dim=MAX_WORDS,
@@ -554,54 +407,36 @@ X_train = pad_sequences(train_sequences, maxlen=100,
                   loss="binary_crossentropy",
                   metrics=["accuracy"])
     return model</code></pre>
-        </article>
-      </div>
+        </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Design Choice</th>
-            <th>Academic Explanation</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Embedding Layer</td>
-            <td>Transforms sparse token IDs into dense vectors so the network can learn semantic relations among words.</td>
-          </tr>
-          <tr>
-            <td>LSTM Instead of SimpleRNN</td>
-            <td>LSTM uses gated memory to retain important information over longer word sequences and better handles contextual phrases such as negation.</td>
-          </tr>
-          <tr>
-            <td>Sigmoid Output</td>
-            <td>Binary sentiment classification requires a probability between 0 and 1, which is provided by the sigmoid activation function.</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+        <p>
+          This architecture was selected because sequence learning is essential for sentiment analysis. In contrast to
+          SimpleRNN, the LSTM uses gated memory to retain important signals over longer spans and therefore better
+          captures contextual reversals and sentiment-bearing phrases.
+        </p>
+      </section>
 
-    <section class="section" id="task3">
-      <div class="task-label">Task 3</div>
-      <h2>Training and Evaluation</h2>
-      <p>
-        The original model was trained for <strong>5 epochs</strong> using a batch size of <strong>32</strong>.
-        Training and validation curves were analyzed to assess generalization performance and determine whether the model
-        was underfitting, overfitting, or reasonably fit.
-      </p>
+      <section id="results">
+        <h2>Experimental Results</h2>
 
-      <div class="metric-grid">
-        <div class="metric"><strong>Training Accuracy</strong><div class="value">0.8817</div></div>
-        <div class="metric"><strong>Validation Accuracy</strong><div class="value">0.8142</div></div>
-        <div class="metric"><strong>Training Loss</strong><div class="value">0.2873</div></div>
-        <div class="metric"><strong>Validation Loss</strong><div class="value">0.4262</div></div>
-        <div class="metric"><strong>Test Accuracy</strong><div class="value">0.8164</div></div>
-        <div class="metric"><strong>Test Loss</strong><div class="value">0.4230</div></div>
-      </div>
+        <h3>Baseline Training Performance</h3>
+        <p>
+          The original model was trained for five epochs with a batch size of 32. The resulting metrics indicate that
+          the model learned the training data effectively but exhibited a noticeable generalization gap on the
+          validation set.
+        </p>
 
-      <div class="two-col">
-        <article class="card">
-          <h3>Training Snippet</h3>
+        <ul class="results-list">
+          <li><strong>Training Accuracy:</strong> 0.8817</li>
+          <li><strong>Validation Accuracy:</strong> 0.8142</li>
+          <li><strong>Training Loss:</strong> 0.2873</li>
+          <li><strong>Validation Loss:</strong> 0.4262</li>
+          <li><strong>Test Accuracy:</strong> 0.8164</li>
+          <li><strong>Test Loss:</strong> 0.4230</li>
+        </ul>
+
+        <div class="listing-block">
+          <div class="listing-caption">Listing 3. Baseline Training Procedure</div>
 <pre><code>history_original = original_model.fit(
     X_train_original,
     y_train,
@@ -614,209 +449,146 @@ X_train = pad_sequences(train_sequences, maxlen=100,
 original_test_loss, original_test_acc = original_model.evaluate(
     X_test_original, y_test, verbose=1
 )</code></pre>
-        </article>
+        </div>
 
-        <article class="callout">
-          <h3>Fit Diagnosis</h3>
-<pre><code>Original model diagnosis: Overfitting
-Train accuracy: 0.8817
-Validation accuracy: 0.8142
-Train loss: 0.2873
-Validation loss: 0.4262</code></pre>
-          <p>
-            The original model learned the training set better than the validation set, producing a visible generalization gap.
-            This is consistent with mild overfitting.
-          </p>
-        </article>
-      </div>
+        <p>
+          The difference between training and validation performance indicates mild overfitting. The model captured the
+          training distribution more strongly than the held-out data, suggesting a need for additional regularization
+          or architectural adjustment.
+        </p>
 
-      <figure>
-        <img src="plots/task3_accuracy_curve.png" alt="Accuracy versus epochs for original LSTM model">
-        <figcaption>
-          Figure 3. Accuracy curves for the original LSTM. Training accuracy increases steadily, while validation accuracy
-          improves more slowly and remains below the training curve.
-        </figcaption>
-      </figure>
+        <figure>
+          <img src="plots/task3_accuracy_curve.png" alt="Accuracy curves for original LSTM model">
+          <figcaption>Fig. 3. Accuracy curves for the original LSTM model across training epochs.</figcaption>
+        </figure>
 
-      <figure>
-        <img src="plots/task3_loss_curve.png" alt="Loss versus epochs for original LSTM model">
-        <figcaption>
-          Figure 4. Loss curves for the original LSTM. Training loss decreases consistently, but validation loss remains
-          higher, which supports the overfitting diagnosis.
-        </figcaption>
-      </figure>
-    </section>
+        <figure>
+          <img src="plots/task3_loss_curve.png" alt="Loss curves for original LSTM model">
+          <figcaption>Fig. 4. Loss curves for the original LSTM model. Validation loss remains higher than training loss.</figcaption>
+        </figure>
 
-    <section class="section" id="task4">
-      <div class="task-label">Task 4</div>
-      <h2>Parameter Modification</h2>
-      <p>
-        Two modifications were applied to improve the model:
-      </p>
-      <ol>
-        <li>LSTM units were increased from <span class="inline-code">64</span> to <span class="inline-code">128</span>.</li>
-        <li>Dropout of <span class="inline-code">0.3</span> was introduced in the LSTM layer.</li>
-      </ol>
-      <p>
-        The objective of these changes was to increase model capacity while also introducing regularization to reduce
-        the generalization gap.
-      </p>
+        <h3>Modified Model and Comparative Analysis</h3>
+        <p>
+          To improve performance, the LSTM size was increased from 64 to 128 units and dropout of 0.3 was applied.
+          The intention behind these changes was to improve representational capacity while counteracting overfitting
+          through regularization.
+        </p>
 
-      <div class="two-col">
-        <article class="card">
-          <h3>Modified Model Configuration</h3>
+        <div class="listing-block">
+          <div class="listing-caption">Listing 4. Modified Model Configuration</div>
 <pre><code>modified_model = build_lstm_model(
     max_len=100,
     lstm_units=128,
     dropout_rate=0.3,
 )</code></pre>
-        </article>
+        </div>
 
-        <article class="callout">
-          <h3>Key Result</h3>
-          <p>
-            The modified model improved validation accuracy from <strong>0.8142</strong> to <strong>0.8318</strong>,
-            an absolute gain of <strong>0.0176</strong>. Test accuracy also improved from <strong>0.8164</strong> to
-            <strong>0.8318</strong>.
-          </p>
-        </article>
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Model</th>
-            <th>Train Accuracy</th>
-            <th>Validation Accuracy</th>
-            <th>Test Accuracy</th>
-            <th>Train Loss</th>
-            <th>Validation Loss</th>
-            <th>Test Loss</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Original</td>
-            <td>0.8817</td>
-            <td>0.8142</td>
-            <td>0.8164</td>
-            <td>0.2873</td>
-            <td>0.4262</td>
-            <td>0.4230</td>
-          </tr>
-          <tr>
-            <td>Modified</td>
-            <td>0.8826</td>
-            <td>0.8318</td>
-            <td>0.8318</td>
-            <td>0.2818</td>
-            <td>0.3979</td>
-            <td>0.4001</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <figure>
-        <img src="plots/task4_validation_accuracy_comparison.png" alt="Validation accuracy comparison between original and modified model">
-        <figcaption>
-          Figure 5. Validation accuracy comparison across epochs. After modification, the model achieves stronger and more stable
-          validation performance than the original baseline.
-        </figcaption>
-      </figure>
-    </section>
-
-    <section class="section" id="task5">
-      <div class="task-label">Task 5</div>
-      <h2>Prediction Test</h2>
-      <p>
-        The <strong>modified model</strong> was selected as the final model because it achieved the higher validation accuracy.
-        It was then applied to custom review sentences and evaluated on the held-out test set using a confusion matrix and classification report.
-      </p>
-
-      <div class="two-col">
-        <article class="card">
-          <h3>Custom Prediction Snippet</h3>
-<pre><code>custom_samples = [
-    "This movie was absolutely amazing",
-    "This movie was not good at all",
-    "The acting was great but the story was too slow and boring",
-    "I really loved the characters and the ending was satisfying",
-    "I expected something better, and honestly it was a waste of time",
-]
-
-custom_sequences = tokenizer.texts_to_sequences(
-    [clean_review(x) for x in custom_samples]
-)
-custom_padded = pad_sequences(custom_sequences, maxlen=100,
-                              padding="post", truncating="post")
-custom_probs = best_model.predict(custom_padded, verbose=0)</code></pre>
-        </article>
-
-        <article class="summary">
-          <h3>Final Model Performance</h3>
+        <div class="table-block">
+          <div class="table-caption">Table II<br>Comparison of Original and Modified Models</div>
           <table>
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Train Acc.</th>
+                <th>Val. Acc.</th>
+                <th>Test Acc.</th>
+                <th>Train Loss</th>
+                <th>Val. Loss</th>
+                <th>Test Loss</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><th>Selected Model</th><td>Modified LSTM</td></tr>
-              <tr><th>Final Test Accuracy</th><td>0.8318</td></tr>
-              <tr><th>Final Test Loss</th><td>0.4001</td></tr>
-              <tr><th>Probability Rule</th><td>Probability &ge; 0.5 = Positive, otherwise Negative</td></tr>
+              <tr>
+                <td>Original</td>
+                <td>0.8817</td>
+                <td>0.8142</td>
+                <td>0.8164</td>
+                <td>0.2873</td>
+                <td>0.4262</td>
+                <td>0.4230</td>
+              </tr>
+              <tr>
+                <td>Modified</td>
+                <td>0.8826</td>
+                <td>0.8318</td>
+                <td>0.8318</td>
+                <td>0.2818</td>
+                <td>0.3979</td>
+                <td>0.4001</td>
+              </tr>
             </tbody>
           </table>
-        </article>
-      </div>
+        </div>
 
-      <h3>Custom Review Predictions</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Review</th>
-            <th>Predicted Probability</th>
-            <th>Predicted Sentiment</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>This movie was absolutely amazing</td>
-            <td>0.9819</td>
-            <td>Positive</td>
-          </tr>
-          <tr>
-            <td>This movie was not good at all</td>
-            <td>0.2619</td>
-            <td>Negative</td>
-          </tr>
-          <tr>
-            <td>The acting was great but the story was too slow and boring</td>
-            <td>0.0548</td>
-            <td>Negative</td>
-          </tr>
-          <tr>
-            <td>I really loved the characters and the ending was satisfying</td>
-            <td>0.9863</td>
-            <td>Positive</td>
-          </tr>
-          <tr>
-            <td>I expected something better, and honestly it was a waste of time</td>
-            <td>0.0165</td>
-            <td>Negative</td>
-          </tr>
-        </tbody>
-      </table>
+        <p>
+          The modified model improved validation accuracy from 0.8142 to 0.8318, which represents an absolute
+          improvement of 0.0176. Test accuracy increased by the same magnitude, confirming that the modification
+          improved out-of-sample generalization rather than merely fitting the training data more aggressively.
+        </p>
 
-      <p>
-        These examples show that the model correctly identifies explicit positive sentiment, strong negative sentiment,
-        and mixed statements where negative wording dominates the overall review.
-      </p>
+        <figure>
+          <img src="plots/task4_validation_accuracy_comparison.png" alt="Validation accuracy comparison between original and modified models">
+          <figcaption>Fig. 5. Validation accuracy comparison between the baseline and modified LSTM configurations.</figcaption>
+        </figure>
 
-      <figure>
-        <img src="plots/task5_confusion_matrix.png" alt="Confusion matrix for modified model">
-        <figcaption>
-          Figure 6. Confusion matrix of the final modified model on the test set. The model correctly classified
-          2216 negative reviews and 1943 positive reviews, while misclassifying 284 negative and 557 positive reviews.
-        </figcaption>
-      </figure>
+        <h3>Final Prediction Analysis</h3>
+        <p>
+          Because the modified model achieved the best validation performance, it was selected as the final model for
+          custom review prediction and final test-set analysis.
+        </p>
 
-      <h3>Classification Report</h3>
+        <div class="table-block">
+          <div class="table-caption">Table III<br>Custom Review Predictions Using the Final Model</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Review</th>
+                <th>Predicted Probability</th>
+                <th>Predicted Sentiment</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>This movie was absolutely amazing</td>
+                <td>0.9819</td>
+                <td>Positive</td>
+              </tr>
+              <tr>
+                <td>This movie was not good at all</td>
+                <td>0.2619</td>
+                <td>Negative</td>
+              </tr>
+              <tr>
+                <td>The acting was great but the story was too slow and boring</td>
+                <td>0.0548</td>
+                <td>Negative</td>
+              </tr>
+              <tr>
+                <td>I really loved the characters and the ending was satisfying</td>
+                <td>0.9863</td>
+                <td>Positive</td>
+              </tr>
+              <tr>
+                <td>I expected something better, and honestly it was a waste of time</td>
+                <td>0.0165</td>
+                <td>Negative</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          These outputs show that the final model reliably classifies strongly positive and strongly negative reviews,
+          while also handling mixed expressions in which negative wording dominates the final interpretation.
+        </p>
+
+        <figure>
+          <img src="plots/task5_confusion_matrix.png" alt="Confusion matrix for final modified model">
+          <figcaption>Fig. 6. Confusion matrix of the final modified model on the held-out test set.</figcaption>
+        </figure>
+
+        <div class="listing-block">
+          <div class="listing-caption">Listing 5. Classification Report of the Final Model</div>
 <pre><code>              precision    recall  f1-score   support
 
     Negative     0.7991    0.8864    0.8405      2500
@@ -825,94 +597,73 @@ custom_probs = best_model.predict(custom_padded, verbose=0)</code></pre>
     accuracy                         0.8318      5000
    macro avg     0.8358    0.8318    0.8313      5000
 weighted avg     0.8358    0.8318    0.8313      5000</code></pre>
+        </div>
 
-      <p>
-        The report indicates that the model has higher recall for the negative class than for the positive class,
-        meaning it is slightly better at detecting negative reviews than positive ones in this experiment.
-      </p>
-    </section>
-
-    <section class="section" id="reflection">
-      <h2>Reflection Questions</h2>
-
-      <article class="card">
-        <h3>1. Why does LSTM perform better than SimpleRNN?</h3>
         <p>
-          LSTM performs better than SimpleRNN because it uses gated memory to preserve useful information for longer parts
-          of the sequence. This allows it to understand contextual phrases and word order more effectively, which is essential
-          for sentiment analysis.
+          The report shows stronger recall for the negative class than for the positive class. This indicates that, in
+          the present experiment, the model was slightly more effective at detecting negative sentiment.
         </p>
-      </article>
+      </section>
 
-      <article class="card" style="margin-top: 16px;">
-        <h3>2. What role does the memory cell play?</h3>
+      <section id="discussion">
+        <h2>Discussion</h2>
+
+        <h3>Why LSTM Outperforms SimpleRNN</h3>
         <p>
-          The memory cell stores information across time steps so the network can remember earlier words while processing later
-          ones. This helps the model interpret expressions such as <span class="inline-code">not good</span> correctly instead
-          of judging the word <span class="inline-code">good</span> in isolation.
+          LSTM performs better than SimpleRNN because it uses input, forget, and output gates to manage the flow of
+          information through time. This design mitigates the vanishing-gradient problem and enables the model to retain
+          useful contextual cues over longer sequences. As a result, it is more effective for sentiment analysis, where
+          polarity may depend on interactions among multiple words.
         </p>
-      </article>
 
-      <article class="card" style="margin-top: 16px;">
-        <h3>3. Why is padding important in NLP tasks?</h3>
+        <h3>Role of the Memory Cell</h3>
         <p>
-          Padding is important because deep learning models are typically trained in batches, and every sample in a batch must
-          have the same shape. Without padding, reviews of different lengths cannot be arranged into a regular tensor.
+          The memory cell acts as a persistent state that carries relevant information across time steps. This allows
+          the model to connect earlier expressions with later tokens and interpret phrases such as
+          <span class="inline-code">not good</span> correctly instead of treating each word independently.
         </p>
-      </article>
 
-      <article class="card" style="margin-top: 16px;">
-        <h3>4. What happens if sequence length is too small?</h3>
+        <h3>Importance of Padding and Sequence Length</h3>
         <p>
-          If the sequence length is too small, long reviews are truncated and important sentiment-bearing words may be removed.
-          This can reduce the model's accuracy because it no longer receives the full context of the review.
+          Padding is required because batch-based deep learning methods expect inputs with identical shape. At the same
+          time, sequence length must be chosen carefully. If the selected maximum length is too small, important
+          sentiment-bearing tokens may be truncated; if it is too large, training becomes more expensive and may
+          introduce unnecessary noise.
         </p>
-      </article>
 
-      <article class="card" style="margin-top: 16px;">
-        <h3>5. Why does increasing LSTM units improve performance?</h3>
+        <h3>Effect of Increasing LSTM Units</h3>
         <p>
-          Increasing the number of LSTM units gives the model greater representational capacity, which helps it learn more complex
-          contextual patterns. In this lab, increasing the units to 128 and adding dropout improved validation accuracy from 0.8142
-          to 0.8318, so the modification was beneficial on this dataset.
+          Increasing the number of LSTM units improves representational capacity by allowing the model to learn a richer
+          set of sequential features. In this lab, expanding the hidden state to 128 units and adding dropout produced a
+          better balance between learning capacity and regularization, which improved both validation and test accuracy.
         </p>
-      </article>
-    </section>
+      </section>
 
-    <section class="section" id="discussion">
-      <h2>Discussion</h2>
-      <p>
-        The original LSTM model achieved strong training performance, but the difference between training and validation metrics
-        indicated overfitting. The validation curves showed that although the network continued to learn the training set, its
-        generalization to unseen reviews did not improve at the same rate. This is a common issue in sequence models when the model
-        starts memorizing dataset-specific patterns.
-      </p>
-      <p>
-        The modified model addressed this by increasing the LSTM capacity while also introducing dropout. The result was a better
-        balance between learning power and regularization. Validation accuracy improved, test loss decreased, and the final confusion
-        matrix showed a solid overall classification ability on the held-out test set. These findings confirm that LSTM-based text
-        models are more suitable than basic fixed-input approaches when the order and context of words influence the final meaning.
-      </p>
-    </section>
+      <section id="conclusion">
+        <h2>Conclusion</h2>
+        <p>
+          This lab demonstrated the complete workflow for LSTM-based sentiment analysis on the IMDb review dataset,
+          including preprocessing, sequence construction, baseline modeling, evaluation, and architecture refinement.
+          The baseline model performed well but showed mild overfitting, which motivated a modified design with a larger
+          hidden state and dropout regularization.
+        </p>
+        <p>
+          The modified model achieved a final test accuracy of 83.18%, outperforming the original baseline and
+          confirming that careful parameter tuning can improve generalization in sequence classification problems.
+          Overall, the experiment reinforces the suitability of LSTM architectures for tasks in which contextual order
+          and phrase-level dependencies determine sentiment.
+        </p>
+      </section>
 
-    <section class="section" id="conclusion">
-      <h2>Conclusion</h2>
-      <p>
-        In this lab, the IMDb movie review dataset was preprocessed through cleaning, tokenization, and sequence padding, and then
-        classified using an LSTM-based neural network. The experiment demonstrated the practical advantage of sequence learning for
-        sentiment analysis, especially when the polarity of a sentence depends on contextual relationships among words.
-      </p>
-      <p>
-        The final modified model, using 128 LSTM units with dropout 0.3, outperformed the original baseline and achieved
-        <strong>83.18%</strong> test accuracy. Overall, the results show that thoughtful model modification can improve generalization,
-        and that LSTM remains an effective architecture for binary sentiment classification tasks.
-      </p>
-    </section>
-
-    <footer class="footer">
-      Prepared as an academic lab report for COMP-341L. All results, images, and code snippets in this document are based on the
-      saved outputs present in the Lab 10 folder.
-    </footer>
+      <section id="references-section">
+        <h2>References</h2>
+        <ol class="references">
+          <li>[1] S. Hochreiter and J. Schmidhuber, "Long Short-Term Memory," <em>Neural Computation</em>, vol. 9, no. 8, pp. 1735-1780, 1997.</li>
+          <li>[2] A. L. Maas, R. E. Daly, P. T. Pham, D. Huang, A. Y. Ng, and C. Potts, "Learning Word Vectors for Sentiment Analysis," in <em>Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics</em>, 2011, pp. 142-150.</li>
+          <li>[3] I. Goodfellow, Y. Bengio, and A. Courville, <em>Deep Learning</em>. Cambridge, MA, USA: MIT Press, 2016.</li>
+        </ol>
+      </section>
+    </article>
   </main>
 </body>
 </html>

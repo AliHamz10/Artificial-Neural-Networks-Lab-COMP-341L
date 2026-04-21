@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>APA 7 Student Paper - Lab 10 - Zarmeena Jawad</title>
+  <style>
+    :root {
+      --paper-width: 210mm;
+      --page-bg: #ececec;
+      --ink: #000000;
+      --line: #6f6f6f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--ink);
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12pt;
+      line-height: 2;
+    }
+
+    .paper {
+      width: min(var(--paper-width), calc(100% - 24px));
+      margin: 18px auto;
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+      padding: 25.4mm;
+    }
+
+    .page-number {
+      text-align: right;
+      font-size: 12pt;
+      margin-bottom: 24px;
+    }
+
+    .title-page {
+      min-height: 245mm;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .title-page-content {
+      margin: auto 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .title-page-title {
+      margin: 0 0 26px;
+      font-size: 12pt;
+      font-weight: 700;
+      line-height: 2;
+    }
+
+    .title-page-meta {
+      margin: 0;
+      text-align: center;
+    }
+
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .body-title {
+      margin: 0 0 18px;
+      text-align: center;
+      font-size: 12pt;
+      font-weight: 700;
+      line-height: 2;
+    }
+
+    h2,
+    h3,
+    h4 {
+      font-size: 12pt;
+      line-height: 2;
+    }
+
+    h2 {
+      margin: 18px 0 8px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    h3 {
+      margin: 16px 0 6px;
+      text-align: left;
+      font-weight: 700;
+    }
+
+    h4 {
+      margin: 14px 0 6px;
+      text-align: left;
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0 0 12px;
+      text-align: justify;
+      text-indent: 0.5in;
+    }
+
+    p.no-indent,
+    .title-page p,
+    .table-label,
+    .table-title,
+    .figure-label,
+    .figure-title,
+    .code-label,
+    .code-title,
+    .references li {
+      text-indent: 0;
+    }
+
+    ul {
+      margin: 0 0 12px 28px;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .inline-code {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 10pt;
+    }
+
+    .table-block,
+    .figure-block,
+    .code-block {
+      margin: 18px 0 22px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .table-label,
+    .figure-label,
+    .code-label {
+      margin: 0;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .table-title,
+    .figure-title,
+    .code-title {
+      margin: 0 0 8px;
+      font-style: italic;
+      text-align: left;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11pt;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      font-weight: 700;
+    }
+
+    pre {
+      margin: 0;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: #fafafa;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 10pt;
+      line-height: 1.5;
+    }
+
+    img {
+      width: 100%;
+      display: block;
+      border: 1px solid var(--line);
+    }
+
+    .figure-note {
+      margin-top: 8px;
+      font-size: 11pt;
+      text-align: left;
+    }
+
+    .references {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .references li {
+      margin: 0 0 12px;
+      padding-left: 0.5in;
+      text-indent: -0.5in;
+      text-align: left;
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 25.4mm;
+      }
+
+      body {
+        background: #ffffff;
+      }
+
+      .paper {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .paper {
+        width: calc(100% - 16px);
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="paper title-page page-break">
+    <div class="page-number">1</div>
+    <div class="title-page-content">
+      <h1 class="title-page-title">Sentiment Classification of IMDb Reviews Using a Long Short-Term Memory Network</h1>
+      <p class="title-page-meta no-indent">Zarmeena Jawad</p>
+      <p class="title-page-meta no-indent">Department of Computer Science and Artificial Intelligence, PAF Institute of Applied Sciences and Technology</p>
+      <p class="title-page-meta no-indent">COMP-341L: Artificial Neural Networks Lab</p>
+      <p class="title-page-meta no-indent">Lab 10</p>
+      <p class="title-page-meta no-indent">April 21, 2026</p>
+    </div>
+  </section>
+
+  <main class="paper">
+    <div class="page-number">2</div>
+    <h1 class="body-title">Sentiment Classification of IMDb Reviews Using a Long Short-Term Memory Network</h1>
+
+    <p>
+      Sentiment analysis is a common natural language processing task in which a system determines whether a text
+      expresses positive or negative opinion. In this lab, the objective was to classify IMDb movie reviews into binary
+      sentiment categories. This problem is sequence-sensitive because the sentiment of a sentence often depends on the
+      order in which words appear rather than on isolated tokens alone.
+    </p>
+    <p>
+      A standard feedforward architecture is limited for this purpose because it does not naturally preserve contextual
+      ordering. Long short-term memory networks are more appropriate because they process sequences while retaining
+      relevant information through gated memory. This makes them effective for phrases such as
+      <span class="inline-code">not good</span>, where the final meaning depends on context.
+    </p>
+
+    <h2>Scenario</h2>
+    <p>
+      The working scenario for this lab is the development of an automated review analysis system that can identify the
+      sentiment of movie reviews as positive or negative. Because movie reviews are sequential text, the model must be
+      able to understand contextual order rather than relying only on isolated words.
+    </p>
+
+    <h2>Task 1: Data Preparation</h2>
+    <p>
+      The IMDb movie review dataset used in this experiment contains 50,000 labeled reviews. Before model training,
+      the reviews were cleaned, tokenized, padded, and split into training, validation, and testing subsets. The
+      cleaning stage removed HTML tags, normalized whitespace, retained only relevant characters, and converted all
+      tokens to lowercase.
+    </p>
+
+    <div class="table-block">
+      <p class="table-label">Table 1</p>
+      <p class="table-title">Dataset and Preprocessing Configuration</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Configuration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Dataset Source</td>
+            <td><span class="inline-code">IMDB Dataset.csv</span> containing 50,000 movie reviews</td>
+          </tr>
+          <tr>
+            <td>Vocabulary Limit</td>
+            <td>5,000 tokens</td>
+          </tr>
+          <tr>
+            <td>Maximum Sequence Length</td>
+            <td>100 tokens</td>
+          </tr>
+          <tr>
+            <td>Train / Validation / Test Split</td>
+            <td>40,000 / 5,000 / 5,000</td>
+          </tr>
+          <tr>
+            <td>Padding and Truncation</td>
+            <td>Post padding and post truncation</td>
+          </tr>
+          <tr>
+            <td>Label Mapping</td>
+            <td>Negative = 0, Positive = 1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-block">
+      <p class="code-label">Code Example 1</p>
+      <p class="code-title">Cleaning and Sequence Padding Procedure</p>
+<pre><code>def clean_review(text):
+    text = html.unescape(str(text))
+    text = re.sub(r"&lt;[^&gt;]+&gt;", " ", text)
+    text = text.replace("\n", " ")
+    text = re.sub(r"[^a-zA-Z0-9' ]+", " ", text)
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    return text
+
+tokenizer = Tokenizer(num_words=5000, oov_token="&lt;OOV&gt;")
+tokenizer.fit_on_texts(train_df["review_clean"])
+
+X_train = pad_sequences(train_sequences, maxlen=100,
+                        padding="post", truncating="post")</code></pre>
+    </div>
+
+    <p>
+      Padding is necessary because text sequences vary naturally in length, whereas mini-batch training requires all
+      inputs in a batch to share the same shape. Selecting a fixed sequence length also improves efficiency and keeps
+      the input representation consistent across the experiment.
+    </p>
+
+    <div class="figure-block">
+      <p class="figure-label">Figure 1</p>
+      <p class="figure-title">Sample normalized reviews after the cleaning stage</p>
+      <img src="plots/task1_sample_reviews.png" alt="Sample cleaned reviews">
+      <p class="figure-note">Note. These examples were used to visually verify that the review text had been normalized correctly before tokenization.</p>
+    </div>
+
+    <div class="figure-block">
+      <p class="figure-label">Figure 2</p>
+      <p class="figure-title">Distribution of review lengths in tokens</p>
+      <img src="plots/task1_length_distribution.png" alt="Review length distribution">
+      <p class="figure-note">Note. The selected maximum sequence length of 100 tokens provides a balance between contextual coverage and computational cost.</p>
+    </div>
+
+    <h2>Task 2: Model Construction</h2>
+    <p>
+      The baseline model used in this lab consists of an embedding layer, a single LSTM layer, and a sigmoid output
+      neuron. The embedding layer converts token identifiers into dense word vectors, the LSTM captures sequential
+      dependencies, and the sigmoid unit outputs the probability of positive sentiment.
+    </p>
+
+    <div class="code-block">
+      <p class="code-label">Code Example 2</p>
+      <p class="code-title">Baseline and Configurable LSTM Model Definitions</p>
+<pre><code>model = tf.keras.Sequential([
+    tf.keras.layers.Embedding(input_dim=5000,
+                              output_dim=64,
+                              input_length=100),
+    tf.keras.layers.LSTM(64),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+def build_lstm_model(max_len, lstm_units=64,
+                     dropout_rate=0.0, learning_rate=1e-3):
+    model = tf.keras.Sequential([
+        tf.keras.layers.Embedding(input_dim=MAX_WORDS,
+                                  output_dim=EMBEDDING_DIM,
+                                  input_length=max_len),
+        tf.keras.layers.LSTM(lstm_units, dropout=dropout_rate),
+        tf.keras.layers.Dense(1, activation="sigmoid"),
+    ])
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate),
+                  loss="binary_crossentropy",
+                  metrics=["accuracy"])
+    return model</code></pre>
+    </div>
+
+    <p>
+      LSTM was selected instead of SimpleRNN because its gated structure is better at retaining important contextual
+      information over longer sequences. This property is especially useful in sentiment analysis, where negation,
+      contrast, and emphasis often change the meaning of a sentence.
+    </p>
+
+    <h2>Task 3: Training and Evaluation</h2>
+
+    <h3>Baseline Model Performance</h3>
+    <p>
+      The original model was trained for five epochs with batch size 32. The results indicate effective learning on
+      the training set, but the validation metrics reveal a modest generalization gap.
+    </p>
+    <ul>
+      <li>Training accuracy: 0.8817</li>
+      <li>Validation accuracy: 0.8142</li>
+      <li>Training loss: 0.2873</li>
+      <li>Validation loss: 0.4262</li>
+      <li>Test accuracy: 0.8164</li>
+      <li>Test loss: 0.4230</li>
+    </ul>
+
+    <div class="code-block">
+      <p class="code-label">Code Example 3</p>
+      <p class="code-title">Baseline Training Procedure</p>
+<pre><code>history_original = original_model.fit(
+    X_train_original,
+    y_train,
+    validation_data=(X_val_original, y_val),
+    epochs=5,
+    batch_size=32,
+    verbose=1,
+)
+
+original_test_loss, original_test_acc = original_model.evaluate(
+    X_test_original, y_test, verbose=1
+)</code></pre>
+    </div>
+
+    <div class="figure-block">
+      <p class="figure-label">Figure 3</p>
+      <p class="figure-title">Training and validation accuracy for the baseline model</p>
+      <img src="plots/task3_accuracy_curve.png" alt="Baseline accuracy curve">
+      <p class="figure-note">Note. The validation curve remains below the training curve, which suggests limited generalization relative to training performance.</p>
+    </div>
+
+    <div class="figure-block">
+      <p class="figure-label">Figure 4</p>
+      <p class="figure-title">Training and validation loss for the baseline model</p>
+      <img src="plots/task3_loss_curve.png" alt="Baseline loss curve">
+      <p class="figure-note">Note. The consistently higher validation loss supports the interpretation of mild overfitting.</p>
+    </div>
+
+    <h2>Task 4: Parameter Modification</h2>
+    <h3>Modified Model Performance</h3>
+    <p>
+      To improve performance, the number of LSTM units was increased from 64 to 128 and a dropout rate of 0.3 was
+      introduced. The revised model aimed to combine stronger representational capacity with regularization.
+    </p>
+
+    <div class="code-block">
+      <p class="code-label">Code Example 4</p>
+      <p class="code-title">Updated LSTM Configuration</p>
+<pre><code>modified_model = build_lstm_model(
+    max_len=100,
+    lstm_units=128,
+    dropout_rate=0.3,
+)</code></pre>
+    </div>
+
+    <div class="table-block">
+      <p class="table-label">Table 2</p>
+      <p class="table-title">Comparison of Baseline and Modified Models</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Train Acc.</th>
+            <th>Val. Acc.</th>
+            <th>Test Acc.</th>
+            <th>Train Loss</th>
+            <th>Val. Loss</th>
+            <th>Test Loss</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Original</td>
+            <td>0.8817</td>
+            <td>0.8142</td>
+            <td>0.8164</td>
+            <td>0.2873</td>
+            <td>0.4262</td>
+            <td>0.4230</td>
+          </tr>
+          <tr>
+            <td>Modified</td>
+            <td>0.8826</td>
+            <td>0.8318</td>
+            <td>0.8318</td>
+            <td>0.2818</td>
+            <td>0.3979</td>
+            <td>0.4001</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      The modified model improved both validation and test accuracy to 0.8318. This suggests that the revised
+      configuration achieved better out-of-sample generalization rather than simply memorizing the training set more
+      strongly.
+    </p>
+
+    <div class="figure-block">
+      <p class="figure-label">Figure 5</p>
+      <p class="figure-title">Validation accuracy comparison for the two LSTM configurations</p>
+      <img src="plots/task4_validation_accuracy_comparison.png" alt="Validation accuracy comparison">
+      <p class="figure-note">Note. The modified architecture produced stronger validation behavior across the training period.</p>
+    </div>
+
+    <h2>Task 5: Final Prediction Analysis</h2>
+    <h3>Custom Prediction and Test Review</h3>
+    <p>
+      The modified LSTM was selected as the final model and evaluated on custom review samples as well as the held-out
+      test set.
+    </p>
+
+    <div class="table-block">
+      <p class="table-label">Table 3</p>
+      <p class="table-title">Predictions for Custom Review Samples</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Review</th>
+            <th>Predicted Probability</th>
+            <th>Predicted Sentiment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>This movie was absolutely amazing</td>
+            <td>0.9819</td>
+            <td>Positive</td>
+          </tr>
+          <tr>
+            <td>This movie was not good at all</td>
+            <td>0.2619</td>
+            <td>Negative</td>
+          </tr>
+          <tr>
+            <td>The acting was great but the story was too slow and boring</td>
+            <td>0.0548</td>
+            <td>Negative</td>
+          </tr>
+          <tr>
+            <td>I really loved the characters and the ending was satisfying</td>
+            <td>0.9863</td>
+            <td>Positive</td>
+          </tr>
+          <tr>
+            <td>I expected something better, and honestly it was a waste of time</td>
+            <td>0.0165</td>
+            <td>Negative</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="figure-block">
+      <p class="figure-label">Figure 6</p>
+      <p class="figure-title">Confusion matrix for the final model</p>
+      <img src="plots/task5_confusion_matrix.png" alt="Confusion matrix">
+      <p class="figure-note">Note. The final model showed balanced but slightly stronger recognition of negative reviews.</p>
+    </div>
+
+    <div class="code-block">
+      <p class="code-label">Code Example 5</p>
+      <p class="code-title">Classification Report for the Final Model</p>
+<pre><code>              precision    recall  f1-score   support
+
+    Negative     0.7991    0.8864    0.8405      2500
+    Positive     0.8725    0.7772    0.8221      2500
+
+    accuracy                         0.8318      5000
+   macro avg     0.8358    0.8318    0.8313      5000
+weighted avg     0.8358    0.8318    0.8313      5000</code></pre>
+    </div>
+
+    <h2>Discussion</h2>
+    <p>
+      The findings of this lab show that LSTM is better suited than SimpleRNN for sentiment analysis because it can
+      preserve useful context across longer sequences. The memory cell allows the network to connect earlier and later
+      words, which is necessary for phrases in which negation changes polarity. Padding was also a necessary
+      preprocessing step because variable-length reviews cannot be trained in batches without converting them to a
+      common shape. Increasing the number of hidden units gave the model greater representational capacity, and the
+      addition of dropout improved its ability to generalize.
+    </p>
+
+    <h2>Conclusion</h2>
+    <p>
+      This lab demonstrated the use of a long short-term memory network for binary sentiment analysis on IMDb movie
+      reviews. The workflow included review cleaning, tokenization, padding, baseline model training, architectural
+      modification, and final performance evaluation. The revised model outperformed the baseline and achieved 83.18%
+      test accuracy. Overall, the experiment confirms that sequence-aware neural models are effective for text
+      classification tasks in which context strongly influences meaning.
+    </p>
+
+    <h2>References</h2>
+    <ol class="references">
+      <li>Goodfellow, I., Bengio, Y., &amp; Courville, A. (2016). <em>Deep learning</em>. MIT Press.</li>
+      <li>Hochreiter, S., &amp; Schmidhuber, J. (1997). Long short-term memory. <em>Neural Computation, 9</em>(8), 1735-1780.</li>
+      <li>Maas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., &amp; Potts, C. (2011). Learning word vectors for sentiment analysis. In <em>Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human Language Technologies</em> (pp. 142-150).</li>
+    </ol>
+  </main>
+</body>
+</html>
