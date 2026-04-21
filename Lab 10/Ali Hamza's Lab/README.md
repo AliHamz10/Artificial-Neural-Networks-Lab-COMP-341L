@@ -5,10 +5,13 @@
 - `build_lab10_lstm_notebook.py`: notebook generator used to create the `.ipynb`
 
 ## Dataset
-The notebook now downloads the IMDb CSV automatically from an online source and saves it in your lab folder on Google Drive.
+The notebook now downloads the IMDb dataset automatically from Hugging Face and saves a CSV copy in your lab folder on Google Drive.
 
 Saved file name:
 - `IMDB Dataset.csv`
+
+Online source used by the notebook:
+- Hugging Face dataset: `scikit-learn/imdb`
 
 ## How to run in Colab
 1. Open `lab10_lstm_sentiment_colab.ipynb` in Google Colab.

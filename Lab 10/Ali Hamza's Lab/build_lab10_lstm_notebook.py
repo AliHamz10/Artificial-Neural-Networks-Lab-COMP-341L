@@ -41,7 +41,7 @@ cells = [
         **Execution Environment:** Google Colab
 
         This notebook follows the Lab 10 task step by step:
-        1. Load the IMDb CSV dataset
+        1. Load the IMDb dataset online and save a CSV copy in Google Drive
         2. Tokenize text and pad sequences
         3. Train an original LSTM model
         4. Improve the model using two modifications
@@ -49,8 +49,7 @@ cells = [
         6. Generate plots plus `Lab_Report_10.md` and `Lab_Report_10.html`
 
         ## Before running
-        Keep the Kaggle file name as **`IMDB Dataset.csv`** if possible.  
-        If the file is not found automatically, the notebook will ask you to upload it in Colab.
+        This notebook saves everything to Google Drive and downloads the IMDb dataset online automatically if it is not already present.
         """
     ),
     code_cell(
@@ -103,7 +102,9 @@ cells = [
             from datasets import load_dataset
             print("datasets package already available.")
         except Exception:
-            !pip -q install datasets
+            import subprocess
+            import sys
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "datasets"])
             from datasets import load_dataset
             print("Installed datasets package.")
         """

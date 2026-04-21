@@ -1,0 +1,6 @@
+Review,Predicted Probability,Predicted Sentiment
+This movie was absolutely amazing,0.9818773865699768,Positive
+This movie was not good at all,0.26185867190361023,Negative
+The acting was great but the story was too slow and boring,0.054823219776153564,Negative
+I really loved the characters and the ending was satisfying,0.9862909317016602,Positive
+"I expected something better, and honestly it was a waste of time",0.01649198681116104,Negative

@@ -1,0 +1,1 @@
+Original model diagnosis: Overfitting. Train accuracy = 0.8817, validation accuracy = 0.8142, train loss = 0.2873, validation loss = 0.4262.
