@@ -21,6 +21,7 @@ This folder contains a **NumPy-from-scratch** implementation of four neural lear
 3. Run cells top→bottom.
 
 Notes:
+
 - The notebook uses TensorFlow/Keras **only to load MNIST**. All models are implemented in `src/` using NumPy only.
 - Set `FAST_RUN = True` near the top for a quick demo run.
 - The first setup cell is **self-contained**: if the runtime cannot see `src/` (common with Cursor “Colab server” extensions that only sync the notebook), it will recreate `src/` from embedded sources automatically.
