@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>COMP-341L — Lab 11 Report — Zarmeena Jawad</title>
+    <style>
+      /* One-column IEEE-like styling (HTML approximation) — Zarmeena variant */
+      * { box-sizing: border-box; }
+      html, body { background: #fff; color: #000; }
+
+      body {
+        margin: 0;
+        font-family: "Times New Roman", Times, serif;
+        font-size: 10pt;
+        line-height: 1.28;
+      }
+
+      .paper {
+        max-width: 7.15in;
+        margin: 0 auto;
+        padding: 0.9in 0.85in 0.95in;
+      }
+
+      .toprule {
+        border: none;
+        border-top: 2px solid #000;
+        margin: 0 0 10px;
+      }
+
+      .course {
+        text-align: center;
+        font-size: 9.5pt;
+        letter-spacing: 0.02em;
+        margin: 0 0 6px;
+      }
+
+      .title {
+        text-align: center;
+        margin: 0 0 6px;
+        font-size: 17pt;
+        font-weight: bold;
+      }
+
+      .authors {
+        text-align: center;
+        margin: 0 0 4px;
+        font-size: 10.5pt;
+        font-style: italic;
+      }
+
+      .meta {
+        text-align: center;
+        margin: 0 0 10px;
+        font-size: 9.5pt;
+      }
+
+      .midrule {
+        border: none;
+        border-top: 1px solid #000;
+        margin: 8px 0 12px;
+      }
+
+      h2 {
+        font-size: 10pt;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin: 12px 0 6px;
+        border-bottom: 1px solid #000;
+        padding-bottom: 2px;
+      }
+
+      h3 {
+        font-size: 10pt;
+        font-weight: bold;
+        margin: 10px 0 6px;
+      }
+
+      p { margin: 0 0 8px; text-align: justify; }
+      .label { font-weight: bold; }
+
+      .callout {
+        border: 1px solid #000;
+        background: #f6f6f6;
+        padding: 6px 8px;
+        margin: 8px 0 10px;
+      }
+
+      pre {
+        border: 1px solid #000;
+        background: #fbfbfb;
+        padding: 8px;
+        margin: 8px 0 10px;
+        white-space: pre;
+        overflow-x: auto;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 9pt;
+        line-height: 1.2;
+      }
+
+      code {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 9pt;
+      }
+
+      .figure {
+        margin: 10px 0 12px;
+        text-align: center;
+      }
+
+      .figure img {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #000;
+        padding: 4px;
+      }
+
+      .figcap {
+        font-size: 9pt;
+        margin-top: 4px;
+        text-align: center;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8px 0 10px;
+        font-size: 9.5pt;
+      }
+
+      th, td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+        vertical-align: top;
+      }
+
+      th {
+        font-weight: bold;
+        background: #efefef;
+      }
+
+      .footer {
+        margin-top: 12px;
+        padding-top: 6px;
+        border-top: 1px solid #000;
+        font-size: 9pt;
+        text-align: left;
+      }
+
+      @media print {
+        .paper { padding: 0; margin: 0; max-width: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="paper">
+      <hr class="toprule" />
+      <p class="course">COMP-341L — Artificial Neural Networks Lab</p>
+      <h1 class="title">Lab 11 Report: LSTM for Time Series Forecasting (Regression)</h1>
+      <p class="authors">Zarmeena Jawad (B23F0115AI125), B.S AI - Red</p>
+      <p class="meta">Submission Date: April 23, 2026</p>
+      <hr class="midrule" />
+
+      <section class="abstract">
+        <h2>Abstract</h2>
+        <p>
+          <span class="label">Abstract—</span> This lab implements LSTM-based time series forecasting (regression) using a univariate sales sequence.
+          The time series is inspected for trend and seasonality using visual plots, normalized using Min–Max scaling, and transformed into supervised
+          samples using a sliding window. Two LSTM configurations (baseline and modified) are trained for 20 epochs and compared using training/validation
+          MSE loss. Finally, the trained model is used to forecast the next 12 time steps using iterative prediction.
+        </p>
+      </section>
+
+      <section class="keywords">
+        <p><span class="label">Keywords—</span> Time Series Forecasting, LSTM, Sliding Window, Regression, Trend, Seasonality.</p>
+      </section>
+
+      <section>
+        <h2>I. Data Understanding (Trend and Seasonality)</h2>
+        <div class="callout">
+          <span class="label">Dataset summary:</span> Detected date column = <code>Month</code>, detected value column = <code>Sales</code>, samples (after cleaning) = <code>108</code>.
+        </div>
+        <p>
+          In time series data, the ordering of samples is critical because each observation depends on previous ones. A time series can often be
+          viewed as a combination of trend, seasonality, and noise. Visual inspection helps confirm whether repeating seasonal patterns exist and
+          whether the mean level changes over time (trend).
+        </p>
+        <div class="figure">
+          <img src="plots/task1_time_series.png" alt="Time series plot" />
+          <div class="figcap">Figure 1: Raw time series plot used to observe overall behavior of the sequence.</div>
+        </div>
+        <div class="figure">
+          <img src="plots/task1_trend_rolling_mean.png" alt="Trend rolling mean" />
+          <div class="figcap">Figure 2: Rolling mean as a simple approximation of the underlying trend.</div>
+        </div>
+        <div class="figure">
+          <img src="plots/task1_seasonality_month_avg.png" alt="Seasonality by month average" />
+          <div class="figcap">Figure 3: Seasonality view (average value by month-of-year) to highlight repeated annual patterns.</div>
+        </div>
+      </section>
+
+      <section>
+        <h2>II. Preprocessing and Sliding Window (Window = 12)</h2>
+        <p>
+          The values are normalized using <code>MinMaxScaler</code>. The scaler should be fit on the training portion only to avoid leakage
+          of future information into the training process. The sequence is then transformed into supervised samples using a sliding window.
+        </p>
+        <h3>Sliding Window Transformation</h3>
+        <pre><code># Given a scaled series: values_scaled shape (N, 1)
+# Create supervised samples: (x[t-window : t]) -> x[t]
+def make_windowed_dataset(values_scaled, start, end, window):
+    X, y = [], []
+    for t in range(start + window, end):
+        X.append(values_scaled[t-window:t, 0])
+        y.append(values_scaled[t, 0])
+    X = np.array(X).reshape(-1, window, 1)
+    y = np.array(y).reshape(-1, 1)
+    return X, y</code></pre>
+        <p>
+          This step is crucial because the LSTM does not learn from raw unordered points; it learns from sequences of fixed length. The chosen window size is
+          a tradeoff: small windows may miss long-term patterns, while large windows can increase training difficulty and overfitting risk.
+        </p>
+      </section>
+
+      <section>
+        <h2>III. Baseline LSTM Model</h2>
+        <div class="callout">
+          <span class="label">Baseline hyperparameters:</span> Window = <code>12</code>, LSTM units = <code>50</code>, dropout = <code>0.0</code>, epochs = <code>20</code>.
+        </div>
+        <p>
+          The baseline model is a single-layer LSTM followed by a dense output neuron (<code>Dense(1)</code>) for regression. The model is optimized with Adam and trained using MSE loss.
+        </p>
+        <h3>LSTM Regressor Definition</h3>
+        <pre><code>model = Sequential([
+    LSTM(50, input_shape=(12, 1)),
+    Dense(1)
+])
+model.compile(optimizer="adam", loss="mse")</code></pre>
+        <div class="figure">
+          <img src="plots/task3_baseline_loss.png" alt="Baseline loss curve" />
+          <div class="figcap">Figure 4: Baseline training vs validation loss across epochs.</div>
+        </div>
+        <div class="figure">
+          <img src="plots/task3_baseline_actual_vs_pred.png" alt="Baseline actual vs predicted" />
+          <div class="figcap">Figure 5: Baseline predictions compared to actual values on the test set.</div>
+        </div>
+      </section>
+
+      <section>
+        <h2>IV. Modified Model (Modify Any Two Parameters)</h2>
+        <div class="callout">
+          <span class="label">Modified hyperparameters:</span> Window = <code>24</code>, LSTM units = <code>100</code>, dropout = <code>0.0</code>, epochs = <code>20</code>.
+        </div>
+        <p>
+          The modified model increases the temporal context (window length) and the number of LSTM units. Increasing the window helps the model see a longer
+          history, while more units increase capacity to represent complex patterns. However, these changes can also increase the risk of overfitting if the
+          dataset is small.
+        </p>
+        <div class="figure">
+          <img src="plots/task4_modified_loss.png" alt="Modified loss curve" />
+          <div class="figcap">Figure 6: Modified model training vs validation loss across epochs.</div>
+        </div>
+        <div class="figure">
+          <img src="plots/task4_modified_actual_vs_pred.png" alt="Modified actual vs predicted" />
+          <div class="figcap">Figure 7: Modified predictions compared to actual values on the test set.</div>
+        </div>
+        <h3>Loss Comparison (Final Epoch)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Window</th>
+              <th>LSTM Units</th>
+              <th>Dropout</th>
+              <th>Train Loss (final)</th>
+              <th>Val Loss (final)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Base</td>
+              <td>12</td>
+              <td>50</td>
+              <td>0.0</td>
+              <td>0.050946</td>
+              <td>0.052949</td>
+            </tr>
+            <tr>
+              <td>Modified</td>
+              <td>24</td>
+              <td>100</td>
+              <td>0.0</td>
+              <td>0.055747</td>
+              <td>0.053419</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <span class="label">Discussion:</span> Here, the baseline shows slightly lower validation loss than the modified model, suggesting that the added capacity/context did not
+          improve generalization for this dataset. This can happen when the dataset size is limited or when the longer window introduces noisier inputs.
+        </p>
+      </section>
+
+      <section>
+        <h2>V. Forecast Next 12 Time Steps</h2>
+        <p>
+          Future forecasting is performed iteratively: the prediction for the next time step is appended to the sequence and then used as part of the input for
+          predicting subsequent steps. This procedure is common in one-step-ahead models extended to multi-step forecasting.
+        </p>
+        <h3>Iterative Forecasting</h3>
+        <pre><code># Use last "window" points, predict next, append prediction, repeat
+history_scaled = values_scaled[:, 0].tolist()
+future_scaled = []
+for _ in range(12):
+    x = np.array(history_scaled[-24:]).reshape(1, 24, 1)
+    yhat = float(mod_model.predict(x, verbose=0)[0, 0])
+    future_scaled.append(yhat)
+    history_scaled.append(yhat)</code></pre>
+        <div class="figure">
+          <img src="plots/task5_future_forecast.png" alt="Future forecast" />
+          <div class="figcap">Figure 8: Forecasted next 12 time steps overlaid on recent history.</div>
+        </div>
+        <div class="callout">
+          <span class="label">Note:</span> Multi-step iterative forecasting can accumulate error because each future step depends on earlier predictions, not on true values.
+        </div>
+      </section>
+
+      <section>
+        <h2>VI. Conclusion</h2>
+        <p>
+          This lab demonstrates an end-to-end LSTM forecasting workflow for time series regression. The time series was analyzed for trend and seasonality,
+          normalized, and transformed into supervised samples using a sliding window. A baseline LSTM model and a modified model (changing window size and units)
+          were trained and compared using training and validation MSE loss.
+        </p>
+        <p>
+          The results show that increasing the window size and LSTM units does not guarantee improved validation performance; the best configuration depends on
+          the dataset size, noise level, and strength of temporal patterns. In practice, model selection should be guided by validation error and careful testing on
+          unseen future segments.
+        </p>
+        <p>
+          <span class="label">Future work:</span> add dropout, try stacked LSTMs, use early stopping, and incorporate multivariate features (promotions/holidays) to improve forecasting robustness.
+        </p>
+        <div class="footer">
+          Report file: <code>Lab_Report_11.html</code> • Figures: <code>plots/</code> • Course: COMP-341L
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
