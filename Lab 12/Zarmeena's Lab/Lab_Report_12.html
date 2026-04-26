@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>COMP-341L — Lab 12 Report — Zarmeena Jawad</title>
+    <style>
+      /* One-column academic report (IEEE-like HTML approximation) */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        background: #fff;
+        color: #000;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Times New Roman", Times, serif;
+        font-size: 10pt;
+        line-height: 1.25;
+      }
+
+      .paper {
+        /* A4 page geometry */
+        width: 210mm;
+        max-width: 210mm;
+        margin: 0 auto;
+        padding: 20mm 18mm 22mm;
+      }
+
+      /* Title page */
+      .title-page {
+        /* Fill most of one A4 page on screen (printing handled by @page) */
+        min-height: 250mm;
+        border: 1px solid #000;
+        padding: 15mm 14mm;
+        margin-bottom: 16px;
+        page-break-after: always;
+        break-after: page;
+      }
+
+      .tp-topline {
+        text-align: center;
+        font-size: 10pt;
+        margin: 0 0 16px;
+      }
+
+      .tp-title {
+        text-align: center;
+        font-size: 18pt;
+        font-weight: bold;
+        margin: 0 0 10px;
+      }
+
+      .tp-subtitle {
+        text-align: center;
+        font-size: 11pt;
+        margin: 0 0 22px;
+      }
+
+      .tp-meta {
+        margin: 0 auto 18px;
+        width: 100%;
+        max-width: 5.6in;
+        border-collapse: collapse;
+        font-size: 10pt;
+      }
+
+      .tp-meta td {
+        border: 1px solid #000;
+        padding: 6px 8px;
+      }
+
+      .tp-meta .lbl {
+        width: 1.6in;
+        font-weight: bold;
+      }
+
+      .tp-note {
+        margin-top: 20px;
+        font-size: 9.5pt;
+        text-align: justify;
+      }
+
+      .toc {
+        margin-top: 22px;
+        border: 1px solid #000;
+        padding: 8px 10px;
+      }
+      .toc-title {
+        font-weight: bold;
+        margin: 0 0 6px;
+      }
+      .toc ul {
+        margin: 0 0 0 18px;
+        padding: 0;
+      }
+      .toc li {
+        margin: 2px 0;
+      }
+
+      /* Body headings */
+      h2 {
+        font-size: 10pt;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin: 12px 0 6px;
+      }
+
+      h3 {
+        font-size: 10pt;
+        font-weight: bold;
+        margin: 10px 0 6px;
+      }
+
+      p {
+        margin: 0 0 8px;
+        text-align: justify;
+      }
+
+      .label {
+        font-weight: bold;
+      }
+
+      .callout {
+        border: 1px solid #000;
+        padding: 6px 8px;
+        margin: 8px 0 10px;
+      }
+
+      /* Code blocks requested: black background + white text */
+      pre {
+        border: 1px solid #000;
+        padding: 8px;
+        margin: 8px 0 10px;
+        white-space: pre;
+        overflow-x: auto;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 9pt;
+        line-height: 1.2;
+        background: #000;
+        color: #fff;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      code {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 9pt;
+      }
+
+      .inline-code {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 9pt;
+      }
+
+      .figure {
+        margin: 10px 0 12px;
+        text-align: center;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .figure img {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #000;
+        padding: 4px;
+      }
+
+      .figcap {
+        font-size: 9pt;
+        margin-top: 4px;
+        text-align: center;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8px 0 10px;
+        font-size: 9.5pt;
+      }
+
+      th,
+      td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+        vertical-align: top;
+      }
+
+      th {
+        font-weight: bold;
+      }
+
+      .footer {
+        margin-top: 12px;
+        font-size: 9pt;
+        text-align: left;
+      }
+
+      @media print {
+        @page {
+          size: A4;
+          margin: 20mm 18mm 22mm;
+        }
+
+        .paper {
+          width: auto;
+          max-width: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .title-page {
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="paper">
+      <!-- Title Page -->
+      <section class="title-page">
+        <p class="tp-topline">COMP-341L — Artificial Neural Networks Lab</p>
+        <h1 class="tp-title">LAB 12 REPORT</h1>
+        <p class="tp-subtitle">
+          Generative Adversarial Networks (GANs): Synthetic Handwritten Digits
+        </p>
+
+        <table class="tp-meta">
+          <tr>
+            <td class="lbl">Student</td>
+            <td>Zarmeena Jawad</td>
+          </tr>
+          <tr>
+            <td class="lbl">Roll No</td>
+            <td>B23F0115AI125</td>
+          </tr>
+          <tr>
+            <td class="lbl">Section</td>
+            <td>B.S AI - Red</td>
+          </tr>
+          <tr>
+            <td class="lbl">Instructor</td>
+            <td>Ms. Shakeela Shaheen</td>
+          </tr>
+          <tr>
+            <td class="lbl">Submission Date</td>
+            <td>April 26, 2026</td>
+          </tr>
+        </table>
+
+        <p class="tp-note">
+          <span class="label">Objective:</span> Build and train a GAN to
+          generate MNIST-like handwritten digits. The generated samples can be
+          used to support data augmentation when labeled data is scarce and
+          overfitting is observed in recognition models.
+        </p>
+
+        <div class="toc">
+          <p class="toc-title">Table of Contents</p>
+          <ul>
+            <li>Abstract and Keywords</li>
+            <li>I. Problem Context and GAN Overview</li>
+            <li>II. Dataset and Preprocessing</li>
+            <li>III. Model Design (Vanilla GAN / MLP)</li>
+            <li>IV. Training Algorithm and Hyperparameters</li>
+            <li>V. Results (Loss Curves and Visual Outputs)</li>
+            <li>VI. Discussion and Challenges</li>
+            <li>VII. Experimentation (Suggested Variations)</li>
+            <li>VIII. Lab Questions</li>
+            <li>Conclusion and References</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Main Report -->
+      <section class="abstract">
+        <h2>Abstract</h2>
+        <p>
+          <span class="label">Abstract—</span> This work trains a Vanilla GAN
+          (MLP-based generator and discriminator) on the MNIST handwritten digit
+          dataset to produce synthetic digits. The data is normalized to [-1, 1]
+          to align with the generator’s tanh output. Training is performed for
+          15 epochs using Adam optimization and BCEWithLogitsLoss. Performance
+          is analyzed through epoch-wise loss curves and a qualitative
+          comparison of real and generated images, with sample grids saved at
+          each epoch.
+        </p>
+      </section>
+
+      <section class="keywords">
+        <p>
+          <span class="label">Keywords—</span> GAN, Vanilla GAN, MNIST,
+          Synthetic Data Generation, MLP, BCEWithLogitsLoss, PyTorch.
+        </p>
+      </section>
+
+      <section>
+        <h2>I. Problem Context and GAN Overview</h2>
+        <p>
+          When a recognition model is trained on a small dataset, it can
+          memorize training examples and fail to generalize. GANs address this
+          by learning the underlying distribution of the training data and
+          generating new samples. A GAN consists of two components trained
+          together: a generator that produces fake samples from random noise,
+          and a discriminator that predicts whether a sample is real or fake.
+        </p>
+        <div class="callout">
+          <span class="label">Core idea:</span> Generator improves by learning
+          to fool the discriminator; discriminator improves by learning to
+          detect fakes.
+        </div>
+      </section>
+
+      <section>
+        <h2>II. Dataset and Preprocessing</h2>
+        <div class="callout">
+          <span class="label">Dataset summary:</span> Source used =
+          <span class="inline-code">torchvision.datasets.MNIST</span>, image
+          size = <span class="inline-code">28×28</span>, normalization =
+          <span class="inline-code">[-1, 1]</span>.
+        </div>
+        <p>
+          The notebook supports MNIST CSV (Kaggle) and falls back to torchvision
+          MNIST when Kaggle credentials are not present. Each digit image is
+          normalized to [-1, 1] so that the real data range matches the
+          generator’s output range. This reduces output saturation and improves
+          training stability.
+        </p>
+        <h3>Important Code Snippet: Normalization</h3>
+        <pre><code>transform = transforms.Compose([
+    transforms.ToTensor(),               # [0, 1]
+    transforms.Normalize((0.5,), (0.5,)) # -> [-1, 1]
+])</code></pre>
+        <div class="figure">
+          <img src="outputs/plots/task1_real_grid.png" alt="Real MNIST grid" />
+          <div class="figcap">
+            Figure 1: Real MNIST digits used as training data (sample grid).
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>III. Model Design (Vanilla GAN / MLP)</h2>
+        <p>
+          A Vanilla GAN is implemented using fully-connected layers (MLPs). The
+          generator maps a latent vector z to a 784-dimensional image vector
+          (28×28 pixels). The discriminator maps the flattened image vector to a
+          single logit value that represents the real/fake decision.
+        </p>
+        <div class="callout">
+          <span class="label">Loss function choice:</span> The discriminator
+          outputs logits (no sigmoid), therefore
+          <span class="inline-code">BCEWithLogitsLoss</span> is used for
+          numerical stability.
+        </div>
+
+        <h3>Important Code Snippet: Generator (MLP)</h3>
+        <pre><code>class Generator(nn.Module):
+    def __init__(self, z_dim, out_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(z_dim, 256),
+            nn.BatchNorm1d(256),
+            nn.ReLU(True),
+            nn.Linear(256, 512),
+            nn.BatchNorm1d(512),
+            nn.ReLU(True),
+            nn.Linear(512, 1024),
+            nn.BatchNorm1d(1024),
+            nn.ReLU(True),
+            nn.Linear(1024, out_dim),
+            nn.Tanh()
+        )</code></pre>
+
+        <h3>Important Code Snippet: Discriminator (MLP, logits)</h3>
+        <pre><code>class Discriminator(nn.Module):
+    def __init__(self, in_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(in_dim, 512),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Dropout(0.2),
+            nn.Linear(512, 256),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Dropout(0.2),
+            nn.Linear(256, 1)  # logits
+        )</code></pre>
+      </section>
+
+      <section>
+        <h2>IV. Training Algorithm and Hyperparameters</h2>
+        <div class="callout">
+          <span class="label">Training setup (this run):</span> epochs =
+          <code>15</code>, batch size = <code>128</code>, latent dim =
+          <code>100</code>, optimizer = <code>Adam</code>, lr =
+          <code>2e-4</code>, betas = <code>(0.5, 0.999)</code>.<br />
+          <span class="label">Final epoch losses:</span> D =
+          <code>1.3052</code>, G = <code>0.8467</code>.
+        </div>
+        <p>
+          Training alternates between updating the discriminator (to classify
+          real as 1 and fake as 0) and updating the generator (to make fake
+          samples classified as real). A fixed noise batch is used for
+          consistent epoch-to-epoch sample grids.
+        </p>
+        <h3>Important Code Snippet: Core Adversarial Update</h3>
+        <pre><code># D step: learn to separate real and fake
+real_y = torch.ones(bsz, 1, device=device)
+fake_y = torch.zeros(bsz, 1, device=device)
+
+d_real = loss(D(real_flat), real_y)
+fake_flat = G(torch.randn(bsz, z_dim, device=device)).detach()
+d_fake = loss(D(fake_flat), fake_y)
+d_loss = d_real + d_fake
+d_loss.backward(); opt_D.step()
+
+# G step: learn to fool D
+gen_flat = G(torch.randn(bsz, z_dim, device=device))
+g_loss = loss(D(gen_flat), real_y)
+g_loss.backward(); opt_G.step()</code></pre>
+      </section>
+
+      <section>
+        <h2>V. Results (Loss Curves and Visual Outputs)</h2>
+        <p>
+          The learning progress is captured by epoch-wise losses for both
+          networks and by visual quality of generated digits. Since GAN losses
+          may fluctuate, qualitative inspection of samples is important to judge
+          realism and diversity.
+        </p>
+        <div class="figure">
+          <img
+            src="outputs/plots/task3_epoch_losses.png"
+            alt="Epoch loss plot"
+          />
+          <div class="figcap">
+            Figure 2: Generator vs discriminator loss per epoch
+            (BCEWithLogitsLoss).
+          </div>
+        </div>
+        <div class="figure">
+          <img
+            src="outputs/plots/task4_real_vs_fake.png"
+            alt="Real vs fake comparison"
+          />
+          <div class="figcap">
+            Figure 3: Visual comparison of real MNIST digits and generated
+            digits.
+          </div>
+        </div>
+        <h3>Generated Samples Across Training</h3>
+        <div class="figure">
+          <img
+            src="outputs/samples/epoch_001.png"
+            alt="Generated digits epoch 1"
+          />
+          <div class="figcap">Figure 4: Generated samples at epoch 1.</div>
+        </div>
+        <div class="figure">
+          <img
+            src="outputs/samples/epoch_008.png"
+            alt="Generated digits epoch 8"
+          />
+          <div class="figcap">Figure 5: Generated samples at epoch 8.</div>
+        </div>
+        <div class="figure">
+          <img
+            src="outputs/samples/epoch_015.png"
+            alt="Generated digits epoch 15"
+          />
+          <div class="figcap">Figure 6: Generated samples at epoch 15.</div>
+        </div>
+      </section>
+
+      <section>
+        <h2>VI. Discussion and Challenges</h2>
+        <p>
+          GAN optimization is sensitive because two models are learning
+          simultaneously. If the discriminator becomes too accurate, the
+          generator’s gradients become weak and training slows. Another common
+          issue is mode collapse, where the generator produces only a small
+          subset of digit styles. Monitoring sample diversity and balancing
+          update speeds are practical ways to manage these challenges.
+        </p>
+      </section>
+
+      <section>
+        <h2>VII. Experimentation (Suggested Variations)</h2>
+        <p>
+          To explore different behaviors, the following changes can be tested:
+        </p>
+        <ul>
+          <li>
+            Latent dimension: <code>100 → 50 → 200</code> (controls generator
+            input capacity).
+          </li>
+          <li>
+            Learning rate: <code>2e-4 → 1e-4</code> or
+            <code>5e-4</code> (affects stability and balance).
+          </li>
+          <li>
+            Add layers or adjust hidden widths (may improve detail but can
+            destabilize training).
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>VIII. Lab Questions</h2>
+        <ol>
+          <li>
+            <span class="label">Why are GANs called “adversarial”?</span>
+            Because the generator and discriminator have opposing goals and are
+            trained in competition.
+          </li>
+          <li>
+            <span class="label"
+              >What happens if the discriminator becomes too strong?</span
+            >
+            The generator receives weak gradients and may stop improving.
+          </li>
+          <li>
+            <span class="label">What is mode collapse?</span> The generator
+            outputs low-diversity samples, repeating a limited set of patterns.
+          </li>
+          <li>
+            <span class="label">Why do we use random noise as input?</span>
+            Noise provides a controllable source of randomness that maps to
+            varied outputs.
+          </li>
+          <li>
+            <span class="label">Difference between GAN and CNN?</span> GAN is a
+            generative framework (G vs D); CNN is an architecture often used for
+            images.
+          </li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Conclusion</h2>
+        <p>
+          This lab demonstrates end-to-end GAN training for digit synthesis
+          using a Vanilla GAN with MLP layers. The generated digits improve
+          across epochs, and the saved sample grids and loss curves provide both
+          quantitative and qualitative evidence of adversarial learning. Such
+          synthetic samples can be used to augment limited datasets and reduce
+          overfitting in recognition tasks.
+        </p>
+      </section>
+
+      <section>
+        <h2>References</h2>
+        <p>
+          [1] I. Goodfellow et al., “Generative Adversarial Nets,” in
+          <em>Advances in Neural Information Processing Systems</em>, 2014.
+        </p>
+      </section>
+    </div>
+  </body>
+</html>
