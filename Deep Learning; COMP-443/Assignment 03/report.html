@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>COMP-443 — Assignment 03 — ResNet50 vs InceptionV3 (CIFAR-10)</title>
+    <style>
+      /* ===== IEEE one-column (HTML approximation) ===== */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        background: #fff;
+        color: #000;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Times New Roman", Times, serif;
+        font-size: 10pt;
+        line-height: 1.18;
+      }
+
+      .page {
+        width: 210mm; /* A4 */
+        max-width: 210mm;
+        margin: 0 auto;
+        padding: 20mm 18mm 22mm; /* top, left/right, bottom */
+      }
+
+      /* Cover / Title page */
+      .cover {
+        min-height: 250mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border: 1px solid #000;
+        padding: 18mm 16mm;
+        page-break-after: always;
+        break-after: page;
+      }
+      .cover .uni {
+        text-align: center;
+        font-size: 11pt;
+        margin: 0 0 10px;
+      }
+      .cover .course {
+        text-align: center;
+        font-size: 11pt;
+        margin: 0 0 18px;
+      }
+      .cover .title {
+        text-align: center;
+        font-size: 18pt;
+        font-weight: bold;
+        margin: 0 0 10px;
+      }
+      .cover .subtitle {
+        text-align: center;
+        font-size: 12pt;
+        margin: 0 0 22px;
+      }
+      .cover table {
+        width: 100%;
+        max-width: 150mm;
+        margin: 0 auto;
+        border-collapse: collapse;
+        font-size: 10pt;
+      }
+      .cover td {
+        border: 1px solid #000;
+        padding: 6px 8px;
+        vertical-align: top;
+      }
+      .cover .lbl {
+        width: 35mm;
+        font-weight: bold;
+      }
+      .cover .note {
+        margin: 18px auto 0;
+        max-width: 160mm;
+        text-align: justify;
+      }
+
+      /* IEEE headings */
+      h1.report-title {
+        text-align: center;
+        margin: 0 0 6px;
+        font-size: 18pt;
+        font-weight: bold;
+      }
+      .authors {
+        text-align: center;
+        margin: 0 0 6px;
+        font-size: 11pt;
+      }
+      .meta {
+        text-align: center;
+        margin: 0 0 14px;
+        font-size: 9.5pt;
+      }
+      h2 {
+        font-size: 10pt;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin: 11px 0 5px;
+      }
+      h3 {
+        font-size: 10pt;
+        font-weight: bold;
+        margin: 9px 0 5px;
+      }
+
+      p {
+        margin: 0 0 7px;
+        text-align: justify;
+        text-indent: 1em;
+      }
+
+      /* IEEE-like: first paragraph after a heading is not indented */
+      section > p:first-of-type {
+        text-indent: 0;
+      }
+
+      .authors,
+      .meta,
+      .cover p,
+      .callout p,
+      .footer {
+        text-indent: 0;
+      }
+      .label {
+        font-weight: bold;
+      }
+
+      .callout {
+        border: 1px solid #000;
+        padding: 6px 8px;
+        margin: 8px 0 10px;
+      }
+
+      /* Code */
+      pre {
+        border: 1px solid #000;
+        padding: 8px;
+        margin: 7px 0 9px;
+        white-space: pre;
+        overflow-x: auto;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 9pt;
+        line-height: 1.2;
+        text-indent: 0;
+      }
+      code {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 9pt;
+      }
+
+      /* Tables and figures (IEEE conventions: table caption above, figure caption below) */
+      .tbl-caption {
+        font-size: 9.5pt;
+        font-weight: bold;
+        text-align: center;
+        margin: 8px 0 4px;
+        text-indent: 0;
+      }
+      table.ieee {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 0 10px;
+        font-size: 9.5pt;
+      }
+      table.ieee th,
+      table.ieee td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+        vertical-align: top;
+      }
+      table.ieee th {
+        font-weight: bold;
+      }
+
+      figure {
+        margin: 10px 0 12px;
+        text-align: center;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        text-indent: 0;
+      }
+      figure img {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #000;
+        padding: 4px;
+      }
+      figcaption {
+        font-size: 9pt;
+        margin-top: 4px;
+        text-align: center;
+      }
+
+      .refs {
+        font-size: 9.5pt;
+      }
+      .footer {
+        margin-top: 12px;
+        font-size: 9pt;
+      }
+
+      @media print {
+        @page {
+          size: A4;
+          margin: 20mm 18mm 22mm;
+        }
+        .page {
+          padding: 0;
+          margin: 0;
+          max-width: none;
+          width: auto;
+        }
+        .cover {
+          border: none;
+          padding: 0;
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ===== Cover Page ===== -->
+    <div class="page cover">
+      <p class="uni">Department of Computer Science</p>
+      <p class="course">
+        <span class="label">Course:</span> COMP-443 (Deep Learning)
+      </p>
+      <h1 class="title">ASSIGNMENT 03</h1>
+      <p class="subtitle">
+        Implementation and Performance Comparison of ResNet and
+        GoogLeNet/Inception for Image Classification
+      </p>
+
+      <table>
+        <tr>
+          <td class="lbl">Students</td>
+          <td>
+            Ali Hamza (B23F0063AI106) &amp; Zarmeena Jawad (B23F0115AI125)
+          </td>
+        </tr>
+        <tr>
+          <td class="lbl">Instructor</td>
+          <td>Dr. Arshad Iqbal</td>
+        </tr>
+        <tr>
+          <td class="lbl">Program</td>
+          <td>B.S AI - Red</td>
+        </tr>
+        <tr>
+          <td class="lbl">Semester</td>
+          <td>6th</td>
+        </tr>
+        <tr>
+          <td class="lbl">Dataset</td>
+          <td>CIFAR-10</td>
+        </tr>
+        <tr>
+          <td class="lbl">Models</td>
+          <td>ResNet50 and InceptionV3 (Transfer Learning)</td>
+        </tr>
+        <tr>
+          <td class="lbl">Framework</td>
+          <td>TensorFlow / Keras</td>
+        </tr>
+        <tr>
+          <td class="lbl">Submission Date</td>
+          <td>April 27, 2026</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ===== Main Report ===== -->
+    <div class="page">
+      <h1 class="report-title">
+        Transfer Learning on CIFAR-10: ResNet50 vs InceptionV3
+      </h1>
+      <p class="authors">
+        Ali Hamza (B23F0063AI106) &amp; Zarmeena Jawad (B23F0115AI125)
+      </p>
+      <p class="meta">
+        Instructor: Dr. Arshad Iqbal • Program: B.S AI - Red • Semester: 6th •
+        Submission Date: April 27, 2026
+      </p>
+
+      <section class="abstract">
+        <h2>Abstract</h2>
+        <p>
+          <span class="label">Abstract—</span> This assignment implements and
+          compares two pretrained convolutional neural network backbones,
+          ResNet50 and InceptionV3 (GoogLeNet/Inception family), for CIFAR-10
+          classification using transfer learning. A two-stage protocol is used:
+          (i) train only the new classifier head while freezing the ImageNet
+          backbone, followed by (ii) fine-tuning by unfreezing the last N
+          backbone layers with a smaller learning rate while keeping BatchNorm
+          layers frozen. Results are evaluated using test accuracy/loss,
+          training curves, confusion matrices, and per-class
+          precision/recall/F1.
+        </p>
+      </section>
+
+      <section class="keywords">
+        <p>
+          <span class="label">Keywords—</span> CIFAR-10, Transfer Learning,
+          Fine-tuning, ResNet50, InceptionV3, Confusion Matrix, Classification
+          Report.
+        </p>
+      </section>
+
+      <section>
+        <h2>I. Objective and Tasks</h2>
+        <p>
+          The objective is to implement and compare ResNet50 and
+          GoogLeNet/Inception (InceptionV3) using transfer learning on a
+          standard dataset, and report differences in accuracy, loss, training
+          time, and model size. The expected artifacts include training curves,
+          confusion matrices, and a short report.
+        </p>
+        <div class="callout">
+          <span class="label">Notebook:</span>
+          <code
+            >Assignment_03_Image_Classification_ResNet50_vs_InceptionV3_CIFAR10.ipynb</code
+          ><br />
+          <span class="label">Organized outputs:</span> <code>figures/</code>,
+          <code>results/</code>, <code>models/</code>, <code>reports/</code>.
+        </div>
+      </section>
+
+      <section>
+        <h2>II. Dataset and Preprocessing</h2>
+        <p>
+          CIFAR-10 contains 60,000 RGB images (32×32) across 10 classes. Since
+          ImageNet pretrained models expect larger inputs, CIFAR-10 images are
+          resized to 224×224 for ResNet50 and 299×299 for InceptionV3.
+          Model-specific preprocessing functions are applied to match the
+          ImageNet training distribution.
+        </p>
+        <h3>Important Code Snippet: tf.data Pipeline</h3>
+        <pre><code>def make_dataset(x, y, image_size, preprocess_fn, training, batch_size, name):
+    ds = tf.data.Dataset.from_tensor_slices((x, y))
+    if training:
+        ds = ds.shuffle(10_000, seed=SEED, reshuffle_each_iteration=True)
+
+    def _map(img, label):
+        img = tf.cast(img, tf.float32)
+        if training:
+            img = augment(img)
+        img = tf.image.resize(img, image_size, method="bilinear")
+        img = preprocess_fn(img)
+        return img, tf.one_hot(label, num_classes)
+
+    ds = ds.map(_map, num_parallel_calls=AUTOTUNE)
+    ds = ds.batch(batch_size).prefetch(AUTOTUNE)
+    return ds</code></pre>
+      </section>
+
+      <section>
+        <h2>III. Model Architectures and Transfer Learning Setup</h2>
+        <p>
+          Both models use ImageNet weights with the top classification layer
+          removed (<code>include_top=False</code>) and global average pooling. A
+          dropout layer is used for regularization, followed by a dense softmax
+          classifier sized to the CIFAR-10 class count (10 classes).
+        </p>
+        <h3>
+          Important Code Snippet: Backbone + New Classification Head (ResNet50)
+        </h3>
+        <pre><code>backbone = ResNet50(weights="imagenet", include_top=False, pooling="avg")
+backbone.trainable = False
+
+x = backbone(inputs, training=False)
+x = layers.Dropout(0.3)(x)
+outputs = layers.Dense(num_classes, activation="softmax", dtype="float32")(x)</code></pre>
+      </section>
+
+      <section>
+        <h2>IV. Training Strategy</h2>
+        <p>
+          Training is performed in two stages for stability and to reduce
+          overfitting: head training with a frozen backbone, then fine-tuning by
+          unfreezing the last N layers with a lower learning rate. BatchNorm
+          layers are kept frozen during fine-tuning to avoid instability on
+          small batches.
+        </p>
+
+        <div class="tbl-caption">TABLE I<br />TWO-STAGE TRAINING PROTOCOL</div>
+        <table class="ieee">
+          <thead>
+            <tr>
+              <th>Stage</th>
+              <th>Trainable Parameters</th>
+              <th>Learning Rate</th>
+              <th>Epochs</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Head Training</td>
+              <td>Classifier head only</td>
+              <td>1e-3</td>
+              <td>8</td>
+              <td>Backbone frozen</td>
+            </tr>
+            <tr>
+              <td>Fine-tuning</td>
+              <td>Last N backbone layers + head</td>
+              <td>1e-4</td>
+              <td>7</td>
+              <td>BatchNorm frozen</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Important Code Snippet: Unfreeze Last N Layers (BN Frozen)</h3>
+        <pre><code>def set_finetune(backbone, unfreeze_last_n):
+    backbone.trainable = True
+    for layer in backbone.layers[:-unfreeze_last_n]:
+        layer.trainable = False
+    freeze_batchnorm(backbone)</code></pre>
+
+        <div class="tbl-caption">
+          TABLE II<br />KEY HYPERPARAMETERS (THIS RUN)
+        </div>
+        <table class="ieee">
+          <thead>
+            <tr>
+              <th>Setting</th>
+              <th>ResNet50</th>
+              <th>InceptionV3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Input size</td>
+              <td>224×224</td>
+              <td>299×299</td>
+            </tr>
+            <tr>
+              <td>Batch size</td>
+              <td>64</td>
+              <td>32</td>
+            </tr>
+            <tr>
+              <td>Epochs (head + fine-tune)</td>
+              <td>8 + 7</td>
+              <td>8 + 7</td>
+            </tr>
+            <tr>
+              <td>Unfreeze depth (last N layers)</td>
+              <td>40</td>
+              <td>60</td>
+            </tr>
+            <tr>
+              <td>Learning rates (head → fine-tune)</td>
+              <td>1e-3 → 1e-4</td>
+              <td>1e-3 → 1e-4</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>V. Evaluation Metrics</h2>
+        <p>
+          The models are evaluated on the CIFAR-10 test set using accuracy and
+          cross-entropy loss. To understand class-wise behavior, confusion
+          matrices and classification reports (precision, recall, and F1-score
+          per class) are computed.
+        </p>
+        <h3>Important Code Snippet: Confusion Matrix + Report</h3>
+        <pre><code>y_true, y_pred = predict_labels(model, test_ds)
+cm = confusion_matrix(y_true, y_pred)
+print(classification_report(y_true, y_pred, target_names=class_names))</code></pre>
+      </section>
+
+      <section>
+        <h2>VI. Results and Comparison</h2>
+        <p>
+          This run produced the metrics saved in
+          <code>results/metrics.json</code> and
+          <code>results/summary_table.csv</code>. ResNet50 achieved higher test
+          accuracy and lower test loss compared to InceptionV3.
+        </p>
+
+        <div class="tbl-caption">
+          TABLE III<br />TEST-SET COMPARISON SUMMARY
+        </div>
+        <table class="ieee">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Test Accuracy</th>
+              <th>Test Loss</th>
+              <th>Training Time (min)</th>
+              <th>Model Size (MB)</th>
+              <th>Params</th>
+              <th>Input Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ResNet50</td>
+              <td>0.9398</td>
+              <td>0.1936</td>
+              <td>9.98</td>
+              <td>211.45</td>
+              <td>23,608,202</td>
+              <td>224×224</td>
+            </tr>
+            <tr>
+              <td>InceptionV3</td>
+              <td>0.8988</td>
+              <td>0.3015</td>
+              <td>5.22</td>
+              <td>164.84</td>
+              <td>21,823,274</td>
+              <td>299×299</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <figure>
+          <img
+            src="figures/resnet50_accuracy_loss.png"
+            alt="ResNet50 accuracy and loss curves"
+          />
+          <figcaption>
+            Fig. 1. ResNet50 training/validation accuracy and loss across
+            epochs.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="figures/inceptionv3_accuracy_loss.png"
+            alt="InceptionV3 accuracy and loss curves"
+          />
+          <figcaption>
+            Fig. 2. InceptionV3 training/validation accuracy and loss across
+            epochs.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="figures/confusion_matrix_resnet50.png"
+            alt="ResNet50 confusion matrix"
+          />
+          <figcaption>
+            Fig. 3. ResNet50 confusion matrix on the CIFAR-10 test set.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="figures/confusion_matrix_inceptionv3.png"
+            alt="InceptionV3 confusion matrix"
+          />
+          <figcaption>
+            Fig. 4. InceptionV3 confusion matrix on the CIFAR-10 test set.
+          </figcaption>
+        </figure>
+
+        <h3>Per-class observations</h3>
+        <p>
+          The lowest F1-score classes indicate which categories were most
+          challenging. For ResNet50: cat (0.8787), dog (0.9041), bird (0.9266).
+          For InceptionV3: cat (0.8246), dog (0.8657), deer (0.8811). These
+          patterns are consistent with CIFAR-10, where visually similar animals
+          commonly confuse classifiers after upscaling from 32×32.
+        </p>
+      </section>
+
+      <section>
+        <h2>VII. Discussion: Why One Model Performed Better</h2>
+        <p>
+          ResNet50 outperformed InceptionV3 on test accuracy and loss in this
+          experiment. A likely reason is that the residual architecture often
+          fine-tunes robustly under moderate augmentation and limited epochs,
+          while InceptionV3 may be more sensitive to preprocessing, input
+          resizing, or the selected unfreeze depth. Additionally, CIFAR-10’s low
+          resolution can reduce the benefit of the larger 299×299 input, while
+          still increasing compute cost.
+        </p>
+        <p>
+          In practice, the choice depends on constraints: InceptionV3 was
+          smaller and faster to train here, while ResNet50 produced the best
+          test accuracy. For deployment, one must balance accuracy, latency,
+          memory, and storage size.
+        </p>
+      </section>
+
+      <section>
+        <h2>VIII. Submission Organization</h2>
+        <div class="callout">
+          <span class="label">Folder structure:</span>
+          <ul style="margin: 6px 0 0 18px">
+            <li><code>figures/</code>: curves and confusion matrices</li>
+            <li>
+              <code>results/</code>: metrics, histories, classification reports
+            </li>
+            <li><code>models/</code>: saved Keras models (*.keras)</li>
+            <li><code>reports/</code>: archived old reports</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Conclusion</h2>
+        <p>
+          This assignment demonstrates transfer learning with staged fine-tuning
+          on CIFAR-10. Both pretrained architectures achieved strong
+          performance, while ResNet50 performed best on this run. Future
+          improvements could include stronger augmentation, label smoothing, a
+          learning-rate schedule tuned per backbone, and systematic exploration
+          of unfreeze depth and batch size.
+        </p>
+      </section>
+
+      <section class="refs">
+        <h2>References</h2>
+        <p>
+          [1] K. He, X. Zhang, S. Ren, and J. Sun, “Deep Residual Learning for
+          Image Recognition,” in <em>CVPR</em>, 2016.<br />
+          [2] C. Szegedy et al., “Rethinking the Inception Architecture for
+          Computer Vision,” in <em>CVPR</em>, 2016.<br />
+          [3] A. Krizhevsky, “Learning Multiple Layers of Features from Tiny
+          Images,” 2009 (CIFAR-10).
+        </p>
+      </section>
+    </div>
+  </body>
+</html>

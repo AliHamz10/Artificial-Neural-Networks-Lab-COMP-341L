@@ -65,3 +65,6 @@ wheels/
 *.tmp
 *.log
 *.bak
+
+# Model checkpoints / weights (keep local)
+*.keras

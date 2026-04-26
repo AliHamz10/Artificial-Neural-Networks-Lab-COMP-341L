@@ -1,0 +1,26 @@
+{
+  "resnet50": {
+    "test_accuracy": 0.9398000240325928,
+    "test_loss": 0.19358372688293457,
+    "training_time_sec": 598.507685013,
+    "model_size_mb": 211.45491218566895,
+    "params": 23608202,
+    "input_size": [
+      224,
+      224
+    ],
+    "model_path": "/content/drive/MyDrive/COMP-443/Assignment_03_ResNet_vs_Inception/resnet50_cifar10_transfer.keras"
+  },
+  "inceptionv3": {
+    "test_accuracy": 0.8988000154495239,
+    "test_loss": 0.3014853000640869,
+    "training_time_sec": 313.1123752750001,
+    "model_size_mb": 164.84077072143555,
+    "params": 21823274,
+    "input_size": [
+      299,
+      299
+    ],
+    "model_path": "/content/drive/MyDrive/COMP-443/Assignment_03_ResNet_vs_Inception/inceptionv3_cifar10_transfer.keras"
+  }
+}

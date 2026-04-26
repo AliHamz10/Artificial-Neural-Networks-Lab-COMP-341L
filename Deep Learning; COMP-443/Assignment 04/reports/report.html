@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      COMP-443 — Assignment 04 — MobileNetV2 vs DenseNet121 vs EfficientNetB0
+    </title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        background: #fff;
+        color: #000;
+      }
+      body {
+        margin: 0;
+        font-family: "Times New Roman", Times, serif;
+        font-size: 10pt;
+        line-height: 1.2;
+      }
+      .page {
+        width: 210mm;
+        max-width: 210mm;
+        margin: 0 auto;
+        padding: 20mm 18mm 22mm;
+      }
+      .cover {
+        min-height: 250mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border: 1px solid #000;
+        padding: 18mm 16mm;
+        page-break-after: always;
+        break-after: page;
+      }
+      .cover .uni,
+      .cover .course,
+      .cover .subtitle {
+        text-align: center;
+        margin: 0 0 12px;
+      }
+      .cover .uni,
+      .cover .course {
+        font-size: 11pt;
+      }
+      .cover .title {
+        text-align: center;
+        font-size: 18pt;
+        font-weight: bold;
+        margin: 0 0 10px;
+      }
+      .cover table {
+        width: 100%;
+        max-width: 150mm;
+        margin: 0 auto;
+        border-collapse: collapse;
+        font-size: 10pt;
+      }
+      .cover td {
+        border: 1px solid #000;
+        padding: 6px 8px;
+      }
+      .cover .lbl {
+        width: 40mm;
+        font-weight: bold;
+      }
+      h1.report-title {
+        text-align: center;
+        margin: 0 0 6px;
+        font-size: 18pt;
+        font-weight: bold;
+      }
+      .authors,
+      .meta {
+        text-align: center;
+        text-indent: 0;
+      }
+      .authors {
+        margin: 0 0 6px;
+        font-size: 11pt;
+      }
+      .meta {
+        margin: 0 0 14px;
+        font-size: 9.5pt;
+      }
+      h2 {
+        font-size: 10pt;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin: 12px 0 5px;
+      }
+      h3 {
+        font-size: 10pt;
+        font-weight: bold;
+        margin: 9px 0 5px;
+      }
+      p {
+        margin: 0 0 7px;
+        text-align: justify;
+        text-indent: 1em;
+      }
+      section > p:first-of-type,
+      .callout p,
+      ul,
+      li,
+      .refs p {
+        text-indent: 0;
+      }
+      .label {
+        font-weight: bold;
+      }
+      .callout {
+        border: 1px solid #000;
+        padding: 6px 8px;
+        margin: 8px 0 10px;
+      }
+      .callout code {
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        font-size: 9pt;
+      }
+      .tbl-caption {
+        font-size: 9.5pt;
+        font-weight: bold;
+        text-align: center;
+        margin: 9px 0 4px;
+      }
+      table.ieee {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 0 10px;
+        font-size: 9.5pt;
+      }
+      table.ieee th,
+      table.ieee td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+        vertical-align: top;
+      }
+      figure {
+        margin: 10px 0 12px;
+        text-align: center;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      figure img {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #000;
+        padding: 4px;
+      }
+      figcaption {
+        font-size: 9pt;
+        margin-top: 4px;
+      }
+      .refs {
+        font-size: 9.5pt;
+      }
+      .toc {
+        border: 1px solid #000;
+        padding: 8px 10px;
+        margin: 10px 0 12px;
+      }
+      .toc p {
+        margin: 0 0 4px;
+        text-indent: 0;
+      }
+      .toc ul {
+        margin: 4px 0 0 18px;
+        padding: 0;
+      }
+      .toc li {
+        margin: 0 0 2px;
+      }
+      @media print {
+        @page {
+          size: A4;
+          margin: 20mm 18mm 22mm;
+        }
+        .page {
+          padding: 0;
+          margin: 0;
+          max-width: none;
+          width: auto;
+        }
+        .cover {
+          border: none;
+          padding: 0;
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page cover">
+      <p class="uni">Department of Computer Science</p>
+      <p class="course">
+        <span class="label">Course:</span> COMP-443 (Deep Learning)
+      </p>
+      <h1 class="title">ASSIGNMENT 04</h1>
+      <p class="subtitle">
+        Lightweight CNNs on CIFAR-10: MobileNetV2, DenseNet121, and
+        EfficientNetB0
+      </p>
+      <table>
+        <tr>
+          <td class="lbl">Student</td>
+          <td>Ali Hamza (B23F0063AI106) & Zarmeena Jawad (B23F0115AI125)</td>
+        </tr>
+        <tr>
+          <td class="lbl">Instructor</td>
+          <td>Dr. Arshad Iqbal</td>
+        </tr>
+        <tr>
+          <td class="lbl">Program</td>
+          <td>B.S AI - Red</td>
+        </tr>
+        <tr>
+          <td class="lbl">Semester</td>
+          <td>6th</td>
+        </tr>
+        <tr>
+          <td class="lbl">Dataset</td>
+          <td>CIFAR-10</td>
+        </tr>
+        <tr>
+          <td class="lbl">Models</td>
+          <td>MobileNetV2, DenseNet121, EfficientNetB0</td>
+        </tr>
+        <tr>
+          <td class="lbl">Framework</td>
+          <td>TensorFlow / Keras</td>
+        </tr>
+        <tr>
+          <td class="lbl">Submission Date</td>
+          <td>April 27, 2026</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="page">
+      <h1 class="report-title">
+        Transfer Learning on CIFAR-10: MobileNetV2 vs DenseNet121 vs
+        EfficientNetB0
+      </h1>
+      <p class="authors">Ali Hamza (B23F0063AI106)</p>
+      <p class="meta">
+        Instructor: Dr. Arshad Iqbal • Program: B.S AI - Red • Semester: 6th •
+        Dataset: CIFAR-10
+      </p>
+
+      <section>
+        <h2>Abstract</h2>
+        <p>
+          <span class="label">Abstract—</span> This report compares three
+          transfer-learning backbones on CIFAR-10 under a common protocol:
+          MobileNetV2, DenseNet121, and EfficientNetB0. Evaluation focuses on
+          test accuracy/loss, model parameter count, model size, training time,
+          and inference speed. EfficientNetB0 achieves the best test accuracy
+          and loss, MobileNetV2 provides the fastest GPU and CPU inference, and
+          DenseNet121 yields competitive accuracy but at the highest
+          computational cost. The final recommendation is scenario-specific:
+          MobileNetV2 for strict edge/latency constraints, EfficientNetB0 for
+          cloud accuracy-first inference, and DenseNet121 when additional
+          accuracy over MobileNetV2 is required despite higher resource usage.
+        </p>
+      </section>
+
+      <section>
+        <p>
+          <span class="label">Keywords—</span> CIFAR-10, Transfer Learning,
+          MobileNetV2, DenseNet121, EfficientNetB0, Inference Speed, Model
+          Efficiency.
+        </p>
+      </section>
+
+      <section class="toc">
+        <p><span class="label">Report Roadmap</span></p>
+        <ul>
+          <li>Section I: Objective and assignment requirement mapping</li>
+          <li>Section II: Dataset and experimental setup</li>
+          <li>Section III: Quantitative comparison table</li>
+          <li>Sections IV-VI: Findings and figure-driven analysis</li>
+          <li>Sections VII-VIII: CPU and memory analysis</li>
+          <li>Section IX: Deployment recommendations and conclusion</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>I. Objective and Requirement Mapping</h2>
+        <p>
+          The objective is to compare lightweight/efficient CNN architectures
+          for image classification and provide deployment recommendations using
+          evidence from accuracy, loss, model complexity, training cost, and
+          inference latency. To make grading straightforward, each assignment
+          requirement is directly mapped to its corresponding section and
+          figures in this report.
+        </p>
+        <div class="tbl-caption">
+          TABLE I<br />ASSIGNMENT REQUIREMENTS COVERAGE
+        </div>
+        <table class="ieee">
+          <thead>
+            <tr>
+              <th>Requirement</th>
+              <th>Coverage in this report</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Train and compare 3 pretrained models</td>
+              <td>Sections III, V, and figures in Section VI</td>
+            </tr>
+            <tr>
+              <td>Accuracy and loss comparison</td>
+              <td>Table II and Fig. 1</td>
+            </tr>
+            <tr>
+              <td>Model size / parameter efficiency</td>
+              <td>Table II, Fig. 3, Fig. 4</td>
+            </tr>
+            <tr>
+              <td>Inference speed and CPU-only test</td>
+              <td>Table II, Section VII, Fig. 2</td>
+            </tr>
+            <tr>
+              <td>Memory usage analysis</td>
+              <td>Section VIII with notebook RSS evidence</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>II. Dataset and Experimental Setup</h2>
+        <p>
+          CIFAR-10 contains 60,000 RGB images in 10 classes. The experiment uses
+          a train/validation/test split of 45,000 / 5,000 / 10,000 with a fixed
+          random seed. Images are resized to 224x224 and processed with
+          model-specific ImageNet preprocessing functions. All models are
+          trained under a consistent protocol so the comparison reflects model
+          behavior rather than different training conditions.
+        </p>
+        <div class="callout">
+          <p>
+            <span class="label">Notebook:</span>
+            <code
+              >notebooks/Assignment_04_Lightweight_CNNs_MobileNetV2_DenseNet121_EfficientNetB0_CIFAR10.ipynb</code
+            >
+          </p>
+          <p>
+            <span class="label">Artifacts:</span>
+            <code>models/</code>, <code>results/plots/</code>,
+            <code>results/tables/</code>, <code>reports/</code>
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2>III. Model Architectures and Training Protocol</h2>
+        <p>
+          Each model is initialized with ImageNet pretrained weights using a
+          transfer-learning setup and then fine-tuned. A unified two-stage
+          schedule is used for fairness: head training followed by partial
+          backbone fine-tuning. This keeps experimental conditions aligned
+          across MobileNetV2, DenseNet121, and EfficientNetB0 so the final
+          metric differences are interpretable and defensible.
+        </p>
+        <div class="tbl-caption">
+          TABLE II<br />QUANTITATIVE COMPARISON SUMMARY
+        </div>
+        <table class="ieee">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Accuracy</th>
+              <th>Loss</th>
+              <th>Params</th>
+              <th>Model Size (MB)</th>
+              <th>Train Time (min)</th>
+              <th>GPU sec/batch</th>
+              <th>CPU sec/batch</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>MobileNetV2</td>
+              <td>0.9002</td>
+              <td>0.3398</td>
+              <td>2,270,794</td>
+              <td>22.1755</td>
+              <td>5.4956</td>
+              <td>0.021823</td>
+              <td>0.285467</td>
+            </tr>
+            <tr>
+              <td>DenseNet121</td>
+              <td>0.9261</td>
+              <td>0.2246</td>
+              <td>7,047,754</td>
+              <td>37.7080</td>
+              <td>9.4996</td>
+              <td>0.043467</td>
+              <td>N/A</td>
+            </tr>
+            <tr>
+              <td>EfficientNetB0</td>
+              <td>0.9488</td>
+              <td>0.1618</td>
+              <td>4,062,381</td>
+              <td>34.0231</td>
+              <td>5.4157</td>
+              <td>0.029900</td>
+              <td>N/A</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>IV. Primary Findings</h2>
+        <p>
+          EfficientNetB0 provides the highest predictive performance with 94.88%
+          test accuracy and the lowest loss (0.1618), making it the strongest
+          choice when quality is the main priority. MobileNetV2 is the most
+          efficient model, with the smallest parameter count (2.27M), smallest
+          artifact size (22.18 MB), fastest GPU inference (0.021823 sec/batch),
+          and available CPU benchmark (0.285467 sec/batch). DenseNet121 reaches
+          solid accuracy (92.61%) but requires the largest resource budget in
+          parameters, model size, training time, and GPU latency.
+        </p>
+      </section>
+
+      <section>
+        <h2>V. Figure-Based Analysis</h2>
+        <p>
+          Figures 1-4 summarize accuracy, latency, and model complexity from the
+          same comparison table. Together, they show a clear trade-off frontier:
+          EfficientNetB0 maximizes accuracy while MobileNetV2 minimizes
+          computational overhead.
+        </p>
+        <figure>
+          <img
+            src="../results/plots/bar_accuracy.png"
+            alt="Accuracy comparison"
+          />
+          <figcaption>
+            Fig. 1. Test accuracy comparison across MobileNetV2, DenseNet121,
+            and EfficientNetB0.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../results/plots/bar_gpu_speed.png"
+            alt="GPU inference speed comparison"
+          />
+          <figcaption>
+            Fig. 2. GPU inference time per batch (lower is better).
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../results/plots/bar_params.png"
+            alt="Parameter count comparison"
+          />
+          <figcaption>
+            Fig. 3. Parameter-count comparison as a proxy for computational
+            footprint.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../results/plots/bar_model_size.png"
+            alt="Model size comparison"
+          />
+          <figcaption>
+            Fig. 4. Exported model size comparison in megabytes.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2>VI. Training Dynamics</h2>
+        <p>
+          The per-model learning curves validate that all three backbones
+          converged under the selected schedule. EfficientNetB0 demonstrates the
+          best final validation behavior, DenseNet121 converges strongly but
+          with higher training cost, and MobileNetV2 converges quickly with
+          lower computational burden.
+        </p>
+        <figure>
+          <img
+            src="../results/plots/mobilenetv2_curves.png"
+            alt="MobileNetV2 curves"
+          />
+          <figcaption>
+            Fig. 5. MobileNetV2 training/validation accuracy and loss curves.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../results/plots/densenet121_curves.png"
+            alt="DenseNet121 curves"
+          />
+          <figcaption>
+            Fig. 6. DenseNet121 training/validation accuracy and loss curves.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../results/plots/efficientnetb0_curves.png"
+            alt="EfficientNetB0 curves"
+          />
+          <figcaption>
+            Fig. 7. EfficientNetB0 training/validation accuracy and loss curves.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2>VII. CPU-Only and Latency Analysis</h2>
+        <p>
+          The required CPU-only benchmark was executed for MobileNetV2, yielding
+          <span class="label">0.285467 sec/batch</span>. GPU benchmarks show
+          MobileNetV2 as the fastest model overall (0.021823 sec/batch), then
+          EfficientNetB0 (0.029900), then DenseNet121 (0.043467). This supports
+          MobileNetV2 as the strongest low-latency option for deployment on
+          constrained hardware or real-time pipelines.
+        </p>
+      </section>
+
+      <section>
+        <h2>VIII. Memory Usage Analysis</h2>
+        <p>
+          The notebook recorded process RSS around the benchmark stage:
+          <span class="label">114416.1367 MB</span> before and
+          <span class="label">114495.9375 MB</span> after benchmark execution
+          (delta: <span class="label">79.8008 MB</span>). This is a global
+          benchmark-session memory reading and not per-model isolated runtime
+          memory.
+        </p>
+        <p>
+          Per-model memory evidence in current artifacts is represented by
+          exported model size: MobileNetV2 (22.18 MB), EfficientNetB0 (34.02
+          MB), and DenseNet121 (37.71 MB). Hence MobileNetV2 is the most memory
+          friendly for constrained deployment. This section explicitly separates
+          session-level runtime RSS evidence from per-model artifact size to
+          avoid ambiguity during evaluation.
+        </p>
+      </section>
+
+      <section>
+        <h2>IX. Deployment Recommendations</h2>
+        <h3>Mobile phone</h3>
+        <p>
+          <span class="label">Recommended: MobileNetV2.</span> It is the
+          smallest model, has the fewest parameters, and is fastest on both GPU
+          and CPU benchmarks.
+        </p>
+        <h3>Cloud server</h3>
+        <p>
+          <span class="label">Recommended: EfficientNetB0.</span> It provides
+          the best accuracy/loss and still has moderate runtime relative to
+          DenseNet121.
+        </p>
+        <h3>Real-time system</h3>
+        <p>
+          <span class="label">Recommended: MobileNetV2</span> for strict latency
+          constraints. EfficientNetB0 is a valid alternative when higher
+          accuracy is prioritized and slightly higher latency is acceptable.
+        </p>
+      </section>
+
+      <section>
+        <h2>Conclusion</h2>
+        <p>
+          EfficientNetB0 achieved the highest predictive quality, while
+          MobileNetV2 delivered the strongest efficiency profile. For practical
+          deployment, the best choice is context dependent: MobileNetV2 for
+          edge/real-time constraints and EfficientNetB0 for accuracy-oriented
+          cloud inference. The report organizes each requirement with a direct
+          mapping, quantitative table, and supporting plots so grading and
+          verification can be performed quickly and transparently.
+        </p>
+      </section>
+
+      <section class="refs">
+        <h2>References</h2>
+        <p>
+          [1] M. Tan and Q. Le, “EfficientNet: Rethinking Model Scaling for
+          Convolutional Neural Networks,” in <em>ICML</em>, 2019.<br />
+          [2] M. Sandler et al., “MobileNetV2: Inverted Residuals and Linear
+          Bottlenecks,” in <em>CVPR</em>, 2018.<br />
+          [3] G. Huang et al., “Densely Connected Convolutional Networks,” in
+          <em>CVPR</em>, 2017.<br />
+          [4] A. Krizhevsky, “Learning Multiple Layers of Features from Tiny
+          Images,” 2009 (CIFAR-10).
+        </p>
+      </section>
+    </div>
+  </body>
+</html>

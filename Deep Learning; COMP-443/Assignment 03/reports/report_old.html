@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assignment 03 Report — ResNet50 vs InceptionV3</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; line-height: 1.45; }
+    h1,h2,h3 { margin-bottom: 8px; }
+    .meta { color: #444; margin-bottom: 18px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f5f5f5; }
+    figure { margin: 16px 0; }
+    figcaption { color: #555; font-size: 0.95em; margin-top: 6px; }
+    code { background:#f6f6f6; padding:2px 4px; }
+  </style>
+</head>
+<body>
+  <h1>Assignment 03 Report</h1>
+  <div class="meta">
+    Generated: 2026-04-26 20:08:57<br>
+    Dataset: CIFAR-10<br>
+    Models: ResNet50, InceptionV3<br>
+    Outputs folder: <code>/content/drive/MyDrive/COMP-443/Assignment_03_ResNet_vs_Inception</code>
+  </div>
+
+  <h2>Summary Table</h2>
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Model</th>
+      <th>Test Accuracy</th>
+      <th>Test Loss</th>
+      <th>Training Time (min)</th>
+      <th>Model Size (MB)</th>
+      <th>Params</th>
+      <th>Input Size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ResNet50</td>
+      <td>0.9398</td>
+      <td>0.193584</td>
+      <td>9.975128</td>
+      <td>211.454912</td>
+      <td>23608202</td>
+      <td>224x224</td>
+    </tr>
+    <tr>
+      <td>InceptionV3</td>
+      <td>0.8988</td>
+      <td>0.301485</td>
+      <td>5.218540</td>
+      <td>164.840771</td>
+      <td>21823274</td>
+      <td>299x299</td>
+    </tr>
+  </tbody>
+</table>
+
+  <h2>Training Curves</h2>
+  <figure><img src="resnet50_accuracy_loss.png" style="max-width:100%;border:1px solid #ddd"/><figcaption>ResNet50 accuracy/loss vs epoch</figcaption></figure>
+  <figure><img src="inceptionv3_accuracy_loss.png" style="max-width:100%;border:1px solid #ddd"/><figcaption>InceptionV3 accuracy/loss vs epoch</figcaption></figure>
+
+  <h2>Confusion Matrices</h2>
+  <figure><img src="confusion_matrix_resnet50.png" style="max-width:100%;border:1px solid #ddd"/><figcaption>ResNet50 confusion matrix (test)</figcaption></figure>
+  <figure><img src="confusion_matrix_inceptionv3.png" style="max-width:100%;border:1px solid #ddd"/><figcaption>InceptionV3 confusion matrix (test)</figcaption></figure>
+
+  <h2>Files</h2>
+  <ul>
+    <li><code>summary_table.csv</code>, <code>metrics.json</code></li>
+    <li><code>classification_report_resnet50.txt</code>, <code>classification_report_inceptionv3.txt</code></li>
+    <li><code>resnet50_cifar10_transfer.keras</code>, <code>inceptionv3_cifar10_transfer.keras</code></li>
+  </ul>
+
+  <h2>Discussion (template)</h2>
+  <p>
+    Use the summary table and confusion matrices to explain which model performed better.
+    Comment on accuracy vs training time vs model size and typical CIFAR-10 confusions.
+  </p>
+</body>
+</html>
