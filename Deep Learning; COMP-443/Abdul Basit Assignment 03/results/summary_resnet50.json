@@ -1,0 +1,11 @@
+{
+  "model_name": "ResNet50",
+  "image_size": 224,
+  "epochs_head": 5,
+  "epochs_finetune": 5,
+  "train_time_sec": 368.94099438700005,
+  "test_loss": 0.18624146282672882,
+  "test_accuracy": 0.9474999904632568,
+  "params_million": 23.608202,
+  "saved_model_mb": 228.48646926879883
+}

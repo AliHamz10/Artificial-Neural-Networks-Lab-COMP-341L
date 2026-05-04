@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lab 13 Report — Domain-Specific Academic Assistant (LLMs)</title>
+    <style>
+      :root {
+        --page-max: 1040px;
+        --fg: #111827;
+        --muted: #4b5563;
+        --border: #e5e7eb;
+        --paper: #ffffff;
+        --bg: #f3f4f6;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
+        --serif: "Times New Roman", Times, serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--serif);
+        line-height: 1.35;
+      }
+      .page {
+        max-width: var(--page-max);
+        margin: 24px auto;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        padding: 28px 34px;
+      }
+      header {
+        border-bottom: 2px solid #111827;
+        padding-bottom: 10px;
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 6px 0;
+        font-weight: 700;
+        text-align: center;
+      }
+      .meta {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px 14px;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .meta b {
+        color: var(--fg);
+        font-weight: 700;
+      }
+      .two-col {
+        column-count: 2;
+        column-gap: 28px;
+        font-size: 13.5px;
+      }
+      .two-col h2,
+      .two-col h3 {
+        break-after: avoid;
+        break-inside: avoid;
+      }
+      h2 {
+        font-size: 14px;
+        margin: 14px 0 6px 0;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+      }
+      h3 {
+        font-size: 13.5px;
+        margin: 10px 0 4px 0;
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 8px 0;
+      }
+      ul {
+        margin: 0 0 8px 16px;
+        padding: 0;
+      }
+      li {
+        margin: 0 0 3px 0;
+      }
+      .callout {
+        border: 1px solid var(--border);
+        padding: 8px 10px;
+        background: #fafafa;
+        break-inside: avoid;
+        margin: 8px 0 10px 0;
+      }
+      .kbd {
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 1px 6px;
+        border: 1px solid var(--border);
+        border-bottom-width: 2px;
+        border-radius: 6px;
+        background: #fff;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 11px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #0b1020;
+        color: #e5e7eb;
+        padding: 10px 10px;
+        border-radius: 10px;
+        border: 1px solid #111827;
+        margin: 6px 0 10px 0;
+        break-inside: avoid;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 6px 0 10px 0;
+        font-size: 12.5px;
+        break-inside: avoid;
+      }
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 6px 8px;
+        vertical-align: top;
+      }
+      th {
+        text-align: left;
+        background: #f9fafb;
+      }
+      .small {
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .refs ol {
+        margin: 0 0 0 16px;
+        padding: 0;
+      }
+      footer {
+        margin-top: 14px;
+        border-top: 1px solid var(--border);
+        padding-top: 10px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      @media print {
+        body {
+          background: #fff;
+        }
+        .page {
+          margin: 0;
+          border: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <h1>Fine-Tuning a Domain-Specific Academic Assistant (LLMs)</h1>
+        <div class="meta">
+          <div><b>Course</b>: COMP-341L (Artificial Neural Networks Lab)</div>
+          <div><b>Lab</b>: 13</div>
+          <div><b>Date</b>: May 04, 2026</div>
+          <div><b>Environment</b>: Google Colab</div>
+          <div><b>Student</b>: Ali Hamza</div>
+          <div><b>Roll No</b>: B23F0063AI106</div>
+          <div><b>Section</b>: B.S AI - Red</div>
+          <div><b>Method</b>: LoRA (PEFT)</div>
+        </div>
+      </header>
+
+      <section class="two-col">
+        <h2>Abstract</h2>
+        <p>
+          This lab develops and evaluates a domain-specific academic assistant for explaining
+          Computer Science concepts in a consistent course-specific teaching style. A small
+          causal language model (<span class="kbd">distilgpt2</span>) is fine-tuned using LoRA adapters on a
+          manually curated instruction-response dataset. We compare base vs fine-tuned outputs using
+          a fixed evaluation prompt (“Explain dynamic programming”), analyze failure cases (hallucination,
+          repetition, off-topic content), and perform one manual improvement iteration by refining the dataset.
+        </p>
+        <p class="small">
+          Note: All dataset explanations were written manually. Model outputs are presented as raw evidence,
+          followed by human analysis and reasoning.
+        </p>
+
+        <h2>Keywords</h2>
+        <p>LLM fine-tuning, LoRA, PEFT, distilgpt2, instruction tuning, hallucination, teaching style.</p>
+
+        <h2>1. Introduction</h2>
+        <p>
+          General-purpose chatbots often respond with generic explanations, inconsistent tone, and may
+          hallucinate details when a prompt is underspecified. In an academic setting, a course assistant
+          must be both <b>clear</b> and <b>style-consistent</b>, and ideally reduce overconfident guessing. This lab
+          targets style control via small-scale instruction tuning.
+        </p>
+
+        <h2>2. Teaching Style Definition (Part 2)</h2>
+        <div class="callout">
+          <b>Strict teaching style template (enforced in the dataset):</b>
+          <ul>
+            <li><b>Step-by-step</b> explanation (numbered)</li>
+            <li><b>Analogy</b> (real-life)</li>
+            <li><b>Tiny example</b> (1–3 lines)</li>
+            <li><b>Common mistake</b> / misconception</li>
+            <li><b>Recap</b> (one-line summary)</li>
+          </ul>
+        </div>
+        <p>
+          The goal is to teach the model a <b>repeatable structure</b> that improves readability for beginners and
+          makes answers predictable for grading and classroom use.
+        </p>
+
+        <h2>3. Dataset Creation (Part 1)</h2>
+        <p>
+          A manual instruction dataset was constructed (JSONL format) by writing original explanations for
+          core CS topics (data structures, algorithms, ML basics, OS/security concepts). Each sample follows
+          the strict teaching style template.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Dataset</th>
+              <th>Path</th>
+              <th>Samples</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>v1</td>
+              <td><span class="kbd">data/dataset_cs_instructions_v1.jsonl</span></td>
+              <td>26</td>
+              <td>Primary style-tuning set</td>
+            </tr>
+            <tr>
+              <td>v2</td>
+              <td><span class="kbd">data/dataset_cs_instructions_v2.jsonl</span></td>
+              <td>5</td>
+              <td>Manual improvement iteration (failure-driven examples)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Example dataset item (excerpt)</h3>
+        <pre>Instruction: Explain recursion using a real-life analogy for a beginner.
+Response (structure):
+1) ... (step-by-step)
+Analogy: ...
+Tiny example: ...
+Common mistake: ...
+Recap: ...</pre>
+
+        <h2>4. Model Selection (Part 3)</h2>
+        <p>
+          <b>Selected model:</b> <span class="kbd">distilgpt2</span> (small causal LM). It is suitable for a classroom lab
+          because it trains quickly on limited compute and makes fine-tuning behavior observable.
+        </p>
+        <p><b>Advantages:</b> small, fast iteration, coherent short-form responses.</p>
+        <p>
+          <b>Limitations:</b> weak factual reliability, limited reasoning depth, prone to repetition and off-topic text
+          when data is small or decoding is stochastic.
+        </p>
+
+        <h2>5. Fine-Tuning Strategy (Part 4)</h2>
+        <p>
+          <b>Method:</b> LoRA (Low-Rank Adaptation) via PEFT. Instead of updating all model parameters, LoRA learns
+          low-rank adapter matrices for selected attention projections. This reduces GPU memory usage and
+          makes training feasible in Colab.
+        </p>
+        <div class="callout">
+          <b>Why LoRA here:</b>
+          <ul>
+            <li>Trains fewer parameters → faster and cheaper</li>
+            <li>Less risk of catastrophic forgetting in the base model</li>
+            <li>Adapters can be saved/loaded independently for comparison</li>
+          </ul>
+        </div>
+
+        <h2>6. Experimental Setup</h2>
+        <ul>
+          <li><b>Prompt format:</b> <span class="kbd">### Instruction:</span> ... <span class="kbd">### Response:</span></li>
+          <li><b>Fine-tuning objective:</b> next-token prediction (causal LM) on formatted instruction-response text</li>
+          <li><b>Evaluation prompt (fixed):</b> “Explain dynamic programming in a step-by-step, analogy-based teaching style.”</li>
+          <li><b>Decoding:</b> sampling enabled (<span class="kbd">temperature=0.7</span>, <span class="kbd">top_p=0.9</span>)</li>
+        </ul>
+
+        <h2>7. Evaluation (Part 5)</h2>
+        <p>
+          The same evaluation prompt is used for base vs fine-tuned models. Outputs below are copied from:
+          <span class="kbd">eval_base.txt</span>, <span class="kbd">eval_finetuned_v1.txt</span>, and <span class="kbd">eval_finetuned_v2.txt</span>.
+        </p>
+
+        <h3>7.1 Base model output</h3>
+        <pre>### Instruction:
+Explain dynamic programming in a step-by-step, analogy-based teaching style.
+
+### Response:
+This is a great introduction to the following topics, which are covered in this tutorial.
+Note: This is not a complete tutorial.
+### The lesson is a part of the course, so please read the full course description.</pre>
+
+        <h3>7.2 Fine-tuned output (v1)</h3>
+        <pre>### Instruction:
+Explain dynamic programming in a step-by-step, analogy-based teaching style.
+
+### Response:
+This post is part of a series that focuses on the language of programming in a way that is not currently possible in the language of programming. It has been translated into English and Spanish.
+The most recent version of this article was translated into Spanish.
+There are three main problems with the language of programming in a way that is not currently possible in the language of programming.
+First, it is not possible to use a language of programming in a way that is not currently possible in the language of programming. The language of programming is not suitable for this purpose.
+Second, it is not possible to use a language of programming in a way that is not currently possible in the language of programming. The language of programming is not suitable for this purpose.
+Third, it is not possible to use a language of programming in a way that is not currently possible in the language of programming. The language of programming is not suitable for this purpose.
+The problem is that the language of programming is not suitable for this purpose.
+The problem is that the language of programming is not suitable for this purpose</pre>
+
+        <h3>7.3 Fine-tuned output (v2, after manual improvement)</h3>
+        <pre>### Instruction:
+Explain dynamic programming in a step-by-step, analogy-based teaching style.
+
+### Response:
+"I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going</pre>
+
+        <h3>7.4 Critical comparison (analysis)</h3>
+        <p>
+          <b>Clarity:</b> Base output is short but does not explain dynamic programming. Fine-tuned v1/v2 outputs are
+          verbose but largely off-topic and repetitive, failing to follow the intended teaching structure.
+        </p>
+        <p>
+          <b>Hallucination reduction:</b> The tuned models did not become more cautious; instead they produced “article-like”
+          filler text. This indicates the fine-tuning did not successfully imprint the desired format.
+        </p>
+        <p>
+          <b>Style consistency:</b> The strict template (steps + analogy + example + mistake + recap) is not consistently produced.
+          This suggests either (i) the dataset is too small for stable behavioral change, (ii) training overfit to noise patterns,
+          or (iii) decoding settings increased repetition.
+        </p>
+
+        <h2>8. Failure Analysis (Part 6)</h2>
+        <p>
+          Two failure prompts were used to diagnose behavior. Raw outputs are stored in JSON files and summarized here.
+        </p>
+        <h3>Failure case 1: “Prove DP always gives optimal answer”</h3>
+        <p>
+          <b>Observed failure:</b> Both tuned models avoid an actual proof and instead generate irrelevant, repetitive filler.
+        </p>
+        <p>
+          <b>Why it failed:</b> The dataset teaches explanation style but does not include proof-like answers, formal assumptions
+          (optimal substructure), or examples of when a “proof request” should be answered carefully.
+        </p>
+        <p>
+          <b>Cause category:</b> primarily <b>data limitation</b> (missing proof-oriented examples) plus <b>model limitation</b> (small model).
+        </p>
+
+        <h3>Failure case 2: “Exact best-known TSP complexity + year”</h3>
+        <p>
+          <b>Observed failure:</b> The base model replies with a vague update statement; tuned models generate confident-sounding
+          content (including a suspicious arXiv link) without actually answering precisely.
+        </p>
+        <p>
+          <b>Why it failed:</b> The prompt requests precise external facts (algorithm details + discovery year). A small model may guess,
+          and the fine-tuning set lacks examples that teach “I’m not sure / I don’t have a citation.”
+        </p>
+        <p><b>Cause category:</b> <b>model limitation</b> + <b>training data does not include uncertainty handling</b>.</p>
+
+        <h2>9. Manual Improvement (Part 7)</h2>
+        <p>
+          A manual improvement iteration was performed by creating <span class="kbd">dataset_cs_instructions_v2.jsonl</span>, focusing on:
+        </p>
+        <ul>
+          <li>Explicit “how to choose a DP state” examples (reduces vague DP answers)</li>
+          <li>Examples explaining why small LLMs hallucinate and how to respond cautiously</li>
+        </ul>
+        <p>
+          <b>Result:</b> In the captured v2 evaluation output, repetition increased rather than decreasing. This suggests that the fix
+          was insufficient because the improvement set is extremely small (5 items) and cannot counteract instability from stochastic decoding.
+        </p>
+
+        <h3>Recommendations (what to try next)</h3>
+        <ul>
+          <li>Increase dataset size (e.g., 80–200 high-quality style-consistent samples) with more DP-focused items.</li>
+          <li>Use deterministic evaluation (greedy decoding) for fair comparisons; keep sampling only for creativity tests.</li>
+          <li>Add “refusal / uncertainty” examples to discourage confident guessing when asked for citations/years.</li>
+          <li>Lower learning rate / epochs to reduce repetition; add early stopping on training loss trends.</li>
+          <li>Use a slightly stronger small model (e.g., GPT-2 medium) if compute allows.</li>
+        </ul>
+
+        <h2>10. Conclusion</h2>
+        <p>
+          This lab demonstrates that fine-tuning a small LLM with very limited data can fail to reliably enforce a desired teaching style.
+          The most important practical insight is that <b>dataset quality and quantity dominate</b>: to achieve consistent behavior, we need
+          more diverse, high-signal examples aligned with the target tasks and evaluation prompts.
+        </p>
+
+        <h2>References</h2>
+        <section class="refs">
+          <ol>
+            <li>Hugging Face, “Transformers” (library documentation).</li>
+            <li>PEFT (Parameter-Efficient Fine-Tuning) library documentation.</li>
+            <li>DistilGPT-2 / GPT-2 model cards and related documentation.</li>
+            <li>LoRA: Low-Rank Adaptation technique for parameter-efficient fine-tuning.</li>
+          </ol>
+        </section>
+      </section>
+
+      <footer>
+        Generated for COMP-341L Lab 13. Related artifacts: <span class="kbd">lab13_llm_finetune_academic_assistant_colab.ipynb</span>,
+        <span class="kbd">data/dataset_cs_instructions_v1.jsonl</span>, <span class="kbd">data/dataset_cs_instructions_v2.jsonl</span>.
+      </footer>
+    </main>
+  </body>
+</html>

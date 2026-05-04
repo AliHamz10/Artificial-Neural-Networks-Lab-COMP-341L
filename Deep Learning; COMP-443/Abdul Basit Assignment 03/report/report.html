@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>COMP-443 Assignment 3 — Transfer Learning: ResNet50 vs InceptionV3</title>
+    <style>
+      :root {
+        --page-max: 980px;
+        --text: #111827;
+        --muted: #4b5563;
+        --border: #e5e7eb;
+        --bg: #ffffff;
+        --code-bg: #f3f4f6;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.6 ui-serif, Georgia, Cambria, "Times New Roman", Times,
+          serif;
+      }
+      main {
+        max-width: var(--page-max);
+        margin: 0 auto;
+        padding: 40px 20px 64px;
+      }
+      header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 16px;
+        margin-bottom: 28px;
+      }
+      h1 {
+        font-size: 30px;
+        line-height: 1.2;
+        margin: 0 0 8px;
+        letter-spacing: -0.01em;
+      }
+      h2 {
+        font-size: 22px;
+        margin: 28px 0 10px;
+      }
+      h3 {
+        font-size: 18px;
+        margin: 18px 0 8px;
+      }
+      p {
+        margin: 10px 0;
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .meta strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+      hr {
+        border: 0;
+        border-top: 1px solid var(--border);
+        margin: 22px 0;
+      }
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+      }
+      code {
+        background: var(--code-bg);
+        padding: 0.1em 0.35em;
+        border-radius: 6px;
+        font-size: 0.92em;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0 18px;
+        font-size: 15px;
+      }
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 10px 10px;
+        vertical-align: top;
+      }
+      th {
+        background: #f9fafb;
+        text-align: left;
+        font-weight: 600;
+      }
+      figure {
+        margin: 16px 0 22px;
+        padding: 0;
+      }
+      figure img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      figcaption {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      ul {
+        margin: 8px 0 14px 22px;
+      }
+      li {
+        margin: 6px 0;
+      }
+      .refs ol {
+        margin: 10px 0 0 22px;
+      }
+      @media print {
+        main {
+          max-width: none;
+          padding: 0;
+        }
+        header {
+          page-break-after: avoid;
+        }
+        figure {
+          page-break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Transfer Learning for CIFAR-10: ResNet50 vs InceptionV3</h1>
+        <div class="meta">
+          <div><strong>Course:</strong> COMP-443 — Deep Learning</div>
+          <div><strong>Assignment:</strong> 3</div>
+          <div>
+            <strong>Members:</strong> Abdul Basit, Dawood Arsalan, Zainab Sajjad
+          </div>
+        </div>
+      </header>
+
+      <section>
+        <h2>Abstract</h2>
+        <p>
+          This report presents a comparative evaluation of two ImageNet-pretrained
+          convolutional neural network backbones—<strong>ResNet50</strong> and
+          <strong>InceptionV3</strong>—adapted to the <strong>CIFAR-10</strong>
+          image classification task via transfer learning. Both models are trained
+          in two stages (frozen-backbone head training followed by partial
+          fine-tuning) and are evaluated on the CIFAR-10 test set. The experimental
+          results show that ResNet50 achieves higher test accuracy and lower test
+          loss than InceptionV3 under the same training schedule, at a slightly
+          lower training time in this run.
+        </p>
+      </section>
+
+      <section>
+        <h2>1. Objective</h2>
+        <p>
+          To implement and compare <strong>ResNet50</strong> and
+          <strong>InceptionV3</strong> for CIFAR-10 classification using transfer
+          learning, and to analyze performance differences using learning curves and
+          confusion matrices.
+        </p>
+      </section>
+
+      <section>
+        <h2>2. Dataset</h2>
+        <p>
+          <strong>CIFAR-10</strong> contains 60,000 RGB images (32×32) across 10
+          classes (50,000 training and 10,000 test).
+        </p>
+        <p><strong>Classes (index → label):</strong></p>
+        <p>
+          0→airplane, 1→automobile, 2→bird, 3→cat, 4→deer, 5→dog, 6→frog, 7→horse,
+          8→ship, 9→truck
+        </p>
+        <h3>Splits and preprocessing</h3>
+        <ul>
+          <li>Train/validation split: 90%/10% (from the training portion).</li>
+          <li>
+            Input resizing: CIFAR-10 images are resized to the model’s input size
+            (ResNet50: 224×224; InceptionV3: 299×299).
+          </li>
+          <li>Normalization: model-specific <code>preprocess_input</code>.</li>
+          <li>
+            Augmentation (applied during training): random horizontal flip,
+            brightness and contrast perturbations.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>3. Methodology</h2>
+        <h3>3.1 Transfer learning setup</h3>
+        <ul>
+          <li>
+            Backbone initialized with ImageNet weights and used with
+            <code>include_top=false</code>.
+          </li>
+          <li>Global average pooling applied to produce a compact feature vector.</li>
+          <li>
+            A new 10-way softmax classification head is trained for CIFAR-10.
+          </li>
+        </ul>
+
+        <h3>3.2 Two-stage training procedure</h3>
+        <ul>
+          <li>
+            <strong>Stage 1 (Head training):</strong> the backbone is frozen and
+            only the classification head is trained.
+          </li>
+          <li>
+            <strong>Stage 2 (Fine-tuning):</strong> the last backbone layers are
+            unfrozen and fine-tuned using a smaller learning rate; BatchNorm layers
+            are kept frozen to preserve stable statistics.
+          </li>
+        </ul>
+
+        <h3>3.3 Training configuration</h3>
+        <ul>
+          <li>Optimizer: Adam</li>
+          <li>Loss: categorical cross-entropy</li>
+          <li>Metric: accuracy</li>
+          <li>Epochs: 5 (head) + 5 (fine-tune) for each model</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>4. Results</h2>
+        <p>All outputs are saved by the notebook:</p>
+        <ul>
+          <li>Curves: <code>../figures/*_accuracy_loss.png</code></li>
+          <li>
+            Confusion matrices:
+            <code>../figures/confusion_matrix_*.png</code> and
+            <code>../results/confusion_matrix_*.npy</code>
+          </li>
+          <li>
+            Summary table:
+            <code>../results/summary_table.csv</code> and
+            <code>../results/metrics.json</code>
+          </li>
+        </ul>
+
+        <h3>4.1 Quantitative comparison (test set)</h3>
+        <table aria-label="Test set comparison table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Input Size</th>
+              <th>Test Accuracy</th>
+              <th>Test Loss</th>
+              <th>Train Time (s)</th>
+              <th>Params (M)</th>
+              <th>Saved Model (MB)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ResNet50</strong></td>
+              <td>224</td>
+              <td><strong>0.9475</strong></td>
+              <td><strong>0.1862</strong></td>
+              <td><strong>368.94</strong></td>
+              <td>23.61</td>
+              <td>228.49</td>
+            </tr>
+            <tr>
+              <td>InceptionV3</td>
+              <td>299</td>
+              <td>0.9186</td>
+              <td>0.2639</td>
+              <td>407.83</td>
+              <td>21.82</td>
+              <td>181.03</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>4.2 Learning curves (accuracy and loss)</h3>
+        <figure>
+          <img
+            src="../figures/resnet50_accuracy_loss.png"
+            alt="ResNet50 training/validation accuracy and loss curves"
+          />
+          <figcaption>
+            <strong>Figure 1.</strong> ResNet50 learning curves across head training
+            and fine-tuning stages.
+          </figcaption>
+        </figure>
+
+        <figure>
+          <img
+            src="../figures/inceptionv3_accuracy_loss.png"
+            alt="InceptionV3 training/validation accuracy and loss curves"
+          />
+          <figcaption>
+            <strong>Figure 2.</strong> InceptionV3 learning curves across head
+            training and fine-tuning stages.
+          </figcaption>
+        </figure>
+
+        <h3>4.3 Confusion matrices</h3>
+        <figure>
+          <img
+            src="../figures/confusion_matrix_resnet50.png"
+            alt="Confusion matrix for ResNet50 on CIFAR-10 test set"
+          />
+          <figcaption>
+            <strong>Figure 3.</strong> ResNet50 confusion matrix on CIFAR-10 test set
+            (10,000 images).
+          </figcaption>
+        </figure>
+
+        <figure>
+          <img
+            src="../figures/confusion_matrix_inceptionv3.png"
+            alt="Confusion matrix for InceptionV3 on CIFAR-10 test set"
+          />
+          <figcaption>
+            <strong>Figure 4.</strong> InceptionV3 confusion matrix on CIFAR-10 test
+            set (10,000 images).
+          </figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2>5. Discussion</h2>
+        <h3>5.1 Accuracy and loss</h3>
+        <p>
+          ResNet50 achieves the best overall performance in this experiment
+          (<strong>94.75%</strong> test accuracy) compared to InceptionV3
+          (<strong>91.86%</strong>). The lower test loss for ResNet50 indicates not
+          only higher correctness but also higher confidence on correct predictions
+          on average.
+        </p>
+
+        <h3>5.2 Training time and input resolution</h3>
+        <p>
+          InceptionV3 uses a larger input resolution (299×299) than ResNet50
+          (224×224), which increases per-step compute and memory cost. Consistent
+          with this, InceptionV3 required more training time in this run (407.83s vs
+          368.94s) despite having fewer parameters (21.82M vs 23.61M). This
+          highlights that parameter count alone is not a complete proxy for runtime;
+          input resolution and architecture operations also affect wall-clock time.
+        </p>
+
+        <h3>5.3 Error patterns from confusion matrices</h3>
+        <p>
+          Both models show higher confusion between semantically similar classes.
+          The most frequent confusions observed include <strong>cat ↔ dog</strong>
+          and <strong>truck → automobile</strong>, which is expected for CIFAR-10 due
+          to limited resolution and similar visual appearance. InceptionV3 shows
+          notably higher <strong>cat → dog</strong> confusion compared to ResNet50,
+          aligning with its lower overall test accuracy.
+        </p>
+
+        <h3>5.4 Why ResNet may generalize better here</h3>
+        <p>
+          ResNet’s residual connections encourage stable gradient flow in deep
+          networks and allow the model to learn refinements over identity mappings.
+          For transfer learning, this can yield strong feature reuse and smooth
+          adaptation with limited fine-tuning. In contrast, Inception’s multi-branch
+          feature extraction can be beneficial, but the larger input size and
+          architecture complexity may require more careful tuning (learning rates,
+          augmentation strength, or longer fine-tuning) to match ResNet’s
+          performance under the same short schedule.
+        </p>
+      </section>
+
+      <section>
+        <h2>6. Conclusion</h2>
+        <p>
+          Under a matched two-stage transfer learning setup on CIFAR-10,
+          <strong>ResNet50 outperformed InceptionV3</strong> in both accuracy and
+          loss while also training faster in this run. Future work can include
+          longer fine-tuning schedules, per-class precision/recall reporting, and
+          systematic hyperparameter sweeps (learning rate, augmentation strength,
+          and number of unfrozen layers) to further optimize both architectures.
+        </p>
+      </section>
+
+      <section class="refs">
+        <h2>References</h2>
+        <ol>
+          <li>
+            K. He, X. Zhang, S. Ren, and J. Sun, “Deep Residual Learning for Image
+            Recognition,” <em>CVPR</em>, 2016.
+          </li>
+          <li>
+            C. Szegedy et al., “Rethinking the Inception Architecture for Computer
+            Vision,” <em>CVPR</em>, 2016.
+          </li>
+          <li>
+            A. Krizhevsky, “Learning Multiple Layers of Features from Tiny Images,”
+            2009 (CIFAR-10).
+          </li>
+        </ol>
+      </section>
+    </main>
+  </body>
+</html>
+

@@ -1,0 +1,7 @@
+### Instruction:
+Explain dynamic programming in a step-by-step, analogy-based teaching style.
+
+### Response:
+This is a great introduction to the following topics, which are covered in this tutorial.
+Note: This is not a complete tutorial.
+### The lesson is a part of the course, so please read the full course description.

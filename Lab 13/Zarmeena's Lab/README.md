@@ -1,29 +1,31 @@
-# Lab 13 - Zarmeena Jawad
+# Lab 13 - Zarmeena
 
-## Files
-- `lab13_llm_finetuning_ta_style_colab.ipynb`: Google Colab notebook for Lab 13 (LLM fine-tuning + LoRA)
+## Included files
+- `lab13_llm_finetune_academic_assistant_colab.ipynb`: Google Colab notebook for Lab 13
 - `build_lab13_llm_finetune_notebook.py`: script used to generate the notebook
+- `data/dataset_cs_instructions_v1.jsonl`: manually curated instruction dataset (v1)
+- `data/dataset_cs_instructions_v2.jsonl`: improved dataset after failure analysis (v2)
 
-## Highlights (distinct setup)
-- Uses `gpt2` (small, Colab-friendly) + **LoRA (PEFT)**
-- Uses a different prompt template:
-  - `<INSTRUCTION> ... </INSTRUCTION>` and `<RESPONSE> ... </RESPONSE>`
-- Report export uses **A4** layout and **black code blocks with white text**
+## What this lab does
+You will fine-tune a **small LLM (DistilGPT2)** to behave like a domain-specific academic assistant for Computer Science concepts.
+
+The notebook includes:
+- Manual dataset loading (instruction → response)
+- Teaching style definition and enforcement
+- LoRA fine-tuning (PEFT)
+- Evaluation: base vs fine-tuned on the same prompt (`Explain dynamic programming`)
+- Failure analysis (2 cases) + 1 manual fix + re-evaluation
 
 ## How to run in Colab
-1. Open `lab13_llm_finetuning_ta_style_colab.ipynb` in Colab.
-2. Run the setup cell (mounts Drive).
-3. Edit the dataset in Drive (manual work required):
-   - `/content/drive/MyDrive/COMP-341L/Lab 13/Zarmeena's Lab/data/academic_assistant.jsonl`
-4. Run training + evaluation cells.
+1. Open `lab13_llm_finetune_academic_assistant_colab.ipynb` in Google Colab.
+2. Keep Google Drive enabled in the first setup cell.
+3. Run all cells in order.
+4. Outputs will be written to:
+   - `/content/drive/MyDrive/COMP-341L/Lab 13/Zarmeena's Lab`
+5. At the end it exports:
+   - `Lab_Report_13.md`
+   - `Lab_Report_13.html`
 
-## Outputs (Saved to Google Drive)
-Saved to:
-- `/content/drive/MyDrive/COMP-341L/Lab 13/Zarmeena's Lab`
-
-Includes:
-- `data/academic_assistant.jsonl`
-- `outputs/before_after_dp.txt`
-- `outputs/failure_cases.txt`
-- `Lab_Report_13.md`, `Lab_Report_13.html`
+## Google Drive note
+This notebook is configured to save **everything** (datasets copy, model adapters, outputs, and reports) into the Google Drive lab folder.
 

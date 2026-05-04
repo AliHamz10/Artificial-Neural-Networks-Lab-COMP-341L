@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lab 13 Report — Academic Assistant Fine-Tuning</title>
+    <style>
+      :root {
+        --fg: #0f172a;
+        --muted: #475569;
+        --border: #e2e8f0;
+        --bg: #0b1220;
+        --paper: #ffffff;
+        --accent: #2563eb;
+        --accent-2: #0ea5e9;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
+        --serif: "Times New Roman", Times, serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: radial-gradient(1200px 800px at 15% 15%, #111c33 0%, var(--bg) 55%, #070b14 100%);
+        color: var(--fg);
+        font-family: var(--serif);
+      }
+      .shell {
+        max-width: 1120px;
+        margin: 22px auto;
+        padding: 0 14px;
+      }
+      .banner {
+        border-radius: 18px;
+        padding: 18px 18px;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.22), rgba(14, 165, 233, 0.16));
+        border: 1px solid rgba(226, 232, 240, 0.16);
+        color: #e5e7eb;
+        margin-bottom: 14px;
+      }
+      .banner h1 {
+        margin: 0 0 6px 0;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+      .banner p {
+        margin: 0;
+        color: rgba(229, 231, 235, 0.85);
+        font-size: 13px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 14px;
+      }
+      @media (max-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card {
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .card .hd {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border);
+        background: #f8fafc;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        font-weight: 700;
+        font-size: 12.5px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: #0f172a;
+      }
+      .card .bd {
+        padding: 12px 14px;
+      }
+
+      .meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 12px;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .meta .k {
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        font-weight: 700;
+        color: #0f172a;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: #fff;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0 6px 6px 0;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      }
+
+      .doc {
+        padding: 18px 18px;
+        line-height: 1.42;
+        font-size: 13.5px;
+      }
+      .doc h2 {
+        margin: 0 0 6px 0;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+      .doc h3 {
+        margin: 10px 0 4px 0;
+        font-size: 13.5px;
+        font-weight: 700;
+      }
+      .doc p {
+        margin: 0 0 10px 0;
+      }
+      .doc ul {
+        margin: 0 0 10px 18px;
+        padding: 0;
+      }
+      .doc li {
+        margin: 0 0 4px 0;
+      }
+      .doc table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 6px 0 10px 0;
+        font-size: 12.5px;
+      }
+      .doc th,
+      .doc td {
+        border: 1px solid var(--border);
+        padding: 7px 8px;
+        vertical-align: top;
+      }
+      .doc th {
+        background: #f8fafc;
+        text-align: left;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 11px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        margin: 8px 0 12px 0;
+        padding: 12px 12px;
+        border-radius: 14px;
+        border: 1px solid #0f172a;
+        background: #0b1020;
+        color: #e5e7eb;
+      }
+      .note {
+        border-left: 4px solid var(--accent);
+        padding: 8px 10px;
+        background: #f8fafc;
+        color: var(--muted);
+        margin: 8px 0 12px 0;
+      }
+      .refs ol {
+        margin: 0 0 0 18px;
+        padding: 0;
+      }
+      footer {
+        padding: 12px 18px;
+        border-top: 1px solid var(--border);
+        background: #fcfcfd;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      @media print {
+        body {
+          background: #fff;
+        }
+        .shell {
+          margin: 0;
+          max-width: none;
+        }
+        .banner {
+          background: #fff;
+          color: #000;
+          border: 1px solid #ddd;
+        }
+        .banner p {
+          color: #000;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="banner">
+        <h1>Lab 13 — Fine-Tuning a Domain-Specific Academic Assistant (LLMs)</h1>
+        <p>
+          Professional report format (IEEE-inspired). Evidence-backed evaluation: base vs LoRA fine-tuned
+          <span style="font-family: var(--mono)">distilgpt2</span>, failure analysis, and one manual dataset improvement cycle.
+        </p>
+      </section>
+
+      <section class="grid">
+        <aside class="card">
+          <div class="hd">Student & Setup</div>
+          <div class="bd">
+            <div class="meta">
+              <div><div class="k">Student</div><div>Zarmeena Jawad</div></div>
+              <div><div class="k">Roll No</div><div>B23F0115AI125</div></div>
+              <div><div class="k">Course</div><div>COMP-341L</div></div>
+              <div><div class="k">Section</div><div>B.S AI - Red</div></div>
+              <div><div class="k">Lab</div><div>13</div></div>
+              <div><div class="k">Date</div><div>May 05, 2026</div></div>
+              <div><div class="k">Base Model</div><div>distilgpt2</div></div>
+              <div><div class="k">Fine-tuning</div><div>LoRA (PEFT)</div></div>
+            </div>
+
+            <div style="margin-top: 12px">
+              <span class="pill"><span class="dot"></span> Manual dataset (JSONL)</span>
+              <span class="pill"><span class="dot"></span> Style template enforced</span>
+              <span class="pill"><span class="dot"></span> Base vs tuned comparison</span>
+              <span class="pill"><span class="dot"></span> Failure-driven iteration</span>
+            </div>
+
+            <div class="note">
+              The goal of this lab is not just code execution: it prioritizes reasoning, analysis, and
+              decision-making about model behavior, limitations, and improvements.
+            </div>
+
+            <div class="hd" style="margin: 12px -14px 0 -14px">Artifacts</div>
+            <div style="padding: 10px 14px; color: var(--muted); font-size: 12.5px">
+              <div><b>Notebook:</b> lab13_llm_finetune_academic_assistant_colab.ipynb</div>
+              <div><b>Dataset v1:</b> data/dataset_cs_instructions_v1.jsonl</div>
+              <div><b>Dataset v2:</b> data/dataset_cs_instructions_v2.jsonl</div>
+              <div><b>Evidence:</b> eval_*.txt, failures_*.json</div>
+            </div>
+          </div>
+        </aside>
+
+        <article class="card">
+          <div class="hd">IEEE-Style Report</div>
+          <div class="doc">
+            <h2>Abstract</h2>
+            <p>
+              This work fine-tunes a small language model to behave as an academic assistant that explains
+              Computer Science concepts in a strict teaching style. A curated instruction dataset is written
+              manually and used to train LoRA adapters on <span style="font-family: var(--mono)">distilgpt2</span>.
+              The system is evaluated by comparing base vs fine-tuned outputs on the same prompt, and analyzed
+              through targeted failure cases. A manual improvement cycle is attempted via dataset refinement.
+            </p>
+
+            <h2>1. Objective & Constraints</h2>
+            <ul>
+              <li>Improve <b>clarity</b>, <b>style consistency</b>, and reduce <b>overconfident guessing</b>.</li>
+              <li>Use a <b>small model</b> that can be fine-tuned under Colab constraints.</li>
+              <li>Do not submit unmodified AI text as “dataset explanations”; explanations are written manually.</li>
+            </ul>
+
+            <h2>2. Teaching Style Definition</h2>
+            <p><b>Template enforced in every dataset response:</b></p>
+            <ul>
+              <li>Step-by-step explanation</li>
+              <li>Real-life analogy</li>
+              <li>Tiny example (1–3 lines)</li>
+              <li>Common mistake</li>
+              <li>One-line recap</li>
+            </ul>
+
+            <h2>3. Dataset (Manual)</h2>
+            <p>
+              The dataset is stored as JSONL with fields <span style="font-family: var(--mono)">instruction</span> and
+              <span style="font-family: var(--mono)">output</span>. Each output is written to follow the defined teaching style.
+            </p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Dataset</th>
+                  <th>Samples</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>v1</td>
+                  <td>25+</td>
+                  <td>Primary style tuning across CS topics</td>
+                </tr>
+                <tr>
+                  <td>v2</td>
+                  <td>5</td>
+                  <td>Failure-driven improvement (DP state selection + uncertainty handling)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2>4. Model Selection</h2>
+            <p>
+              <b>Model:</b> <span style="font-family: var(--mono)">distilgpt2</span>. Selected for fast iteration and low compute cost.
+              The primary limitation is reduced factual reliability and higher repetition risk compared to larger LLMs.
+            </p>
+
+            <h2>5. Fine-Tuning Strategy (LoRA)</h2>
+            <p>
+              LoRA trains a small number of additional parameters (adapters) while freezing the base model.
+              This reduces memory usage and makes fine-tuning feasible on Colab GPUs while enabling direct
+              comparison between base and adapted behavior.
+            </p>
+
+            <h2>6. Evaluation (Same Prompt: “Explain dynamic programming”)</h2>
+            <div class="note">
+              Evidence is presented as raw model outputs saved in <span style="font-family: var(--mono)">eval_*.txt</span>.
+            </div>
+
+            <h3>6.1 Base Model Output</h3>
+            <pre>### Instruction:
+Explain dynamic programming in a step-by-step, analogy-based teaching style.
+
+### Response:
+This is a great introduction to the following topics, which are covered in this tutorial.
+Note: This is not a complete tutorial.
+### The lesson is a part of the course, so please read the full course description.</pre>
+
+            <h3>6.2 Fine-Tuned Output (v1)</h3>
+            <pre>### Instruction:
+Explain dynamic programming in a step-by-step, analogy-based teaching style.
+
+### Response:
+This post is part of a series that focuses on the language of programming in a way that is not currently possible in the language of programming. It has been translated into English and Spanish.
+The most recent version of this article is available on the Web.</pre>
+
+            <h3>6.3 Fine-Tuned Output (v2)</h3>
+            <pre>### Instruction:
+Explain dynamic programming in a step-by-step, analogy-based teaching style.
+
+### Response:
+"I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going to say that I am going</pre>
+
+            <h3>6.4 Analysis</h3>
+            <ul>
+              <li>
+                <b>Clarity:</b> The base response is generic and does not explain DP. Fine-tuned outputs are off-topic or repetitive.
+              </li>
+              <li>
+                <b>Hallucination/overconfidence:</b> The tuned model does not reliably adopt a cautious stance; it generates “article-like”
+                filler without grounded explanation.
+              </li>
+              <li>
+                <b>Style consistency:</b> The strict template (steps, analogy, example, mistake, recap) is not consistently produced, implying
+                insufficient data/epochs/decoding stability for robust style control.
+              </li>
+            </ul>
+
+            <h2>7. Failure Analysis (2 Cases)</h2>
+            <p>
+              Two prompts were used to expose errors: (i) proof-like requests and (ii) requests for precise external facts.
+            </p>
+            <h3>7.1 Proof request failure</h3>
+            <p>
+              Asking for a proof (e.g., “prove DP always gives optimal answer”) fails because the dataset does not teach formal proof framing
+              (optimal substructure assumptions, state definition, recurrence justification). This is a <b>data coverage</b> gap plus a
+              <b>small-model limitation</b>.
+            </p>
+
+            <h3>7.2 External-fact precision failure</h3>
+            <p>
+              Requests like “best-known TSP algorithm complexity and discovery year” encourage hallucination because the model lacks reliable
+              access to up-to-date citations. Without uncertainty examples, it may guess. This is primarily a <b>model limitation</b> and
+              <b>training-data policy gap</b> (missing “I don’t know” patterns).
+            </p>
+
+            <h2>8. Manual Improvement (One Fix)</h2>
+            <p>
+              The v2 dataset adds examples that explicitly teach (a) DP state selection and (b) hallucination awareness / safer behavior.
+              However, since v2 is only a few samples, it is not sufficient to reliably override unstable generation behavior.
+            </p>
+
+            <h2>9. Key Insights</h2>
+            <ul>
+              <li>With tiny datasets, fine-tuning can amplify repetition and irrelevant patterns instead of enforcing structure.</li>
+              <li>Style control requires <b>more high-signal examples</b>, especially for the evaluation concept (DP here).</li>
+              <li>Safer academic behavior benefits from explicit “uncertainty/ask clarifying question” training examples.</li>
+            </ul>
+
+            <h2>References</h2>
+            <section class="refs">
+              <ol>
+                <li>Hugging Face Transformers documentation.</li>
+                <li>PEFT (Parameter-Efficient Fine-Tuning) documentation.</li>
+                <li>LoRA: Low-Rank Adaptation for efficient fine-tuning.</li>
+                <li>DistilGPT-2 / GPT-2 model documentation and model cards.</li>
+              </ol>
+            </section>
+          </div>
+          <footer>
+            Evidence files: <span style="font-family: var(--mono)">eval_base.txt</span>,
+            <span style="font-family: var(--mono)">eval_finetuned_v1.txt</span>,
+            <span style="font-family: var(--mono)">eval_finetuned_v2.txt</span>,
+            <span style="font-family: var(--mono)">failures_*.json</span>.
+          </footer>
+        </article>
+      </section>
+    </div>
+  </body>
+</html>

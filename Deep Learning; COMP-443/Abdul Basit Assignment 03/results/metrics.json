@@ -1,0 +1,26 @@
+{
+  "runs": [
+    {
+      "model_name": "ResNet50",
+      "image_size": 224,
+      "epochs_head": 5,
+      "epochs_finetune": 5,
+      "train_time_sec": 368.94099438700005,
+      "test_loss": 0.18624146282672882,
+      "test_accuracy": 0.9474999904632568,
+      "params_million": 23.608202,
+      "saved_model_mb": 228.48646926879883
+    },
+    {
+      "model_name": "InceptionV3",
+      "image_size": 299,
+      "epochs_head": 5,
+      "epochs_finetune": 5,
+      "train_time_sec": 407.826776053,
+      "test_loss": 0.26385149359703064,
+      "test_accuracy": 0.9186000227928162,
+      "params_million": 21.823274,
+      "saved_model_mb": 181.03276920318604
+    }
+  ]
+}
